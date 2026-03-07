@@ -12,7 +12,7 @@ export default function Hero() {
             </h1>
             <p className={styles.role}>AI Developer & Researcher</p>
             <p className={styles.affiliation}>
-              M.S. Student, Department of Computer Science and AI<br />
+              M.S. Student, Department of Computer Science<br />
               Jeonbuk National University
             </p>
             <div className={styles.interests}>

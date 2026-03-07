@@ -417,7 +417,7 @@ MUSE-News에서는 그림이 더 명확합니다. 다른 선택적 방법들은 
 
 마지막으로, 근본적으로 다른 두 데이터셋에서 접근법을 검증했습니다. TOFU(합성, 벤치마크 유사)와 MUSE-News(실제, 자연스러운)는 일관된 개선을 보입니다: MUSE-News에서 38.38/54.31 유틸리티 유지를 달성하면서 강한 언러닝을 유지하며, 이는 다른 선택적 방법들의 근처 0 유틸리티와 대비됩니다. 이는 실제 배포를 위한 span 수준 언러닝의 실용성을 입증합니다.
 
-본 연구는 ACL 2026에 제출되었으며 선택적이고 모델 인식적 머신 언러닝 방향의 중요한 진전을 나타냅니다.`,
+본 연구는 선택적이고 모델 인식적 머신 언러닝 방향의 중요한 진전을 나타냅니다.`,
         },
       ],
     },
@@ -493,7 +493,7 @@ Third, we design a framework that generalizes across unlearning algorithms. Our 
 
 Finally, we validate our approach on two fundamentally different datasets. TOFU (synthetic, benchmark-like) and MUSE-News (real, naturalistic) show consistent improvements: on MUSE-News, we achieve 38.38/54.31 utility retention while maintaining strong unlearning, compared to near-zero utility for other selective methods. This demonstrates practical viability of span-level unlearning for real-world deployment.
 
-This work was submitted to ACL 2026 and represents a significant step toward selective, model-aware machine unlearning.`,
+This work represents a significant step toward selective, model-aware machine unlearning.`,
         },
       ],
     },

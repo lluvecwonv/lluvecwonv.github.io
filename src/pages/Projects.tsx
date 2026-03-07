@@ -464,7 +464,7 @@ export default function Projects() {
                       value={form.paper}
                       onChange={(event) => setForm((current) => ({ ...current, paper: event.target.value }))}
                       className={styles.input}
-                      placeholder="ACL 2026"
+                      placeholder="Under Review"
                     />
                   </label>
 

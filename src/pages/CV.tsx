@@ -7,7 +7,7 @@ export default function CV() {
         <header className={styles.header}>
           <h1 className={styles.name}>Chaewon Yoon</h1>
           <div className={styles.info}>
-            <p>Department of Computer Science and Artificial Intelligence</p>
+            <p>Department of Computer Science</p>
             <p>Jeonbuk National University</p>
             <p>567 Baekje-daero, Deokjin-gu, Jeonju-si, Jeonbuk, 54896, Korea</p>
             <div className={styles.contactLinks}>

@@ -52,7 +52,8 @@ export default function Blog() {
               <div>
                 <h1 className={styles.title}>Blog</h1>
                 <p className={styles.subtitle}>
-                  AI, 개발, 연구에 대한 기록과 인사이트를 공유합니다
+                  목적은 AI, 개발, 연구에 대한 기록과 인사이트를 공유하려고 만든 공간.<br />
+                  실사용은 고양이 자랑 공간, 너만없어 고양이.
                 </p>
               </div>
               {isAdmin && (

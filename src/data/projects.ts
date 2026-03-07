@@ -262,7 +262,7 @@ export const projects: Project[] = [
       '외부 모델 없이, 대상 모델의 gradient 신호만으로 언러닝 대상 span을 식별하는 2단계 프레임워크 제안.',
     tags: ['Unlearning', 'Span-level', 'LLM', 'Self-consistency', 'Gradient Analysis'],
     category: 'Trustworthy AI',
-    paper: 'ACL 2026 (Under Review)',
+    paper: 'Under Review',
     paperUrl: 'https://openreview.net/pdf?id=6MDIXIASF0',
     paperTitle: 'Selective Span-Level Unlearning for Large Language Models',
     thumbnail: '/projects/span-1.png',
@@ -305,7 +305,7 @@ export const projects: Project[] = [
       },
       {
         heading: '4-1. Key Insights and Contributions',
-        body: 'This work makes four core contributions. First, we demonstrate that model-intrinsic span identification is possible without external models. By reasoning about the target model\'s own gradient signals, we can identify what the model finds "forgettable," creating a tight coupling between identification and the unlearning algorithm.\n\nSecond, we show that self-consistency is a principled way to lift from token importance to meaningful semantic units. The ablation (Table 3) proves that self-consistency adds +0.05 MU improvement and significantly improves Forget Quality, making it essential for practical span-level unlearning.\n\nThird, we design a framework that generalizes across unlearning algorithms. Our span identification works with GA, NPO, SO-NPO, and KL-variant methods, making it broadly applicable rather than algorithm-specific.\n\nFinally, we validate our approach on two fundamentally different datasets. TOFU (synthetic, benchmark-like) and MUSE-News (real, naturalistic) show consistent improvements: on MUSE-News, we achieve 38.38/54.31 utility retention while maintaining strong unlearning, compared to near-zero utility for other selective methods. This demonstrates practical viability of span-level unlearning for real-world deployment.\n\nThis work was submitted to ACL 2026 and represents a significant step toward selective, model-aware machine unlearning.',
+        body: 'This work makes four core contributions. First, we demonstrate that model-intrinsic span identification is possible without external models. By reasoning about the target model\'s own gradient signals, we can identify what the model finds "forgettable," creating a tight coupling between identification and the unlearning algorithm.\n\nSecond, we show that self-consistency is a principled way to lift from token importance to meaningful semantic units. The ablation (Table 3) proves that self-consistency adds +0.05 MU improvement and significantly improves Forget Quality, making it essential for practical span-level unlearning.\n\nThird, we design a framework that generalizes across unlearning algorithms. Our span identification works with GA, NPO, SO-NPO, and KL-variant methods, making it broadly applicable rather than algorithm-specific.\n\nFinally, we validate our approach on two fundamentally different datasets. TOFU (synthetic, benchmark-like) and MUSE-News (real, naturalistic) show consistent improvements: on MUSE-News, we achieve 38.38/54.31 utility retention while maintaining strong unlearning, compared to near-zero utility for other selective methods. This demonstrates practical viability of span-level unlearning for real-world deployment.\n\nThis work represents a significant step toward selective, model-aware machine unlearning.',
       },
     ],
     techStack: ['Python', 'PyTorch', 'Transformers', 'Hugging Face', 'LLaMA-2 7B'],
