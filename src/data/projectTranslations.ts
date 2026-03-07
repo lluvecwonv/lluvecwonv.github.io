@@ -1,6 +1,7 @@
 export type ProjectLocale = 'ko' | 'en'
 
 export interface LocalizedProjectImageTranslation {
+  src?: string
   caption?: string
 }
 
