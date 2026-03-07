@@ -4,19 +4,13 @@ import InteractiveBackground from '../components/InteractiveBackground'
 import BlogCard from '../components/BlogCard'
 import { useAdminAuth } from '../context/AdminAuthContext'
 import { useBlogTheme } from '../context/BlogThemeContext'
-import { posts, categories } from '../data/posts'
-import type { Category } from '../data/posts'
+import { getPosts, deletePost, categories } from '../data/posts'
+import type { Post, Category } from '../data/posts'
 import styles from './Blog.module.css'
 
 const TravelGlobe = lazy(() => import('../components/TravelGlobe'))
 
 type ViewMode = 'grid' | 'list'
-
-function getHiddenSlugs(): string[] {
-  try {
-    return JSON.parse(localStorage.getItem('hiddenPosts') || '[]')
-  } catch { return [] }
-}
 
 export default function Blog() {
   const navigate = useNavigate()
@@ -24,26 +18,29 @@ export default function Blog() {
   const { isBlogLight, toggleBlogTheme } = useBlogTheme()
   const [activeCategory, setActiveCategory] = useState<Category>('전체')
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
-  const [hiddenSlugs, setHiddenSlugs] = useState<string[]>(getHiddenSlugs)
+  const [posts, setPosts] = useState<Post[]>([])
   const [toast, setToast] = useState('')
 
   useEffect(() => {
     window.scrollTo(0, 0)
+    getPosts().then(setPosts)
   }, [])
 
-  const handleDelete = (slug: string, title: string) => {
+  const handleDelete = async (slug: string, title: string) => {
     if (!confirm(`"${title}" 글을 삭제하시겠습니까?`)) return
-    const next = [...hiddenSlugs, slug]
-    setHiddenSlugs(next)
-    localStorage.setItem('hiddenPosts', JSON.stringify(next))
-    setToast(`삭제됨 — 파일도 삭제하려면: src/posts/${slug}.md`)
-    setTimeout(() => setToast(''), 5000)
+    const ok = await deletePost(slug)
+    if (ok) {
+      setPosts((prev) => prev.filter((p) => p.slug !== slug))
+      setToast(`"${title}" 삭제됨`)
+      setTimeout(() => setToast(''), 3000)
+    } else {
+      alert('삭제에 실패했어요.')
+    }
   }
 
-  const visiblePosts = posts.filter((p) => !hiddenSlugs.includes(p.slug))
   const filteredPosts = activeCategory === '전체'
-    ? visiblePosts
-    : visiblePosts.filter((p) => p.category === activeCategory)
+    ? posts
+    : posts.filter((p) => p.category === activeCategory)
 
   return (
     <>
@@ -131,11 +128,6 @@ export default function Blog() {
             </Suspense>
           ) : activeCategory === '전체' ? (
             <div className={styles.splitLayout}>
-              <div className={styles.splitGlobe}>
-                <Suspense fallback={<p className={styles.empty}>지구본 로딩중...</p>}>
-                  <TravelGlobe compact />
-                </Suspense>
-              </div>
               <div className={styles.splitPosts}>
                 <div className={viewMode === 'grid' ? styles.grid : styles.list}>
                   {filteredPosts.map((post, i) => (
@@ -148,6 +140,11 @@ export default function Blog() {
                     />
                   ))}
                 </div>
+              </div>
+              <div className={styles.splitGlobe}>
+                <Suspense fallback={<p className={styles.empty}>지구본 로딩중...</p>}>
+                  <TravelGlobe compact />
+                </Suspense>
               </div>
             </div>
           ) : (
@@ -165,18 +162,6 @@ export default function Blog() {
                 <p className={styles.empty}>아직 이 카테고리에 글이 없습니다.</p>
               )}
             </div>
-          )}
-
-          {isAdmin && hiddenSlugs.length > 0 && (
-            <button
-              className={styles.restoreBtn}
-              onClick={() => {
-                setHiddenSlugs([])
-                localStorage.removeItem('hiddenPosts')
-              }}
-            >
-              삭제된 글 {hiddenSlugs.length}개 복원
-            </button>
           )}
         </div>
 

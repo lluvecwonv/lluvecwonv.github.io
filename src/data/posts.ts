@@ -1,3 +1,5 @@
+import { supabase } from '../lib/supabase'
+
 export type Category = '전체' | 'AI/개발' | '연구노트' | '인사이트' | '여행' | '일상'
 
 export const categories: Category[] = ['전체', 'AI/개발', '연구노트', '인사이트', '여행', '일상']
@@ -12,40 +14,90 @@ export interface Post {
   content: string
 }
 
-function parseFrontmatter(raw: string): { meta: Record<string, string>; content: string } {
-  const match = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/)
-  if (!match) return { meta: {}, content: raw }
+interface PostRow {
+  slug: string
+  title: string
+  date: string
+  summary: string
+  tags: string[]
+  category: string
+  content: string
+  published: boolean
+}
 
-  const meta: Record<string, string> = {}
-  for (const line of match[1].split('\n')) {
-    const idx = line.indexOf(':')
-    if (idx === -1) continue
-    const key = line.slice(0, idx).trim()
-    const val = line.slice(idx + 1).trim()
-    meta[key] = val
+function rowToPost(row: PostRow): Post {
+  return {
+    slug: row.slug,
+    title: row.title,
+    date: row.date,
+    summary: row.summary,
+    tags: row.tags ?? [],
+    category: (row.category || '일상') as Category,
+    content: row.content,
   }
-  return { meta, content: match[2].trim() }
 }
 
-function parseTags(val: string): string[] {
-  const inner = val.replace(/^\[/, '').replace(/\]$/, '')
-  return inner.split(',').map((s) => s.trim()).filter(Boolean)
+export async function getPosts(): Promise<Post[]> {
+  const { data, error } = await supabase
+    .from('posts')
+    .select('*')
+    .eq('published', true)
+    .order('date', { ascending: false })
+
+  if (error) {
+    console.error('Failed to fetch posts:', error)
+    return []
+  }
+
+  return (data as PostRow[]).map(rowToPost)
 }
 
-const mdFiles = import.meta.glob('../posts/*.md', { eager: true, query: '?raw', import: 'default' }) as Record<string, string>
+export async function getPost(slug: string): Promise<Post | null> {
+  const { data, error } = await supabase
+    .from('posts')
+    .select('*')
+    .eq('slug', slug)
+    .eq('published', true)
+    .single()
 
-export const posts: Post[] = Object.entries(mdFiles)
-  .map(([path, raw]) => {
-    const slug = path.split('/').pop()!.replace('.md', '')
-    const { meta, content } = parseFrontmatter(raw)
-    return {
-      slug,
-      title: meta.title || slug,
-      date: meta.date || '',
-      summary: meta.summary || '',
-      tags: parseTags(meta.tags || ''),
-      category: (meta.category || '일상') as Category,
-      content,
-    }
-  })
-  .sort((a, b) => b.date.localeCompare(a.date))
+  if (error) {
+    console.error('Failed to fetch post:', error)
+    return null
+  }
+
+  return rowToPost(data as PostRow)
+}
+
+export async function createPost(post: Post): Promise<boolean> {
+  const { error } = await supabase
+    .from('posts')
+    .insert({
+      slug: post.slug,
+      title: post.title,
+      date: post.date,
+      summary: post.summary,
+      tags: post.tags,
+      category: post.category,
+      content: post.content,
+      published: true,
+    })
+
+  if (error) {
+    console.error('Failed to create post:', error)
+    return false
+  }
+  return true
+}
+
+export async function deletePost(slug: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('posts')
+    .delete()
+    .eq('slug', slug)
+
+  if (error) {
+    console.error('Failed to delete post:', error)
+    return false
+  }
+  return true
+}

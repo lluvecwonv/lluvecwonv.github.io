@@ -1,20 +1,41 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import ReactMarkdown from 'react-markdown'
 import InteractiveBackground from '../components/InteractiveBackground'
 import { useBlogTheme } from '../context/BlogThemeContext'
-import { posts } from '../data/posts'
+import { getPost } from '../data/posts'
+import type { Post } from '../data/posts'
 import styles from './BlogPost.module.css'
 
 export default function BlogPost() {
   const { slug } = useParams()
   const { isBlogLight } = useBlogTheme()
-  const post = posts.find((p) => p.slug === slug)
+  const [post, setPost] = useState<Post | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     window.scrollTo(0, 0)
-  }, [])
+    if (slug) {
+      getPost(slug).then((p) => {
+        setPost(p)
+        setLoading(false)
+      })
+    }
+  }, [slug])
+
+  if (loading) {
+    return (
+      <>
+        {!isBlogLight && <InteractiveBackground />}
+        <main className={`${styles.main} ${isBlogLight ? styles.light : ''}`}>
+          <div className={styles.container}>
+            <p>로딩중...</p>
+          </div>
+        </main>
+      </>
+    )
+  }
 
   if (!post) {
     return (

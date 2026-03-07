@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import InteractiveBackground from '../components/InteractiveBackground'
 import { useBlogTheme } from '../context/BlogThemeContext'
-import { categories } from '../data/posts'
+import { createPost, categories } from '../data/posts'
 import type { Category } from '../data/posts'
 import styles from './BlogWrite.module.css'
 
@@ -60,7 +60,7 @@ export default function BlogWrite() {
   const [title, setTitle] = useState('')
   const [category, setCategory] = useState<Category>('AI/개발')
   const [tags, setTags] = useState('')
-  const [copied, setCopied] = useState(false)
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -99,23 +99,6 @@ export default function BlogWrite() {
     }
   }
 
-  const getMarkdown = useCallback(() => {
-    const html = editorRef.current?.innerHTML || ''
-    const md = htmlToMarkdown(html)
-    const today = new Date().toISOString().split('T')[0]
-    const summary = editorRef.current?.textContent?.trim().slice(0, 100) || ''
-
-    return `---
-title: ${title}
-date: ${today}
-summary: ${summary}
-tags: [${tags}]
-category: ${category}
----
-
-${md}`
-  }, [title, tags, category])
-
   const slug = title
     .toLowerCase()
     .replace(/[^a-z0-9가-힣\s-]/g, '')
@@ -123,20 +106,40 @@ ${md}`
     .replace(/-+/g, '-')
     .trim() || 'untitled'
 
-  const handleDownload = () => {
-    const blob = new Blob([getMarkdown()], { type: 'text/markdown' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${slug}.md`
-    a.click()
-    URL.revokeObjectURL(url)
-  }
+  const handlePublish = async () => {
+    if (!title.trim()) {
+      alert('제목을 입력해주세요.')
+      return
+    }
 
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(getMarkdown())
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    const html = editorRef.current?.innerHTML || ''
+    const content = htmlToMarkdown(html)
+    if (!content.trim()) {
+      alert('내용을 입력해주세요.')
+      return
+    }
+
+    const today = new Date().toISOString().split('T')[0]
+    const summary = editorRef.current?.textContent?.trim().slice(0, 100) || ''
+    const tagList = tags.split(',').map((t) => t.trim()).filter(Boolean)
+
+    setSaving(true)
+    const ok = await createPost({
+      slug,
+      title,
+      date: today,
+      summary,
+      tags: tagList,
+      category,
+      content,
+    })
+    setSaving(false)
+
+    if (ok) {
+      navigate('/blog')
+    } else {
+      alert('글 저장에 실패했어요. 다시 시도해주세요.')
+    }
   }
 
   const writableCategories = categories.filter((c) => c !== '전체')
@@ -280,15 +283,13 @@ ${md}`
             />
 
             <div className={styles.footer}>
-              <p className={styles.info}>
-                파일명: <code>src/posts/{slug}.md</code>
-              </p>
               <div className={styles.actions}>
-                <button onClick={handleDownload} className={styles.downloadBtn}>
-                  .md 다운로드
-                </button>
-                <button onClick={handleCopy} className={styles.copyBtn}>
-                  {copied ? '복사됨!' : '복사'}
+                <button
+                  onClick={handlePublish}
+                  className={styles.downloadBtn}
+                  disabled={saving}
+                >
+                  {saving ? '저장 중...' : '발행하기'}
                 </button>
               </div>
             </div>
