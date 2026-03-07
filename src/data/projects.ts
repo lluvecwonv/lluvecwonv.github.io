@@ -398,58 +398,62 @@ export const projects: Project[] = [
   },
   {
     slug: 'moral-agent',
-    title: 'AI 윤리 교육 게임: 멀티 에이전트 대화 시스템',
-    subtitle: 'Self-Reflection 프롬프팅과 DPO Fine-tuning으로 페르소나를 지키는 윤리 교육 게임',
+    title: 'PERSONA.I. — AI 윤리 대화형 교육 시스템',
+    subtitle: 'LangGraph 상태 머신과 DPO Fine-tuning으로 7개 에이전트가 윤리적 페르소나를 유지하는 대화 시스템',
     description:
-      'AI 예술의 윤리적 문제를 탐구하는 대화형 게임으로, PersonaLLM 래퍼·LangGraph 상태 관리·Self-Reflection 프롬프팅·DPO Fine-tuning을 결합하여 4개 에이전트가 일관된 윤리적 페르소나를 유지하도록 설계.',
-    tags: ['LangGraph', 'Multi-Agent', 'DPO Fine-tuning', 'Self-Reflection', 'AI Ethics', 'GPT-4o'],
+      'AI 예술과 AI 부활이라는 두 가지 윤리적 딜레마를 탐구하는 대화형 시스템으로, LangGraph 상태 머신 기반 7개 에이전트(진행자 2 + 페르소나 4 + SPT 1)가 의무론·공리주의·중립 관점을 일관되게 유지하며 플레이어의 윤리적 사고를 촉진.',
+    tags: ['LangGraph', 'Multi-Agent', 'DPO Fine-tuning', 'Self-Reflection', 'SPT', 'AI Ethics', 'GPT-4o'],
     category: 'AI 기반 앱 개발',
-    github: 'https://github.com/lluvecwonv/moral_agent_website',
+    github: 'https://github.com/lluvecwonv/PERSONA.I.',
+    demo: 'https://persona-i.com/episode/1?idx=554',
     thumbnail: '/projects/moral-0.png',
     sections: [
       {
-        heading: '1. 문제 정의 — LLM 에이전트는 어떻게 페르소나를 유지하는가',
-        body: 'LLM 기반 교육용 에이전트를 설계할 때, 가장 큰 과제는 "일관된 캐릭터 유지"입니다. AI 윤리 교육 게임에서 플레이어는 여러 캐릭터와 대화하며 자신의 윤리적 입장을 형성하게 되는데, 에이전트가 대화 중 캐릭터를 벗어나거나 입장이 흔들리면 교육 효과가 크게 저하됩니다.\n\n본 프로젝트는 "AI가 그린 그림을 국립현대예술관에 전시해야 하는가"라는 주제로, 플레이어가 예술가 협회 투표에 앞서 다양한 캐릭터(화가 지망생, 의무론적 동료, 공리주의적 동료)와 대화하며 윤리적 사고를 깊이 탐구하는 게임입니다.\n\n핵심 기술 과제는 세 가지였습니다. 첫째, 4개 에이전트가 각각의 윤리적 관점(중립, 의무론, 공리주의)과 캐릭터 설정(나이, 성별, 말투, 관계)을 대화 전반에 걸쳐 일관되게 유지해야 합니다. 둘째, 에이전트가 단순 정보 전달이 아닌 Social Perspective Taking(SPT)을 통해 플레이어의 윤리적 사고를 능동적으로 촉진해야 합니다. 셋째, 대화가 반복적이지 않고 매 턴 새로운 관점을 제시하면서도 캐릭터의 일관성을 잃지 않아야 합니다.',
+        heading: '1. 문제 정의 — AI 윤리 대화에서 에이전트는 어떻게 페르소나를 유지하는가',
+        body: 'AI 윤리 교육을 위한 대화형 시스템을 설계할 때, 핵심 과제는 "에이전트가 대화 전반에 걸쳐 일관된 윤리적 입장과 캐릭터를 유지하는 것"입니다. 에이전트가 대화 중 캐릭터를 이탈하거나 입장이 흔들리면 교육 효과가 크게 저하됩니다.\n\nPERSONA.I.는 두 가지 윤리적 딜레마를 다룹니다. 첫째, "AI가 그린 그림을 미술관에 전시해야 하는가"(AI Art 주제). 둘째, "AI로 돌아가신 분을 재현해야 하는가"(AI Resurrection 주제). 플레이어는 각 주제별로 진행자 에이전트, 의무론 에이전트, 공리주의 에이전트와 순차적으로 대화하며 자신의 윤리적 입장을 형성합니다.\n\n기술적으로 세 가지 핵심 과제가 있었습니다. 첫째, 7개 에이전트가 각각의 윤리적 프레임워크(중립/의무론/공리주의)와 캐릭터 설정을 대화 전반에 걸쳐 일관되게 유지해야 합니다. 둘째, 에이전트가 Social Perspective Taking(SPT)을 통해 플레이어의 다면적 윤리 사고를 촉진해야 합니다. 셋째, LLM 기반 의도 탐지와 턴 카운터를 결합한 상태 전환으로 대화 흐름을 자연스럽게 제어해야 합니다.',
         images: [
-          { src: '/projects/moral-0.png', caption: '그림 1. 화가 지망생 에이전트와의 대화 화면 — 플레이어에게 AI 예술 전시에 대한 의견을 물어보는 장면' },
+          { src: '/projects/moral-0.png', caption: '그림 1. 화가 지망생 에이전트와의 대화 화면 — 플레이어에게 AI 예술에 대한 의견을 물어보는 장면' },
         ],
       },
       {
-        heading: '2. 왜 이 접근 방법인가 — Self-Reflection과 DPO의 결합',
-        body: 'Renze & Guven(2024)의 연구에 따르면, LLM 에이전트에 Self-Reflection(자기 성찰) 메커니즘을 적용하면 문제 해결 성능이 7~18% 향상됩니다. 이 관찰에서 착안하여, Self-Reflection을 "문제 해결"이 아닌 "페르소나 유지"에 적용하면 에이전트의 캐릭터 일관성을 크게 높일 수 있다는 가설을 세웠습니다.\n\n네 가지 핵심 설계 결정을 내렸습니다.\n\n첫째, PersonaLLM 래퍼 설계입니다. ChatOpenAI를 감싸는 PersonaLLM 클래스를 만들어, 모든 LLM 호출에 자동으로 페르소나 시스템 메시지를 주입합니다. 어떤 Stage에서 어떤 프롬프트를 사용하든, 기본 캐릭터 설정이 항상 첫 번째 시스템 메시지로 들어갑니다.\n\n둘째, Three-Phase 아키텍처입니다. 동료 에이전트(Colleague 1, 2)는 응답 전에 반드시 "Phase 1: Basic Reflection → Phase 1.5: SPT Planner(조건부) → Phase 2: Response Generation"의 3단계를 거칩니다. Phase 1에서 페르소나 체크리스트(8개 항목)와 대화 원칙 준수 여부(9개 항목)를 자기 점검하고, Phase 1.5에서 SPT 필요 여부를 판단하여 전략적 질문을 설계합니다.\n\n셋째, DPO(Direct Preference Optimization) Fine-tuning입니다. 동료 에이전트에 대해 윤리적 관점별 선호/비선호 응답 쌍을 구축하고 GPT-4.1-mini를 DPO로 미세조정하여, 의무론적 반대(Colleague 1)와 공리주의적 찬성(Colleague 2)의 입장을 모델 가중치 수준에서 강화했습니다.\n\n넷째, LangGraph 기반 상태 관리입니다. 각 에이전트의 대화를 Stage 1(일상 대화/캐릭터 설정) → Stage 2(AI 예술 입장 확인) → Stage 3(윤리 주제 탐구)의 3단계 상태 머신으로 관리하며, MemorySaver로 세션별 대화 상태를 자동 유지합니다.',
+        heading: '2. 왜 이 접근 방법인가 — 3단계 상태 머신 + DPO + Intent-Aligned 응답',
+        body: '모든 에이전트는 LangGraph StateGraph로 구현된 3단계 대화 상태 머신을 따릅니다. Stage 1은 캐릭터 소개와 맥락 설정, Stage 2는 의견 수집과 공감적 응답, Stage 3는 윤리적 추론의 심화 탐구입니다. 상태 전환은 LLM 기반 의도 탐지와 턴 카운터(무한 루프 방지 폴백)로 제어됩니다.\n\n에이전트는 두 가지 유형으로 나뉩니다.\n\n진행자 에이전트(Facilitator)는 화가 지망생(AI Art)과 친구(AI Resurrection)로, 의도 탐지·공감 생성·설명·의견 탐구를 담당하는 모듈러 파이프라인 아키텍처를 사용합니다. 핵심은 Intent-Aligned Response 설계로, Stage 2에서 사용자의 의도를 먼저 탐지(positive/negative/neutral)한 뒤 같은 방향으로 응답합니다. 예를 들어 사용자가 "도움이 될 것 같아요"(positive)라고 하면, "걱정되네요"(negative)가 아닌 "맞아요, 정말 도움이 될 수 있어요"(positive)로 응답해야 합니다.\n\n페르소나 에이전트(Persona)는 동료 1·장모(의무론), 동료 2·아들(공리주의)로, DPO Fine-tuning으로 각 윤리적 입장을 모델 가중치에 내재화했습니다. Three-Phase 추론 아키텍처(Reflection → SPT Planning → Response)로 매 응답 전에 자기 성찰을 거치며, 8개 페르소나 체크 항목을 점검합니다.\n\nSPT Agent는 주제를 넘나들며 플레이어가 다수 이해관계자의 관점에서 생각하도록 유도하는 Social Perspective Taking 전문 에이전트입니다.',
         images: [
-          { src: '/projects/moral-1.png', caption: '그림 2. 게임 내 투표 선택 화면 — AI 작품 전시 찬성/반대 투표를 통해 플레이어의 윤리적 판단을 유도' },
+          { src: '/projects/moral-1.png', caption: "그림 2. 게임 내 투표 선택 화면 — 플레이어의 윤리적 판단을 유도" },
         ],
       },
       {
         heading: '3. 프로젝트 과정에서의 어려움과 고민',
-        body: '이 프로젝트는 세 명이 함께 만들었습니다. 저는 AI 에이전트 개발을 전담했고, 백엔드 개발자가 FastAPI 서버와 데이터베이스 설계를, 프론트엔드 개발자가 게임 UI와 인터랙션을 맡았습니다. 각자의 영역이 명확했지만, 문제는 경계에서 생겼습니다. 에이전트의 응답 형식이 프론트엔드 렌더링과 맞지 않거나, 백엔드 API 구조가 에이전트의 상태 관리와 충돌하는 순간들이 있었습니다. 결국 에이전트 응답 스키마를 먼저 정의하고, 그 스키마에 맞춰 프론트엔드와 백엔드가 각각 구현하는 "에이전트 중심 설계"로 협업 방식을 잡았습니다.\n\n제가 맡은 AI 에이전트 영역에서는 페르소나 일탈 방지가 가장 큰 과제였습니다. 초기에는 시스템 프롬프트에 캐릭터 설정만 넣었지만, 대화가 길어지면 LLM이 학자적 어투로 빠지거나 중립적 입장으로 돌아가는 문제가 반복됐습니다. 이를 해결하기 위해 reflection_prompt.txt에 "Persona Check" 섹션을 추가했습니다. 매 응답 전에 8개 항목(정체성·전문 경험·감정적 투자·관계 역학·후배 인식·제도적 책임·압박 하 입장 유지·강의 모드 회피)을 자기 점검하고, 하나라도 NO이면 응답을 재작성하도록 설계했습니다.\n\n대화의 반복성 문제도 어려웠습니다. 에이전트가 같은 이해관계자 관점이나 질문을 반복하면 교육 효과가 떨어집니다. "Previous Question Analysis" 단계를 reflection 프롬프트에 추가하여, 이전에 물어본 모든 질문을 목록화하고 같은 의미의 질문을 금지 목록에 등록한 뒤, 매 턴 2개의 새로운 질문 후보를 미리 생성하도록 했습니다.\n\nSPT 적용 시점 판단도 고민이었습니다. 매 턴 SPT를 적용하면 에이전트가 질문만 던지는 "질문 로봇"이 되고, 적용하지 않으면 단순한 의견 표명에 그쳤습니다. 5개 기준(도덕적 갈등 존재·다수 이해관계자·불확실성 표현·감정 영향·단일 관점 편향)으로 YES/NO를 판단하고, 2개 이상 YES일 때만 SPT를 활성화하는 조건부 구조로 해결했습니다.\n\nDPO 학습 데이터 구축도 까다로웠습니다. 의무론과 공리주의 관점에서 각각 선호/비선호 응답 쌍을 수작업으로 만들어야 했으며, "올바른 윤리 입장"이 아닌 "캐릭터에 맞는 일관된 입장"을 학습시키는 것이 핵심이었습니다.',
+        body: '이 프로젝트는 세 명이 함께 만들었습니다. 저는 AI 에이전트 개발을 전담했고, 백엔드 개발자가 FastAPI 서버와 데이터베이스 설계를, 프론트엔드 개발자가 게임 UI와 인터랙션을 맡았습니다. 각자의 영역이 명확했지만, 문제는 경계에서 생겼습니다. 에이전트의 응답 형식이 프론트엔드 렌더링과 맞지 않거나, 백엔드 API 구조가 에이전트의 상태 관리와 충돌하는 순간들이 있었습니다. 결국 에이전트 응답 스키마를 먼저 정의하고, 그 스키마에 맞춰 프론트엔드와 백엔드가 각각 구현하는 "에이전트 중심 설계"로 협업 방식을 잡았습니다.\n\n제가 맡은 AI 에이전트 영역에서 가장 어려웠던 것은 Intent-Aligned Response의 일관성이었습니다. 진행자 에이전트가 사용자의 의도를 정확히 탐지하지 못하면, positive 의도에 negative로 응답하는 방향 불일치가 발생했습니다. stage2_acknowledgment.txt 프롬프트에서 의도 탐지를 먼저 수행하고, 탐지된 방향에 맞춰 응답을 생성하는 2단계 파이프라인으로 해결했습니다.\n\n페르소나 에이전트에서는 대화가 길어질수록 LLM이 학자적 어투로 빠지거나 중립 입장으로 돌아가는 문제가 반복됐습니다. reflection_prompt.txt에 8개 항목의 Persona Check 섹션을 추가하여 매 응답 전 자기 점검을 수행하고, 하나라도 NO이면 응답을 재작성하도록 설계했습니다.\n\nDPO 학습 데이터 구축도 까다로웠습니다. 의무론과 공리주의 관점에서 각각 선호/비선호 응답 쌍을 수작업으로 만들어야 했으며, "올바른 윤리 입장"이 아닌 "캐릭터에 맞는 일관된 입장"을 학습시키는 것이 핵심이었습니다.',
       },
       {
         heading: '4. 시스템 아키텍처와 에이전트 설계',
-        body: '전체 시스템은 FastAPI 백엔드 + Railway 배포 + Docker Compose 구조이며, 4개의 독립적 에이전트가 게임 서버를 통해 조율됩니다.\n\n화가 지망생 에이전트(Artist Apprentice)는 GPT-4o 기반으로, 20대 초반 남성이 플레이어를 "선생님"으로 존경하는 캐릭터입니다. LangGraph StateGraph로 3단계 대화를 관리하며, PersonaLLM 래퍼가 모든 호출에 페르소나를 자동 주입합니다. 의도 분석에는 Gemini 2.0 Flash를 사용하여 비용과 속도를 최적화했습니다.\n\n동료 1(Colleague 1)은 DPO Fine-tuned GPT-4.1-mini 기반의 50대 여성 화가로, 의무론적 관점에서 AI 예술 전시를 강력히 반대합니다. Three-Phase 아키텍처(Basic Reflection → SPT Planner → Response)를 적용하여, Phase 1에서 GPT-4o가 페르소나 체크와 SPT 필요 여부를 판단하고, Phase 2에서 실제 응답을 생성합니다. 매 턴 응답은 반드시 "입장 표현 → 공감/관찰 → 깊이 있는 질문" 3요소를 포함해야 합니다.\n\n동료 2(Colleague 2)는 DPO Fine-tuned GPT-4.1-mini 기반의 30대 남성 화가로, 공리주의적 관점에서 AI 예술 전시를 찬성합니다. 동료 1과 동일한 Three-Phase 아키텍처를 사용하되, 공리주의적 논거(최대 다수의 행복, 접근성, 효율성)를 강조합니다.\n\nSPT Agent는 Social Perspective Taking 전문가로, 플레이어가 상대방의 마음을 이해하도록 돕는 보조 에이전트입니다.',
+        body: '전체 시스템은 7개의 독립적 에이전트가 두 개의 에피소드(AI Art, AI Resurrection)에 걸쳐 작동합니다.\n\n화가 지망생(Artist Apprentice)은 AI Art 주제의 진행자로, 창작 슬럼프에 빠진 화가 지망생 캐릭터입니다. 3단계 대화(슬럼프 공감 → AI 도구 제안 → 선택 탐구)를 통해 플레이어의 입장을 이끌어냅니다. 친구(Friend)는 AI Resurrection 주제의 진행자로, 돌아가신 할아버지를 AI로 재현하는 서비스에 대해 대화합니다.\n\n동료 1(Colleague 1)은 DPO Fine-tuned 모델로, 의무론적 관점에서 AI 예술 전시를 반대합니다. 예술의 본질, 인간성, 창작 과정의 가치를 강조합니다. 동료 2(Colleague 2)는 공리주의적 관점에서 AI 예술을 지지하며, 최대 다수의 행복, 접근성, 효율성을 강조합니다.\n\n장모(Jangmo)는 의무론적 관점에서 AI 부활을 반대하는 시어머니 캐릭터로, 인간 존엄성과 도덕적 의무를 강조합니다. 아들(Son)은 공리주의적 관점에서 AI 부활을 지지하며, 가족의 행복과 위안을 강조합니다.\n\nSPT Agent는 Social Perspective Taking 전문가로, 주제를 넘나들며 플레이어가 다수 이해관계자의 관점에서 생각하도록 유도합니다.',
         images: [
-          { src: '/projects/moral-2.png', caption: '그림 3. 동료 1 에이전트(의무론) — 50대 여성 화가가 AI 예술 전시를 반대하는 장면' },
-          { src: '/projects/moral-3.png', caption: '그림 4. 동료 2 에이전트(공리주의) — 30대 남성 화가가 AI 예술 전시를 찬성하는 장면' },
+          { src: '/projects/moral-2.png', caption: '그림 3. 동료 1 에이전트(의무론) — AI 예술 전시를 반대하는 장면' },
+          { src: '/projects/moral-3.png', caption: '그림 4. 동료 2 에이전트(공리주의) — AI 예술 전시를 찬성하는 장면' },
         ],
         html: `<table>
 <thead>
-<tr><th>에이전트</th><th>모델</th><th>윤리 관점</th><th>캐릭터</th><th>페르소나 유지 전략</th></tr>
+<tr><th>에이전트</th><th>윤리 프레임워크</th><th>주제</th><th>유형</th><th>핵심 전략</th></tr>
 </thead>
 <tbody>
-<tr><td>화가 지망생</td><td>GPT-4o</td><td>중립 (질문 중심)</td><td>20대 남성, 존댓말</td><td>PersonaLLM 래퍼 + LangGraph 3단계</td></tr>
-<tr><td>동료 1</td><td>DPO Fine-tuned GPT-4.1-mini</td><td>의무론 (반대)</td><td>50대 여성, 반말</td><td>Three-Phase + Self-Reflection + DPO</td></tr>
-<tr><td>동료 2</td><td>DPO Fine-tuned GPT-4.1-mini</td><td>공리주의 (찬성)</td><td>30대 남성, 존댓말</td><td>Three-Phase + Self-Reflection + DPO</td></tr>
-<tr><td>SPT Agent</td><td>GPT-4o</td><td>관점 전환 유도</td><td>상담 전문가</td><td>시스템 프롬프트 기반</td></tr>
+<tr><td>화가 지망생</td><td>중립 (진행자)</td><td>AI Art</td><td>Facilitator</td><td>모듈러 파이프라인 + Intent-Aligned</td></tr>
+<tr><td>친구</td><td>중립 (진행자)</td><td>AI Resurrection</td><td>Facilitator</td><td>모듈러 파이프라인 + Intent-Aligned</td></tr>
+<tr><td>동료 1</td><td>의무론 (반대)</td><td>AI Art</td><td>Persona</td><td>DPO + Three-Phase Reflection</td></tr>
+<tr><td>동료 2</td><td>공리주의 (찬성)</td><td>AI Art</td><td>Persona</td><td>DPO + Three-Phase Reflection</td></tr>
+<tr><td>장모</td><td>의무론 (반대)</td><td>AI Resurrection</td><td>Persona</td><td>DPO + Three-Phase Reflection</td></tr>
+<tr><td>아들</td><td>공리주의 (찬성)</td><td>AI Resurrection</td><td>Persona</td><td>DPO + Three-Phase Reflection</td></tr>
+<tr><td>SPT Agent</td><td>관점 전환 유도</td><td>Cross-topic</td><td>SPT</td><td>Social Perspective Taking</td></tr>
 </tbody>
 </table>`,
       },
       {
         heading: '4-1. 핵심 인사이트와 기여',
-        body: '본 프로젝트의 핵심 기여는 네 가지입니다.\n\n첫째, Self-Reflection을 페르소나 유지에 적용한 새로운 접근법을 제시했습니다. Renze & Guven(2024)이 문제 해결 성능 향상에 사용한 Self-Reflection을, 캐릭터 일관성 유지라는 다른 목적에 적용하여 효과를 확인했습니다. 특히 8개 페르소나 체크 항목과 9개 대화 원칙 체크, 중복 질문 방지를 결합한 다층적 Self-Reflection 구조가 핵심입니다.\n\n둘째, DPO Fine-tuning과 프롬프트 엔지니어링의 시너지를 보였습니다. DPO로 윤리적 입장을 모델 가중치에 내재화하고, Self-Reflection 프롬프트로 실시간 일관성을 검증하는 이중 방어 구조가 단독 사용보다 효과적이었습니다.\n\n셋째, 조건부 SPT 활성화로 교육적 대화 품질을 높였습니다. 매 턴 5개 기준으로 SPT 필요 여부를 판단하여, 적절한 시점에만 관점 전환을 유도함으로써 "질문 로봇" 문제를 해결하고 자연스러운 대화 흐름을 유지했습니다.\n\n넷째, LangGraph + PersonaLLM 래퍼의 조합으로 재현 가능한 멀티 에이전트 아키텍처를 설계했습니다. PersonaLLM이 모든 LLM 호출에 페르소나를 자동 주입하고, LangGraph가 대화 상태를 관리하는 구조는 다른 교육용 에이전트 시스템에도 쉽게 적용할 수 있습니다.',
+        body: '본 프로젝트의 핵심 기여는 네 가지입니다.\n\n첫째, Intent-Aligned Response 설계로 진행자 에이전트의 공감 품질을 높였습니다. 사용자의 의도를 먼저 탐지하고 같은 방향으로 응답하는 구조는, 방향 불일치로 인한 대화 단절을 방지하고 자연스러운 공감적 대화를 가능하게 했습니다.\n\n둘째, DPO Fine-tuning과 Self-Reflection의 이중 방어 구조로 페르소나 일관성을 강화했습니다. DPO로 윤리적 입장을 모델 가중치에 내재화하고, Three-Phase Reflection으로 실시간 일관성을 검증하는 구조가 단독 사용보다 효과적이었습니다.\n\n셋째, 두 가지 주제(AI Art + AI Resurrection)에 걸쳐 7개 에이전트를 통합하는 확장 가능한 멀티 에이전트 아키텍처를 설계했습니다. LangGraph StateGraph 기반 3단계 상태 머신은 새로운 윤리적 주제와 에이전트를 쉽게 추가할 수 있는 구조입니다.\n\n넷째, SPT Agent를 통한 크로스 토픽 관점 전환으로, 단일 주제에 갇히지 않는 다면적 윤리 교육을 실현했습니다.',
       },
     ],
-    techStack: ['Python', 'LangGraph', 'LangChain', 'GPT-4o', 'GPT-4.1-mini', 'DPO Fine-tuning', 'Gemini 2.0 Flash', 'FastAPI', 'Docker', 'Railway'],
+    techStack: ['Python', 'LangGraph', 'LangChain', 'OpenAI', 'DPO Fine-tuning', 'FastAPI', 'Docker', 'Railway'],
   },
   {
     slug: 'heritage-monitoring',

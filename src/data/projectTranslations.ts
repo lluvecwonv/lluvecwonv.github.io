@@ -24,7 +24,7 @@ export const projectTitleEnglishGlossary: Record<string, string> = {
   memorization: 'LLM Memorization Measurement Study',
   'qa-unlearning': 'Large Language Model Unlearning based on Question Answering',
   'heritage-monitoring': 'National Heritage Monitoring System',
-  'moral-agent': 'AI Ethics Education Game: Multi-Agent Dialogue System',
+  'moral-agent': 'PERSONA.I. — AI Ethics Conversational Education System',
 }
 
 export const projectTranslations: Record<string, Partial<Record<ProjectLocale, LocalizedProjectTranslation>>> = {
@@ -500,74 +500,73 @@ This work was submitted to ACL 2026 and represents a significant step toward sel
   },
   'moral-agent': {
     en: {
-      subtitle: 'Maintaining Personas via Self-Reflection Prompting and DPO Fine-tuning in an Ethics Education Game',
+      subtitle: 'A Conversational System Where 7 Agents Maintain Ethical Personas via LangGraph State Machines and DPO Fine-tuning',
       description:
-        'An interactive game exploring ethical issues in AI art, combining PersonaLLM wrapper, LangGraph state management, Self-Reflection prompting, and DPO Fine-tuning so that 4 agents maintain consistent ethical personas.',
+        'A conversational system exploring two ethical dilemmas — AI Art and AI Resurrection — where 7 LangGraph-based agents (2 Facilitators + 4 Persona + 1 SPT) consistently maintain deontological, utilitarian, and neutral perspectives to promote ethical reasoning.',
       sections: [
         {
-          heading: '1. Problem Definition — How Do LLM Agents Maintain Personas?',
-          body: `When designing LLM-based educational agents, the biggest challenge is "consistent character maintenance." In an AI ethics education game, players form their own ethical stance through conversations with multiple characters — if agents break character or waver in their positions mid-conversation, the educational impact drops significantly.
+          heading: '1. Problem Definition — How Do Agents Maintain Personas in AI Ethics Dialogue?',
+          body: `When designing conversational systems for AI ethics education, the core challenge is "maintaining consistent ethical stances and character traits throughout the conversation." If agents break character or waver in their positions, the educational impact drops significantly.
 
-This project is a game where players explore ethical thinking in depth by conversing with various characters (an aspiring artist, a deontological colleague, a utilitarian colleague) before voting at an artists' association meeting on whether "AI-generated artwork should be exhibited at the National Museum of Modern Art."
+PERSONA.I. addresses two ethical dilemmas. First, "Should AI-generated artwork be exhibited in a gallery?" (AI Art topic). Second, "Should we use AI to recreate deceased people?" (AI Resurrection topic). For each topic, players converse sequentially with a facilitator agent, a deontological agent, and a utilitarian agent to form their own ethical stance.
 
-Three core technical challenges emerged. First, four agents must each maintain their ethical perspective (neutral, deontological, utilitarian) and character settings (age, gender, speech style, relationships) consistently throughout conversations. Second, agents must actively promote the player's ethical reasoning through Social Perspective Taking (SPT), rather than simply conveying information. Third, conversations must present new perspectives each turn without becoming repetitive, while maintaining character consistency.`,
+Three core technical challenges emerged. First, 7 agents must each maintain their ethical framework (neutral/deontological/utilitarian) and character settings consistently throughout conversations. Second, agents must facilitate multi-faceted ethical reasoning through Social Perspective Taking (SPT). Third, natural conversation flow must be controlled through LLM-based intent detection combined with turn counters as fallback against infinite loops.`,
           images: [
-            { caption: 'Figure 1. Conversation with the aspiring artist agent — the agent asks the player about their opinion on exhibiting AI art' },
+            { caption: 'Figure 1. Conversation with the Artist Apprentice agent — asking the player about their opinion on AI art' },
           ],
         },
         {
-          heading: '2. Why This Approach — Combining Self-Reflection and DPO',
-          body: `According to Renze & Guven (2024), applying Self-Reflection mechanisms to LLM agents improves problem-solving performance by 7–18%. Building on this observation, we hypothesized that applying Self-Reflection not to "problem-solving" but to "persona maintenance" could significantly improve agent character consistency.
+          heading: '2. Why This Approach — 3-Stage State Machine + DPO + Intent-Aligned Response',
+          body: `All agents follow a 3-stage conversation state machine implemented with LangGraph StateGraph. Stage 1 is character introduction and context setting, Stage 2 is opinion gathering with empathetic acknowledgment, and Stage 3 is deep exploration of ethical reasoning. Stage transitions are controlled by LLM-based intent detection with turn counters as fallback.
 
-Four key design decisions were made.
+Agents are divided into two types.
 
-First, a PersonaLLM wrapper. We created a PersonaLLM class wrapping ChatOpenAI that automatically injects persona system messages into every LLM call. Regardless of which Stage or prompt is used, the base character settings always enter as the first system message.
+Facilitator Agents — Artist Apprentice (AI Art) and Friend (AI Resurrection) — use a modular pipeline architecture handling intent detection, acknowledgment generation, explanation, and opinion exploration. The key design is Intent-Aligned Response: in Stage 2, the user's intent is first detected (positive/negative/neutral), then the response matches that direction. For example, if the user says "I think it could help" (positive), the agent must respond with "Right, it could really help" (positive), never "That could be worrying" (negative).
 
-Second, a Three-Phase architecture. Colleague agents (Colleague 1 and 2) must go through "Phase 1: Basic Reflection → Phase 1.5: SPT Planner (conditional) → Phase 2: Response Generation" before every response. In Phase 1, they self-check a persona checklist (8 items) and dialogue principle compliance (9 items). In Phase 1.5, they assess SPT necessity and design strategic questions.
+Persona Agents — Colleague 1 and Jangmo (deontology), Colleague 2 and Son (utilitarianism) — are fine-tuned via DPO to internalize their ethical stances at the model weight level. They use a Three-Phase reasoning architecture (Reflection → SPT Planning → Response), performing self-reflection before every response with 8 persona check items.
 
-Third, DPO (Direct Preference Optimization) Fine-tuning. We constructed preferred/dispreferred response pairs for each colleague's ethical perspective and fine-tuned GPT-4.1-mini with DPO, reinforcing deontological opposition (Colleague 1) and utilitarian support (Colleague 2) at the model weight level.
-
-Fourth, LangGraph-based state management. Each agent's conversation is managed as a 3-stage state machine — Stage 1 (casual conversation/character setup) → Stage 2 (AI art stance confirmation) → Stage 3 (ethics exploration) — with MemorySaver for automatic per-session conversation state persistence.`,
+The SPT Agent is a Social Perspective Taking specialist that operates across topics, guiding players to consider multiple stakeholder viewpoints.`,
           images: [
-            { caption: "Figure 2. In-game voting screen — prompting the player's ethical judgment through a vote for/against exhibiting AI artwork" },
+            { caption: "Figure 2. In-game voting screen — prompting the player's ethical judgment" },
           ],
         },
         {
           heading: '3. Challenges During the Project',
-          body: `This project was built by a team of three. I was responsible for all AI agent development, while a backend developer handled the FastAPI server and database design, and a frontend developer built the game UI and interactions. Each person's domain was clear, but problems arose at the boundaries — the agent's response format didn't always match what the frontend expected to render, and the backend API structure sometimes clashed with the agent's state management. We eventually settled on an "agent-centric design" approach: define the agent response schema first, then have the frontend and backend each implement around that contract.
+          body: `This project was built by a team of three. I was responsible for all AI agent development, while a backend developer handled the FastAPI server and database design, and a frontend developer built the game UI and interactions. Each domain was clear, but problems arose at the boundaries — the agent response format sometimes clashed with frontend rendering, and the backend API structure conflicted with agent state management. We settled on an "agent-centric design": define the agent response schema first, then have frontend and backend implement around that contract.
 
-Within my domain of AI agent development, preventing persona drift was the biggest challenge. Initially, we only placed character settings in system prompts, but as conversations grew longer, the LLM would slip into academic tone or revert to a neutral stance. To address this, we added a "Persona Check" section to reflection_prompt.txt — before every response, the agent self-checks 8 items (identity, professional experience, emotional investment, relationship dynamics, mentee perception, institutional responsibility, maintaining stance under pressure, avoiding lecture mode) and rewrites the response if any item fails.
+The hardest challenge in my AI agent domain was Intent-Aligned Response consistency. When the facilitator agent failed to accurately detect user intent, direction mismatches occurred — responding negatively to a positive intent. We resolved this by implementing a two-stage pipeline in stage2_acknowledgment.txt: first detect intent, then generate a response aligned with the detected direction.
 
-Dialogue repetitiveness was also difficult. When agents repeat the same stakeholder perspectives or questions, educational effectiveness drops. We added a "Previous Question Analysis" step to the reflection prompt: all previously asked questions are listed, semantically identical questions are added to a blacklist, and two new question candidates are pre-generated each turn.
-
-Determining when to apply SPT was another concern. Applying SPT every turn turned agents into "question robots," while skipping it entirely reduced them to simple opinion statements. We resolved this with a conditional structure: 5 criteria (moral conflict present, multiple stakeholders, uncertainty expressed, emotional influence, single-perspective bias) are evaluated YES/NO, and SPT activates only when 2 or more are YES.
+For persona agents, as conversations grew longer, the LLM would slip into academic tone or revert to neutral stances. We added an 8-item Persona Check section to reflection_prompt.txt — self-checking before every response and rewriting if any item fails.
 
 Constructing DPO training data was also challenging. Preferred/dispreferred response pairs had to be manually crafted from deontological and utilitarian perspectives. The key was teaching "consistent stance aligned with the character," not "the correct ethical position."`,
         },
         {
           heading: '4. System Architecture and Agent Design',
-          body: `The overall system uses a FastAPI backend deployed on Railway with Docker Compose, where four independent agents are coordinated through the game server.
+          body: `The system features 7 independent agents operating across two episodes (AI Art and AI Resurrection).
 
-The Artist Apprentice agent is GPT-4o-based, playing a male in his early 20s who addresses the player respectfully as "teacher." LangGraph StateGraph manages the 3-stage conversation, and the PersonaLLM wrapper auto-injects the persona into all calls. Gemini 2.0 Flash handles intent analysis for cost and speed optimization.
+The Artist Apprentice is the AI Art facilitator — an aspiring painter going through a creative slump. The 3-stage conversation (empathize with slump → AI tool suggestion → choice exploration) draws out the player's stance. The Friend is the AI Resurrection facilitator, discussing an AI service that recreates a deceased grandfather.
 
-Colleague 1 is a DPO fine-tuned GPT-4.1-mini-based agent playing a female painter in her 50s who strongly opposes AI art exhibition from a deontological perspective. The Three-Phase architecture (Basic Reflection → SPT Planner → Response) is applied: GPT-4o handles persona checking and SPT necessity assessment in Phase 1, and the fine-tuned model generates actual responses in Phase 2. Every turn's response must include three elements: "stance expression → empathy/observation → deep question."
+Colleague 1 is a DPO fine-tuned model opposing AI art exhibition from a deontological perspective, emphasizing the essence of art, humanity, and the value of the creative process. Colleague 2 supports AI art from a utilitarian perspective, emphasizing greatest happiness, accessibility, and efficiency.
 
-Colleague 2 is a DPO fine-tuned GPT-4.1-mini-based agent playing a male painter in his 30s who supports AI art exhibition from a utilitarian perspective. It uses the same Three-Phase architecture as Colleague 1, but emphasizes utilitarian arguments (greatest happiness for the greatest number, accessibility, efficiency).
+Jangmo is a mother-in-law character opposing AI resurrection from a deontological perspective, emphasizing human dignity and moral duty. Son supports AI resurrection from a utilitarian perspective, emphasizing family happiness and emotional comfort.
 
-The SPT Agent is a Social Perspective Taking specialist that helps players understand the other side's perspective.`,
+The SPT Agent is a Social Perspective Taking specialist that operates across topics, guiding players to consider multiple stakeholder viewpoints.`,
           images: [
-            { caption: 'Figure 3. Colleague 1 agent (Deontological) — a female painter in her 50s opposing AI art exhibition' },
-            { caption: 'Figure 4. Colleague 2 agent (Utilitarian) — a male painter in his 30s supporting AI art exhibition' },
+            { caption: 'Figure 3. Colleague 1 agent (Deontological) — opposing AI art exhibition' },
+            { caption: 'Figure 4. Colleague 2 agent (Utilitarian) — supporting AI art exhibition' },
           ],
           html: `<table>
 <thead>
-<tr><th>Agent</th><th>Model</th><th>Ethical Perspective</th><th>Character</th><th>Persona Maintenance Strategy</th></tr>
+<tr><th>Agent</th><th>Ethical Framework</th><th>Topic</th><th>Type</th><th>Key Strategy</th></tr>
 </thead>
 <tbody>
-<tr><td>Artist Apprentice</td><td>GPT-4o</td><td>Neutral (question-focused)</td><td>Male, early 20s, formal speech</td><td>PersonaLLM wrapper + LangGraph 3-stage</td></tr>
-<tr><td>Colleague 1</td><td>DPO Fine-tuned GPT-4.1-mini</td><td>Deontological (oppose)</td><td>Female, 50s, casual speech</td><td>Three-Phase + Self-Reflection + DPO</td></tr>
-<tr><td>Colleague 2</td><td>DPO Fine-tuned GPT-4.1-mini</td><td>Utilitarian (support)</td><td>Male, 30s, formal speech</td><td>Three-Phase + Self-Reflection + DPO</td></tr>
-<tr><td>SPT Agent</td><td>GPT-4o</td><td>Perspective shifting</td><td>Counseling specialist</td><td>System prompt-based</td></tr>
+<tr><td>Artist Apprentice</td><td>Neutral (Facilitator)</td><td>AI Art</td><td>Facilitator</td><td>Modular Pipeline + Intent-Aligned</td></tr>
+<tr><td>Friend</td><td>Neutral (Facilitator)</td><td>AI Resurrection</td><td>Facilitator</td><td>Modular Pipeline + Intent-Aligned</td></tr>
+<tr><td>Colleague 1</td><td>Deontology (Oppose)</td><td>AI Art</td><td>Persona</td><td>DPO + Three-Phase Reflection</td></tr>
+<tr><td>Colleague 2</td><td>Utilitarianism (Support)</td><td>AI Art</td><td>Persona</td><td>DPO + Three-Phase Reflection</td></tr>
+<tr><td>Jangmo</td><td>Deontology (Oppose)</td><td>AI Resurrection</td><td>Persona</td><td>DPO + Three-Phase Reflection</td></tr>
+<tr><td>Son</td><td>Utilitarianism (Support)</td><td>AI Resurrection</td><td>Persona</td><td>DPO + Three-Phase Reflection</td></tr>
+<tr><td>SPT Agent</td><td>Perspective Shifting</td><td>Cross-topic</td><td>SPT</td><td>Social Perspective Taking</td></tr>
 </tbody>
 </table>`,
         },
@@ -575,13 +574,13 @@ The SPT Agent is a Social Perspective Taking specialist that helps players under
           heading: '4-1. Key Insights and Contributions',
           body: `This project makes four key contributions.
 
-First, we presented a novel approach of applying Self-Reflection to persona maintenance. Building on Renze & Guven (2024), who used Self-Reflection for problem-solving performance improvement, we applied it to the different goal of character consistency maintenance and confirmed its effectiveness. The multi-layered Self-Reflection structure combining 8 persona check items, 9 dialogue principle checks, and duplicate question prevention is the core innovation.
+First, Intent-Aligned Response design improved facilitator agent empathy quality. Detecting user intent first and responding in the same direction prevents direction mismatches that break conversation flow, enabling natural empathetic dialogue.
 
-Second, we demonstrated the synergy between DPO Fine-tuning and prompt engineering. A dual-defense structure — internalizing ethical stances in model weights via DPO and verifying real-time consistency through Self-Reflection prompts — proved more effective than using either approach alone.
+Second, a dual-defense structure of DPO Fine-tuning and Self-Reflection strengthened persona consistency. Internalizing ethical stances in model weights via DPO and verifying real-time consistency through Three-Phase Reflection proved more effective than either approach alone.
 
-Third, conditional SPT activation improved educational dialogue quality. By evaluating 5 criteria each turn to determine SPT necessity, perspective-shifting was triggered only at appropriate moments, solving the "question robot" problem while maintaining natural conversation flow.
+Third, we designed a scalable multi-agent architecture integrating 7 agents across two topics (AI Art + AI Resurrection). The LangGraph StateGraph-based 3-stage state machine makes it easy to add new ethical topics and agents.
 
-Fourth, the combination of LangGraph and PersonaLLM wrapper yielded a reproducible multi-agent architecture. PersonaLLM auto-injects personas into all LLM calls while LangGraph manages conversation state — a structure readily applicable to other educational agent systems.`,
+Fourth, cross-topic perspective shifting through the SPT Agent enables multi-faceted ethics education that goes beyond single-topic boundaries.`,
         },
       ],
     },
