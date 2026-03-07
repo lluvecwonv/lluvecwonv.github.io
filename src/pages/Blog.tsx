@@ -93,7 +93,7 @@ export default function Blog() {
           <div className={styles.heroRow}>
             <div className={styles.heroPhoto}>
               <img src={CAT_PHOTO_URL} alt="금비" className={styles.catImg} />
-              <span className={styles.catCaption}>금비</span>
+              <span className={styles.catCaption}>우리집 최강 귀요미, 해피바이러스. 금비를 소개함돠</span>
             </div>
             <div className={styles.heroGlobe}>
               <Suspense fallback={<p className={styles.empty}>지구본 로딩중...</p>}>

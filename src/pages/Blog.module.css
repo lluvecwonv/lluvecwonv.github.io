@@ -109,9 +109,8 @@
 .heroRow {
   display: flex;
   gap: 24px;
-  align-items: stretch;
+  align-items: flex-start;
   margin-bottom: 48px;
-  min-height: 380px;
 }
 
 .heroPhoto {
@@ -127,9 +126,11 @@
 
 .catImg {
   width: 100%;
-  height: 380px;
-  object-fit: cover;
+  max-height: 520px;
+  object-fit: contain;
   display: block;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 12px 12px 0 0;
 }
 
 .catCaption {
@@ -147,7 +148,7 @@
   position: sticky;
   top: calc(var(--nav-height) + 24px);
   align-self: flex-start;
-  min-height: 380px;
+  min-height: 420px;
 }
 
 /* ── Posts Section ── */
@@ -310,7 +311,7 @@
   }
 
   .catImg {
-    height: 280px;
+    max-height: 360px;
   }
 }
 
