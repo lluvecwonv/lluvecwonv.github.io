@@ -119,12 +119,12 @@
   box-shadow: var(--travel-panel-shadow);
 }
 
-/* ─── 왼쪽 사이드 패널 ─── */
+/* ─── 사이드 패널 ─── */
 .sidePanel {
   position: absolute;
   left: 0;
   top: 0;
-  width: 380px;
+  width: 420px;
   background: var(--travel-surface-strong);
   border: 1px solid var(--travel-border);
   border-radius: 14px;
@@ -137,6 +137,11 @@
   flex-direction: column;
   gap: 14px;
   box-shadow: var(--travel-panel-shadow);
+}
+
+.sidePanelRight {
+  left: auto;
+  right: 0;
 }
 
 .panelHeader {
@@ -181,7 +186,7 @@
 .panelPhoto {
   width: 100%;
   height: auto;
-  max-height: 320px;
+  max-height: 380px;
   object-fit: cover;
   border-radius: 10px;
 }

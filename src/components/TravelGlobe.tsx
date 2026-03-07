@@ -340,6 +340,7 @@ export default function TravelGlobe() {
   const [photoIndex, setPhotoIndex] = useState(0)
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 })
   const [showForm, setShowForm] = useState(false)
+  const [panelSide, setPanelSide] = useState<'left' | 'right'>('left')
 
   useEffect(() => {
     const updateSize = () => {
@@ -367,10 +368,16 @@ export default function TravelGlobe() {
     setSelectedSpot(spot)
     setPhotoIndex(0)
     if (globeRef.current) {
+      // 화면 좌표로 좌/우 판단
+      const coords = globeRef.current.getScreenCoords(spot.lat, spot.lng)
+      if (coords) {
+        const centerX = dimensions.width / 2
+        setPanelSide(coords.x < centerX ? 'left' : 'right')
+      }
       globeRef.current.pointOfView({ lat: spot.lat, lng: spot.lng, altitude: 1.5 }, 800)
       globeRef.current.controls().autoRotate = false
     }
-  }, [])
+  }, [dimensions.width])
 
   const closePanel = () => {
     setSelectedSpot(null)
@@ -437,7 +444,7 @@ export default function TravelGlobe() {
       <div className={styles.globeArea}>
         {/* 왼쪽 사이드 패널 */}
         {selectedSpot && (
-          <div className={styles.sidePanel}>
+          <div className={`${styles.sidePanel} ${panelSide === 'right' ? styles.sidePanelRight : ''}`}>
             <div className={styles.panelHeader}>
               <div>
                 <h3 className={styles.panelTitle}>{selectedSpot.name}</h3>
@@ -500,7 +507,7 @@ export default function TravelGlobe() {
             ref={globeRef}
             width={dimensions.width}
             height={dimensions.height}
-            globeImageUrl="//eoimages.gsfc.nasa.gov/images/imagerecords/73000/73909/world.topo.bathy.200412.3x5400x2700.jpg"
+            globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
             bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
             backgroundImageUrl="//unpkg.com/three-globe/example/img/night-sky.png"
             htmlElementsData={htmlData}

@@ -125,11 +125,13 @@ export default function Blog() {
             </div>
           </div>
 
-          {activeCategory === '여행' ? (
+          {(activeCategory === '전체' || activeCategory === '여행') && (
             <Suspense fallback={<p className={styles.empty}>지구본 로딩중...</p>}>
               <TravelGlobe />
             </Suspense>
-          ) : (
+          )}
+
+          {activeCategory !== '여행' && (
             <div className={viewMode === 'grid' ? styles.grid : styles.list}>
               {filteredPosts.map((post, i) => (
                 <BlogCard
@@ -140,7 +142,7 @@ export default function Blog() {
                   onDelete={isAdmin ? () => handleDelete(post.slug, post.title) : undefined}
                 />
               ))}
-              {filteredPosts.length === 0 && (
+              {filteredPosts.length === 0 && activeCategory !== '전체' && (
                 <p className={styles.empty}>아직 이 카테고리에 글이 없습니다.</p>
               )}
             </div>
