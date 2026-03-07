@@ -69,6 +69,14 @@
   gap: 16px;
 }
 
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
 .title {
   font-size: 32px;
   font-weight: 700;
@@ -79,6 +87,7 @@
 .subtitle {
   font-size: 15px;
   color: var(--blog-subtitle);
+  line-height: 1.6;
 }
 
 .writeBtn {
@@ -90,11 +99,60 @@
   background: var(--accent);
   transition: opacity var(--transition-fast);
   white-space: nowrap;
-  margin-top: 4px;
 }
 
 .writeBtn:hover {
   opacity: 0.85;
+}
+
+/* ── Hero Row: Cat photo (left) + Globe (right) ── */
+.heroRow {
+  display: flex;
+  gap: 24px;
+  align-items: stretch;
+  margin-bottom: 48px;
+  min-height: 380px;
+}
+
+.heroPhoto {
+  flex: 0 0 45%;
+  position: sticky;
+  top: calc(var(--nav-height) + 24px);
+  align-self: flex-start;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--blog-border);
+  background: var(--blog-surface);
+}
+
+.catImg {
+  width: 100%;
+  height: 380px;
+  object-fit: cover;
+  display: block;
+}
+
+.catCaption {
+  display: block;
+  text-align: center;
+  padding: 10px 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--blog-subtitle);
+  letter-spacing: 0.5px;
+}
+
+.heroGlobe {
+  flex: 1;
+  position: sticky;
+  top: calc(var(--nav-height) + 24px);
+  align-self: flex-start;
+  min-height: 380px;
+}
+
+/* ── Posts Section ── */
+.postsSection {
+  margin-top: 0;
 }
 
 .toolbarActions {
@@ -185,38 +243,6 @@
   color: var(--blog-title);
 }
 
-/* 전체 카테고리: 지구본(왼쪽) + 글 카드(오른쪽) */
-.splitLayout {
-  display: flex;
-  gap: 28px;
-  align-items: flex-start;
-}
-
-.splitGlobe {
-  flex-shrink: 0;
-  position: sticky;
-  top: 24px;
-}
-
-.splitPosts {
-  flex: 1;
-  min-width: 0;
-}
-
-.splitPosts .grid {
-  grid-template-columns: 1fr;
-}
-
-@media (max-width: 900px) {
-  .splitLayout {
-    flex-direction: column;
-  }
-  .splitGlobe {
-    position: static;
-    width: 100%;
-  }
-}
-
 .grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -264,6 +290,28 @@
   z-index: 100;
   backdrop-filter: blur(8px);
   white-space: nowrap;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .heroRow {
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .heroPhoto {
+    position: static;
+    flex: none;
+  }
+
+  .heroGlobe {
+    position: static;
+    min-height: 300px;
+  }
+
+  .catImg {
+    height: 280px;
+  }
 }
 
 @media (max-width: 700px) {
