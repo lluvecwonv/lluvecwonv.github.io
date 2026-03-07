@@ -262,11 +262,11 @@ Setting the membership inference threshold was another concern. The choice of K 
         },
         {
           heading: '4. Experimental Data and Results',
-          body: `Experiments used the WikiMIA dataset, which assumes most LLMs were trained on data up to 2023 — pre-2023 data is treated as training data (member) and post-2023 data as unseen (non-member). Triplets were extracted from pre-2023 data, QA data was generated via GPT-4 Turbo, and unlearning was performed on Llama-7B with LoRA-Tuning.
+          body: `Experiments used the WikiMIA dataset, which assumes most LLMs were trained on data up to 2023 — pre-2023 data serves as the forget set, while post-2023 data is treated as unseen. Triplets were extracted from the forget set, and GPT-4 was used to generate expanded QA data. The validation dataset was constructed by restructuring the generated QA data with GPT-4, and the evaluation dataset was built by generating QA pairs from entities' Wikipedia articles using the T5 model. Unlearning was performed on Llama-7B with LoRA-Tuning.
 
-Rouge-L and Accuracy were used as evaluation metrics, where lower scores indicate the model fails to reproduce target knowledge — meaning more effective unlearning. The baseline applied gradient ascent using paraphrased text without triplet extraction.
+Rouge-L and Accuracy were used as evaluation metrics, where lower scores indicate the model fails to reproduce target knowledge — meaning more effective unlearning. The baseline applied gradient ascent without data expansion.
 
-The proposed method achieved Rouge-L 0.14 and Accuracy 0.26, showing 26% and 32% additional reduction respectively compared to the baseline (Rouge-L 0.19, Accuracy 0.38). As the number of iterations increased, both metrics decreased sharply, confirming that repeated detection-unlearning cycles progressively improve effectiveness.`,
+The proposed method achieved Rouge-L 0.14 and Accuracy 0.26, showing additional reductions of 0.05 in Rouge-L and 0.12 in Accuracy compared to the baseline (Rouge-L 0.19, Accuracy 0.38). As the number of iterations increased, both metrics decreased sharply, confirming that repeated detection-unlearning cycles progressively improve effectiveness.`,
           images: [
             { src: '/projects/qa-unlearning-1.png', caption: 'Figure 2. Rouge-L and Accuracy changes per iteration — Both metrics decrease sharply with more iterations, confirming progressively effective unlearning' },
           ],
