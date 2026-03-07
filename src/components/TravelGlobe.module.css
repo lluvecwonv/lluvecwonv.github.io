@@ -571,6 +571,15 @@
   border-color: rgba(79, 195, 247, 0.2);
 }
 
+/* compact 모드 (전체 카테고리에서 왼쪽 배치) */
+.compact {
+  padding: 0;
+}
+
+.compact .globeWrap {
+  border-radius: 12px;
+}
+
 /* 모바일 */
 @media (max-width: 768px) {
   .topBar {

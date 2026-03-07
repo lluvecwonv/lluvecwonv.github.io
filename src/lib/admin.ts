@@ -1,17 +1,20 @@
-export const ADMIN_SESSION_KEY = 'my-site-admin-session'
-export const DEFAULT_ADMIN_PASSWORD = '0510'
-export const ADMIN_PASSWORD = (import.meta.env.VITE_ADMIN_PASSWORD || DEFAULT_ADMIN_PASSWORD).trim()
+import { supabase } from './supabase'
 
-export function getStoredAdminSession() {
-  if (typeof window === 'undefined') return false
-  return window.localStorage.getItem(ADMIN_SESSION_KEY) === 'true'
+const ADMIN_EMAIL = (import.meta.env.VITE_ADMIN_EMAIL as string) || ''
+
+export async function signInAdmin(password: string) {
+  const { error } = await supabase.auth.signInWithPassword({
+    email: ADMIN_EMAIL,
+    password,
+  })
+  return error ? error.message : null
 }
 
-export function setStoredAdminSession(isAdmin: boolean) {
-  if (typeof window === 'undefined') return
-  if (isAdmin) {
-    window.localStorage.setItem(ADMIN_SESSION_KEY, 'true')
-    return
-  }
-  window.localStorage.removeItem(ADMIN_SESSION_KEY)
+export async function signOutAdmin() {
+  await supabase.auth.signOut()
+}
+
+export async function getSession() {
+  const { data } = await supabase.auth.getSession()
+  return data.session
 }

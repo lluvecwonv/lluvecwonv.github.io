@@ -185,6 +185,38 @@
   color: var(--blog-title);
 }
 
+/* 전체 카테고리: 지구본(왼쪽) + 글 카드(오른쪽) */
+.splitLayout {
+  display: flex;
+  gap: 28px;
+  align-items: flex-start;
+}
+
+.splitGlobe {
+  flex-shrink: 0;
+  position: sticky;
+  top: 24px;
+}
+
+.splitPosts {
+  flex: 1;
+  min-width: 0;
+}
+
+.splitPosts .grid {
+  grid-template-columns: 1fr;
+}
+
+@media (max-width: 900px) {
+  .splitLayout {
+    flex-direction: column;
+  }
+  .splitGlobe {
+    position: static;
+    width: 100%;
+  }
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

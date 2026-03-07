@@ -125,13 +125,32 @@ export default function Blog() {
             </div>
           </div>
 
-          {(activeCategory === '전체' || activeCategory === '여행') && (
+          {activeCategory === '여행' ? (
             <Suspense fallback={<p className={styles.empty}>지구본 로딩중...</p>}>
               <TravelGlobe />
             </Suspense>
-          )}
-
-          {activeCategory !== '여행' && (
+          ) : activeCategory === '전체' ? (
+            <div className={styles.splitLayout}>
+              <div className={styles.splitGlobe}>
+                <Suspense fallback={<p className={styles.empty}>지구본 로딩중...</p>}>
+                  <TravelGlobe compact />
+                </Suspense>
+              </div>
+              <div className={styles.splitPosts}>
+                <div className={viewMode === 'grid' ? styles.grid : styles.list}>
+                  {filteredPosts.map((post, i) => (
+                    <BlogCard
+                      key={post.slug}
+                      post={post}
+                      index={i}
+                      viewMode={viewMode}
+                      onDelete={isAdmin ? () => handleDelete(post.slug, post.title) : undefined}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : (
             <div className={viewMode === 'grid' ? styles.grid : styles.list}>
               {filteredPosts.map((post, i) => (
                 <BlogCard
@@ -142,7 +161,7 @@ export default function Blog() {
                   onDelete={isAdmin ? () => handleDelete(post.slug, post.title) : undefined}
                 />
               ))}
-              {filteredPosts.length === 0 && activeCategory !== '전체' && (
+              {filteredPosts.length === 0 && (
                 <p className={styles.empty}>아직 이 카테고리에 글이 없습니다.</p>
               )}
             </div>

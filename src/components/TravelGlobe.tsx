@@ -2,7 +2,7 @@ import { useRef, useState, useEffect, useCallback, type ChangeEvent } from 'reac
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import {
-  getSpots, saveSpots,
+  getSpots, addSpot, deleteSpot,
   buildArcs,
 } from '../data/travels'
 import { useAdminAuth } from '../context/AdminAuthContext'
@@ -334,7 +334,7 @@ function AddTravelForm({ onSubmit, onClose }: AddFormProps) {
 }
 
 // ─── 메인 컴포넌트 ───
-export default function TravelGlobe() {
+export default function TravelGlobe({ compact = false }: { compact?: boolean }) {
   const { isAdmin } = useAdminAuth()
   const { isBlogLight } = useBlogTheme()
   const mapRef = useRef<mapboxgl.Map | null>(null)
@@ -344,12 +344,17 @@ export default function TravelGlobe() {
   const animFrameRef = useRef<number>(0)
   const selectedSpotRef = useRef<TravelSpot | null>(null)
 
-  const [spots, setSpots] = useState(getSpots)
+  const [spots, setSpots] = useState<TravelSpot[]>([])
   const [selectedSpot, setSelectedSpot] = useState<TravelSpot | null>(null)
   const [photoIndex, setPhotoIndex] = useState(0)
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 })
   const [showForm, setShowForm] = useState(false)
   const [panelSide, setPanelSide] = useState<'left' | 'right'>('left')
+
+  // Supabase에서 여행 데이터 로딩
+  useEffect(() => {
+    getSpots().then(setSpots)
+  }, [])
 
   // selectedSpot을 ref로도 유지 (이벤트 핸들러 클로저용)
   useEffect(() => {
@@ -359,14 +364,20 @@ export default function TravelGlobe() {
   // 반응형 사이즈
   useEffect(() => {
     const updateSize = () => {
-      const w = Math.min(window.innerWidth - 40, 900)
-      const h = Math.min(window.innerHeight - 200, 650)
-      setDimensions({ width: w, height: h })
+      if (compact) {
+        const w = Math.min(window.innerWidth * 0.4, 480)
+        const h = Math.min(w, 480)
+        setDimensions({ width: w, height: h })
+      } else {
+        const w = Math.min(window.innerWidth - 40, 900)
+        const h = Math.min(window.innerHeight - 200, 650)
+        setDimensions({ width: w, height: h })
+      }
     }
     updateSize()
     window.addEventListener('resize', updateSize)
     return () => window.removeEventListener('resize', updateSize)
-  }, [])
+  }, [compact])
 
   // Mapbox 초기화
   useEffect(() => {
@@ -606,49 +617,56 @@ export default function TravelGlobe() {
     rotatingRef.current = true
   }
 
-  const handleAddSpot = (spot: TravelSpot) => {
+  const handleAddSpot = async (spot: TravelSpot) => {
     if (!isAdmin) return
 
-    const next = [...spots, spot]
-    try {
-      saveSpots(next)
-      setSpots(next)
+    const ok = await addSpot(spot)
+    if (ok) {
+      setSpots((prev) => [...prev, spot])
       setShowForm(false)
-    } catch {
-      alert('브라우저 저장 공간이 부족해요. 사진 수를 줄이거나 더 작은 사진으로 다시 시도해주세요.')
+    } else {
+      alert('여행을 저장하지 못했어요. 다시 시도해주세요.')
     }
   }
 
-  const handleDeleteSpot = (id: string) => {
+  const handleDeleteSpot = async (id: string) => {
     if (!isAdmin) return
     if (!confirm('이 여행을 삭제할까요?')) return
-    const next = spots.filter((s) => s.id !== id)
-    setSpots(next)
-    saveSpots(next)
-    if (selectedSpot?.id === id) closePanel()
+
+    const ok = await deleteSpot(id)
+    if (ok) {
+      setSpots((prev) => prev.filter((s) => s.id !== id))
+      if (selectedSpot?.id === id) closePanel()
+    } else {
+      alert('삭제에 실패했어요. 다시 시도해주세요.')
+    }
   }
 
   return (
-    <div className={`${styles.container} ${isBlogLight ? styles.light : ''}`}>
-      <div className={styles.topBar}>
-        <div className={styles.stats}>
-          <div className={styles.statItem}>
-            <span className={styles.statNumber}>{spots.length}</span>
-            <span className={styles.statLabel}>도시</span>
+    <div className={`${styles.container} ${isBlogLight ? styles.light : ''} ${compact ? styles.compact : ''}`}>
+      {!compact && (
+        <>
+          <div className={styles.topBar}>
+            <div className={styles.stats}>
+              <div className={styles.statItem}>
+                <span className={styles.statNumber}>{spots.length}</span>
+                <span className={styles.statLabel}>도시</span>
+              </div>
+              <div className={styles.statItem}>
+                <span className={styles.statNumber}>
+                  {new Set(spots.map((s) => s.country)).size}
+                </span>
+                <span className={styles.statLabel}>나라</span>
+              </div>
+            </div>
+            {isAdmin && (
+              <button className={styles.addBtn} onClick={() => setShowForm(true)}>+ 여행 추가</button>
+            )}
           </div>
-          <div className={styles.statItem}>
-            <span className={styles.statNumber}>
-              {new Set(spots.map((s) => s.country)).size}
-            </span>
-            <span className={styles.statLabel}>나라</span>
-          </div>
-        </div>
-        {isAdmin && (
-          <button className={styles.addBtn} onClick={() => setShowForm(true)}>+ 여행 추가</button>
-        )}
-      </div>
 
-      <p className={styles.hint}>지구본을 돌려보세요 — 핀을 클릭하면 사진을 볼 수 있어요</p>
+          <p className={styles.hint}>지구본을 돌려보세요 — 핀을 클릭하면 사진을 볼 수 있어요</p>
+        </>
+      )}
 
       <div className={styles.globeArea}>
         {/* 사이드 패널 */}
@@ -720,20 +738,22 @@ export default function TravelGlobe() {
       </div>
 
       {/* 방문 장소 목록 */}
-      <div className={styles.spotList}>
-        <h3 className={styles.spotListTitle}>방문한 곳</h3>
-        <div className={styles.spotTags}>
-          {spots.map((spot) => (
-            <button key={spot.id} className={styles.spotTag} onClick={() => selectSpot(spot)}>
-              {spot.name}
-              {spot.date && <span className={styles.spotDate}>{spot.date}</span>}
-            </button>
-          ))}
+      {!compact && (
+        <div className={styles.spotList}>
+          <h3 className={styles.spotListTitle}>방문한 곳</h3>
+          <div className={styles.spotTags}>
+            {spots.map((spot) => (
+              <button key={spot.id} className={styles.spotTag} onClick={() => selectSpot(spot)}>
+                {spot.name}
+                {spot.date && <span className={styles.spotDate}>{spot.date}</span>}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* 여행 추가 폼 */}
-      {isAdmin && showForm && (
+      {!compact && isAdmin && showForm && (
         <AddTravelForm
           onSubmit={handleAddSpot}
           onClose={() => setShowForm(false)}

@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ADMIN_PASSWORD, getStoredAdminSession, setStoredAdminSession } from '../lib/admin'
+import { signInAdmin, signOutAdmin, getSession } from '../lib/admin'
+import { supabase } from '../lib/supabase'
 import styles from './AdminAuthContext.module.css'
 
 interface AdminAuthContextValue {
@@ -13,11 +14,25 @@ const AdminAuthContext = createContext<AdminAuthContextValue | null>(null)
 
 export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate()
-  const [isAdmin, setIsAdmin] = useState(getStoredAdminSession)
+  const [isAdmin, setIsAdmin] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
   const redirectToRef = useRef<string | null>(null)
+
+  // 페이지 로드 시 기존 세션 확인
+  useEffect(() => {
+    getSession().then((session) => {
+      setIsAdmin(!!session)
+    })
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAdmin(!!session)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
 
   useEffect(() => {
     if (!isModalOpen) return
@@ -50,24 +65,28 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     redirectToRef.current = null
   }
 
-  const logout = () => {
+  const logout = async () => {
+    await signOutAdmin()
     setIsAdmin(false)
-    setStoredAdminSession(false)
   }
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    setLoading(true)
+    setError('')
 
-    if (password !== ADMIN_PASSWORD) {
-      setError('비밀번호가 맞지 않습니다.')
+    const errorMsg = await signInAdmin(password)
+
+    if (errorMsg) {
+      setError('로그인에 실패했습니다. 비밀번호를 확인해주세요.')
+      setLoading(false)
       return
     }
 
     setIsAdmin(true)
-    setStoredAdminSession(true)
     setIsModalOpen(false)
-    setError('')
     setPassword('')
+    setLoading(false)
 
     if (redirectToRef.current) {
       navigate(redirectToRef.current)
@@ -122,8 +141,8 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
               {error && <p className={styles.error}>{error}</p>}
 
               <div className={styles.actions}>
-                <button type="submit" className={styles.submitButton}>
-                  로그인
+                <button type="submit" className={styles.submitButton} disabled={loading}>
+                  {loading ? '로그인 중...' : '로그인'}
                 </button>
               </div>
             </form>
