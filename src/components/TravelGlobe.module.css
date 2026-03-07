@@ -119,6 +119,15 @@
   box-shadow: var(--travel-panel-shadow);
 }
 
+.globeWrap :global(.mapboxgl-ctrl-top-right) {
+  top: 8px;
+  right: 8px;
+}
+
+.globeWrap :global(.mapboxgl-canvas) {
+  outline: none;
+}
+
 /* ─── 사이드 패널 ─── */
 .sidePanel {
   position: absolute;
@@ -186,8 +195,7 @@
 .panelPhoto {
   width: 100%;
   height: auto;
-  max-height: 380px;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 10px;
 }
 

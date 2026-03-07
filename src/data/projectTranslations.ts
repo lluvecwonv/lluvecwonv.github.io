@@ -24,6 +24,7 @@ export const projectTitleEnglishGlossary: Record<string, string> = {
   memorization: 'LLM Memorization Measurement Study',
   'qa-unlearning': 'Large Language Model Unlearning based on Question Answering',
   'heritage-monitoring': 'National Heritage Monitoring System',
+  'moral-agent': 'AI Ethics Education Game: Multi-Agent Dialogue System',
 }
 
 export const projectTranslations: Record<string, Partial<Record<ProjectLocale, LocalizedProjectTranslation>>> = {
@@ -86,6 +87,71 @@ export const projectTranslations: Record<string, Partial<Record<ProjectLocale, L
           body: `본 연구의 핵심 기여는 세 가지입니다. 첫째, LLM의 Chain-of-Thought를 활용한 추론 기반 학습 목표 구체화를 도입해 모호한 목표를 구체적인 학습 목표로 바꾸고 교육과정 설계 품질을 높였습니다. 둘째, 학과별 교육과정 DAG를 활용한 선수 관계 인지형 부분 그래프 추출 방법을 제안했습니다. 셋째, 여러 학과의 교육과정을 하나로 통합하기 위해 LLM이 학과 간 과목 관계를 추론하는 그래프 구성 방식을 설계했습니다.
 
 이 연구는 "Curriculum Planning for Independent Majors with Large Language Models"라는 제목으로 AIED 2025에 공동 제1저자로 게재되었습니다.`,
+        },
+      ],
+    },
+    en: {
+      subtitle: 'Graph-Based Interdisciplinary Curriculum Generation via LLM Reasoning',
+      description: 'A curriculum planning method that leverages prerequisite relationships in department-specific curricula and LLM reasoning to generate personalized interdisciplinary curricula for independent major students.',
+      sections: [
+        {
+          heading: '1. Problem Definition — Designing Personalized Interdisciplinary Curricula',
+          body: `Independent major programs allow students to design customized interdisciplinary studies when their goals fall outside standard departmental offerings. However, curriculum design presents three critical challenges.
+
+First, prerequisite dependencies span multiple disciplines and are difficult to identify automatically. Most curriculum data exists as isolated departmental DAGs with no explicit cross-departmental relationships. Second, students often start with vague, overly broad objectives like "I want to combine AI and semiconductors" without concrete direction on how to structure their coursework. Third, even when students and advisors identify relevant courses, manually arranging them into a logical progression while ensuring all prerequisites are satisfied is time-consuming and error-prone.
+
+This work asks: "Can we leverage LLM reasoning to help students refine their vague objectives, automatically extract relevant courses across disciplines, and intelligently infer prerequisite relationships between interdisciplinary courses?"`,
+        },
+        {
+          heading: '2. Why This Approach — Hypothesis and Design Rationale',
+          body: `Recent work on LLM reasoning (Wei et al. 2022, Kojima et al. 2023) shows that Chain-of-Thought prompting can decompose complex tasks into step-by-step reasoning. We hypothesized that LLMs could apply similar reasoning to curriculum design: breaking down vague student objectives into concrete learning goals, retrieving semantically relevant courses, and inferring implicit prerequisite relationships.
+
+Three design decisions emerged from this hypothesis. First, learning objective refinement via Chain-of-Thought transforms "I want to combine AI and semiconductors" into concrete, structured goals like "AI semiconductor design expertise combining circuit design and deep learning hardware optimization." This refinement guides all downstream steps. Second, curriculum subgraph extraction leverages existing departmental curriculum DAGs (which already encode prerequisites within departments) rather than learning from scratch. Third, inter-department prerequisite inference uses the LLM to reason about course descriptions and the refined objective, determining whether courses from different departments should have prerequisite relationships — a task that requires semantic understanding beyond keyword matching.`,
+          images: [
+            { src: '/projects/jbnu-0.png', caption: 'Figure 1. Three-stage curriculum planning pipeline — Learning Objective Refinement via CoT → Curriculum Subgraph Extraction from departmental DAGs → Interdisciplinary Graph Construction with LLM-inferred prerequisite edges' },
+          ],
+        },
+        {
+          heading: '3. Challenges During Project Development',
+          body: `Learning objective refinement quality was the first challenge. We found that simple few-shot prompting sometimes generated refinements that were too narrow (e.g., eliminating valid alternative paths) or too broad (remaining vague). We designed a multi-turn refinement process where the LLM iteratively asks clarifying questions and integrates student feedback.
+
+Course retrieval accuracy was another concern. A FAISS vector search using raw course descriptions was sometimes imprecise, missing relevant courses or including false positives. To address this, we had the LLM expand the refined objective into multiple search queries, each targeting different aspects (e.g., one query for "AI systems design", another for "semiconductor physics"), then merged results to improve coverage.
+
+Inferring inter-department prerequisites proved unexpectedly difficult. Two courses from different departments might have a prerequisite relationship based on conceptual dependencies, but this relationship is rarely explicit. We addressed this by providing the LLM with course descriptions, syllabi summaries, and the refined student objective, then having the LLM explicitly reason about whether one course's concepts are prerequisites for another.
+
+Finally, we struggled with graph layout and visualization. A naive topological sort sometimes produced nonsensical semester assignments. We developed a constraint satisfaction approach that respects prerequisites while balancing workload (≤6 courses per semester) and spreading foundational to advanced courses logically.`,
+        },
+        {
+          heading: '4. Experimental Results',
+          body: `We evaluated on two quantitative metrics: F1_course (how well selected courses match a gold curriculum) and F1_prerequisite (how accurately inferred prerequisite relationships match ground truth).
+
+The proposed method achieved F1_course 41.03 and F1_prerequisite 23.16, vastly outperforming baselines. TF-IDF (15.60, 1.01) and text embeddings without LLM refinement (32.56, 4.96) showed that vector similarity alone is insufficient for prerequisite inference. Notably, F1_prerequisite improved from ~1–6 for baselines to 23.16 for our method, demonstrating that LLM reasoning is essential for cross-departmental prerequisites.
+
+Qualitative evaluation by five domain experts (2 faculty, 3 curriculum consultants) rated the proposed method highest across all dimensions: Consistency 3.47/5, Interdisciplinarity 3.53/5, Coherence 3.60/5, Essentiality 3.00/5. Experts noted that the method's ability to infer non-obvious interdisciplinary prerequisites was particularly valuable.`,
+          html: `<table>
+<thead>
+<tr><th>Method</th><th>F1<sub>course</sub> ↑</th><th>F1<sub>prerequisite</sub> ↑</th></tr>
+</thead>
+<tbody>
+<tr><td>TF-IDF</td><td>15.60</td><td>1.01</td></tr>
+<tr><td>TF-IDF w/ LO refinement</td><td>19.51</td><td>2.13</td></tr>
+<tr><td>Text embedding</td><td>32.56</td><td>4.96</td></tr>
+<tr><td>Text embedding w/ LO refinement</td><td>33.63</td><td>5.94</td></tr>
+<tr><td><strong>Proposed method</strong></td><td><strong>41.03</strong></td><td><strong>23.16</strong></td></tr>
+</tbody>
+</table>`,
+        },
+        {
+          heading: '4-1. Key Insights and Contributions',
+          body: `This work makes four key contributions. First, we show that LLM Chain-of-Thought reasoning can refine vague student learning objectives into concrete, actionable curriculum targets. This refinement step, often overlooked in prior work, is essential for high-quality downstream curriculum generation.
+
+Second, we demonstrate that leveraging existing departmental curriculum DAGs is more effective than learning prerequisites from scratch. By anchoring to institutional curriculum structures, our method ensures prerequisite relationships within departments are sound.
+
+Third, we propose a practical method for inferring inter-department prerequisites through LLM reasoning. This enables truly interdisciplinary curriculum design at scale, something previous methods could not achieve.
+
+Finally, we validate our approach through both quantitative metrics (F1 scores) and qualitative expert evaluation. The stark improvement in F1_prerequisite over baselines (23.16 vs. 5.94 for the strongest baseline) demonstrates that semantic reasoning is irreplaceable for capturing implicit prerequisites in interdisciplinary curricula.
+
+This work was published at AIED 2025 with co-first authorship and has already informed curriculum design practices at the hosting institution.`,
         },
       ],
     },
@@ -297,73 +363,223 @@ This work was published at KCC 2024 and was later extended to memorization measu
       subtitle: '모델 내재적 Span 식별을 통한 선택적 LLM 언러닝',
       description: '외부 모델 없이 대상 모델의 gradient 신호만으로 언러닝 대상 span을 식별하는 2단계 프레임워크를 제안합니다.',
       sections: [
-        {},
         {
-          heading: 'Step 1 — 토큰 중요도 추정',
-        },
-        {
-          heading: 'Step 2 — Self-Consistency 기반 Span 식별',
+          heading: '1. 문제 정의 — 외부 모델 없는 선택적 언러닝',
+          body: `머신 언러닝은 LLM이 특정 학습 데이터(개인정보, 저작권 콘텐츠 등)를 "잊도록" 요구합니다. 하지만 기존 언러닝 방법은 근본적인 트레이드오프를 가지고 있습니다.
+
+전체 시퀀스 언러닝(예: 전체 문서에 대한 그래디언트 상승)은 무분별하게 대상 정보를 제거하면서 같은 시퀀스에 포함된 유용한 정보도 함께 삭제하여 모델 유틸리티를 심각하게 저하시킵니다. 최근의 선택적 언러닝 방법들(SU, SEUL, WTNPO)은 토큰이나 span 수준에서 대상을 식별하려 시도하지만, 외부 모델(GPT, BERT)에 의존합니다. 이는 근본적인 문제를 야기합니다. 외부 모델로 식별된 대상 span이 실제 대상 모델이 기억하거나 중요하게 여기는 내용과 일치하지 않을 수 있기 때문입니다.
+
+본 연구는 중심 질문을 던집니다: "대상 모델의 내부 신호만으로, 외부 감독 없이 언러닝 대상을 식별할 수 있는가?"`,
           images: [
             {
-              caption: '1단계: differential gradient 기반 토큰 선별 → 2단계: self-consistency 기반 span 식별 → span-weighted 언러닝',
+              caption: '그림 1. 토큰 vs Span 수준의 언러닝 — 토큰 수준 삭제는 부분 정보 복구 가능, span 수준 교체는 완전한 언러닝 달성',
             },
           ],
+        },
+        {
+          heading: '2. 왜 이 접근 방법인가 — 가설과 설계 근거',
+          body: `핵심 관찰에서 출발합니다: 삭제 대상 세트(forget set)와 유지할 데이터 세트(retain set)는 모델의 그래디언트를 반대 방향으로 끌어당깁니다. 삭제 대상 정보를 인코딩하는 토큰은 삭제 목표에 강하게 정렬되면서 유지 목표와는 미정렬되는 gradient를 보이며, 이는 대상 모델 자체에 내재된 성질입니다.
+
+우리의 가설: differential gradient(삭제 gradient − 유지 gradient)를 계산하고 이 미분 방향에 가장 높은 정렬을 보이는 토큰을 식별하면, 외부 모델 없이 모델이 "삭제 가능"하다고 판단하는 정보를 식별할 수 있습니다.
+
+이로부터 두 가지 설계 결정이 나옵니다. 첫째, differential gradient alignment를 사용한 토큰 수준의 중요도 추정입니다(EK-FAC이라는 효율적인 역 Hessian 근사를 사용). 이는 대상 모델의 gradient 신호만 필요하며 외부 감독이 필요 없습니다. 둘째, self-consistency를 통한 span 식별입니다: 토큰만으로는 원자적 중요도를 식별하지만, 의미론적으로 일관된 span을 위해서는 안정성이 필요합니다. K번의 독립적 모델 생성에서 후보 span을 수집하고, 일관되게 나타나는 span만 선택하여 모델 자체가 이 span들을 안정적인 언러닝 대상으로 "동의"하는지 확인합니다.`,
+          images: [
+            {
+              caption: '그림 2. 2단계 프레임워크 — Differential gradient로 중요 토큰 식별 → Self-consistency로 안정적 span 필터링 → 모델 내재적 span-weighted 언러닝 수행',
+            },
+          ],
+        },
+        {
+          heading: '3. 프로젝트 과정에서의 어려움과 고민',
+          body: `Differential gradient의 효율적 계산이 첫 번째 도전이었습니다. 전체 Hessian 역행렬(gradient alignment 가중치에 필요)은 O(n³) 복잡도로, LLM에서는 금지적으로 비쌉니다. 우리는 행렬 없는 효율적 근사인 EK-FAC(Eigenvalue-corrected KFAC)을 채택했으며, 이는 forward/backward 패스만 필요합니다.
+
+안정적인 span 식별은 실제로 까다로웠습니다. 단순한 토큰 중요도 임계값 처리는 때로 비연속적이거나 의미론적으로 단편화된 span을 선택했습니다. Self-consistency 필터링이 도움이 되었지만, K(생성 횟수)를 신중하게 조정해야 함을 발견했습니다. K가 너무 낮으면 노이즈가 지배적이고, 너무 높으면 계산 비용이 폭증합니다. 모델 크기에 따라 K=5–10으로 정했습니다.
+
+언러닝 효과와 유틸리티 보존 간의 트레이드오프 조정은 고통스러웠습니다. 다양한 언러닝 알고리즘(GA, NPO, SO-NPO)은 각기 다른 유틸리티-삭제 트레이드오프를 가지며, 우리의 span 선택은 각각과 다르게 상호작용합니다. (모델, 알고리즘) 쌍마다 consistency 임계값과 중요도 cutoff를 개별적으로 조정해야 했습니다.
+
+마지막으로 평가 지표 설계가 중요했습니다. MIA(멤버십 추론 공격) 같은 표준 언러닝 지표는 span 수준의 삭제를 직접 측정하지 않습니다. 우리는 삭제된 정보가 억압 가능한지를 특별히 테스트하는 새로운 지표(MUSE-News의 VerbMem, KnowMem)를 설계해야 했습니다.`,
+        },
+        {
+          heading: '4. 실험 데이터와 결과',
+          body: `TOFU(허구의 저자 생애 정보, forget10 분할)와 MUSE-News(사실 메모라이제이션에 대한 구조화된 ground truth가 있는 실제 뉴스 기사)라는 두 가지 주요 벤치마크에서 평가했습니다.
+
+TOFU에서 SPAN-SO-NPO는 Model Utility(MU) 0.59를 달성하여 모든 베이스라인(SU 0.51, SEUL 0.00, WTNPO 0.45)과 동등하거나 초과했습니다. 순수 SO-NPO만으로는 MU 0.52를 달성했지만 심각한 유틸리티 손실을 입었으며, 우리의 span 방법은 이를 0.59로 개선하면서 언러닝 효과를 유지했습니다.
+
+MUSE-News에서는 그림이 더 명확합니다. 다른 선택적 방법들은 완전히 실패했습니다(VerbMem/KnowMem → 0, 전체 유틸리티 붕괴). SPAN-SO-NPO+KL은 VerbMem 17.66, KnowMem 26.59, PrivLeak 22.70을 달성하고 유틸리티를 38.38/54.31로 유지하여 삭제와 보존의 최고의 균형을 이루었습니다. 정량 평가와 정성 평가에서 모두 기존 베이스라인을 능가하여, LLM 기반 간단한 파이프라인이 복잡한 비교 요약 태스크를 해결할 수 있음을 입증했습니다.`,
+        },
+        {
+          heading: '4-1. 핵심 인사이트와 기여',
+          body: `본 연구는 네 가지 핵심 기여를 제시합니다. 첫째, 외부 모델 없는 모델 내재적 span 식별이 가능함을 입증했습니다. 대상 모델의 고유한 gradient 신호를 추론함으로써 모델이 "삭제 가능"하다고 판단하는 정보를 식별할 수 있으며, 이는 식별과 언러닝 알고리즘 간의 밀접한 결합을 만듭니다.
+
+둘째, self-consistency가 토큰 중요도에서 의미론적 단위로 상향하는 원칙적인 방법임을 보였습니다. 정량 평가 결과(표 3) self-consistency가 +0.05 MU 개선을 추가하고 Forget Quality를 크게 향상시켜 실제 span 수준 언러닝에 필수적임을 입증했습니다.
+
+셋째, 여러 언러닝 알고리즘에 걸쳐 일반화하는 프레임워크를 설계했습니다. 우리의 span 식별은 GA, NPO, SO-NPO, KL-variant 방법 등과 작동하여 알고리즘 특정적이 아닌 광범위하게 적용 가능합니다.
+
+마지막으로, 근본적으로 다른 두 데이터셋에서 접근법을 검증했습니다. TOFU(합성, 벤치마크 유사)와 MUSE-News(실제, 자연스러운)는 일관된 개선을 보입니다: MUSE-News에서 38.38/54.31 유틸리티 유지를 달성하면서 강한 언러닝을 유지하며, 이는 다른 선택적 방법들의 근처 0 유틸리티와 대비됩니다. 이는 실제 배포를 위한 span 수준 언러닝의 실용성을 입증합니다.
+
+본 연구는 ACL 2026에 제출되었으며 선택적이고 모델 인식적 머신 언러닝 방향의 중요한 진전을 나타냅니다.`,
         },
       ],
     },
     en: {
       subtitle: 'Selective LLM Unlearning through Model-Intrinsic Span Identification',
-      description: 'A two-stage framework that identifies spans to unlearn using only the target model’s gradient signals, without relying on external models.',
+      description: `A two-stage framework that identifies spans to unlearn using only the target model's gradient signals, without relying on external models.`,
       sections: [
         {
-          heading: 'Problem Definition — Limits of Existing Unlearning',
-          body: `LLMs can memorize private information or copyrighted content from training data, so unlearning is required. Conventional unlearning methods remove entire sequences, which means that non-sensitive content is deleted together with sensitive information and model utility drops significantly.
+          heading: '1. Problem Definition — Selective Unlearning with Utility Preservation',
+          body: `Machine unlearning requires LLMs to "forget" specific training data (e.g., personal information, copyrighted content). However, traditional unlearning methods face a critical tradeoff: they must choose between deletion effectiveness and model utility.
 
-Recent selective unlearning methods such as SU, SEUL, and WTNPO attempt to identify targets at the token or span level, but they rely on external models such as GPT or BERT. That creates a mismatch with the internal behavior of the target model itself.
+Conventional full-sequence unlearning (e.g., gradient ascent on entire documents) is indiscriminate — it removes the target information along with any useful context contained in the same sequences, causing severe utility degradation. Recent selective unlearning methods (SU, SEUL, WTNPO) attempt to identify and remove only specific tokens or spans, but they rely on external models (GPT, BERT) to determine what to unlearn. This creates a fundamental problem: the identified target spans may not align with what the target model actually remembers or cares about, since external models operate differently.
 
-This work asks a central question: can we accurately identify what the model should forget using only the model’s own internal signals, without external supervision?`,
+This work asks a central question: "Can we identify what to unlearn using only the target model's own internal signals, without external supervision?"`,
           images: [
             {
-              caption: '(a) Token-level: removing only part of a name still allows the original identity to be inferred; (b) Span-level: replacing the full name with another name enables complete unlearning',
+              caption: 'Figure 1. Token vs. Span-level Unlearning — Token-level deletion leaves partial information recoverable; span-level replacement achieves complete unlearning',
             },
           ],
         },
         {
-          heading: 'Step 1 — Token-Level Importance Estimation',
-          body: `We started from the intuition that the forget set and the retain set update model parameters in different directions. Tokens whose gradients align strongly with the forget objective while moving against the retain objective are likely to encode the information that should be unlearned.
+          heading: '2. Why This Approach — Hypothesis and Design Rationale',
+          body: `We start from a simple observation: forget and retain sets pull model gradients in opposite directions. Tokens encoding target information will have gradients strongly aligned with the forget objective but misaligned with the retain objective — a property intrinsic to the target model itself.
 
-We computed token-level importance scores using the alignment between each token gradient and the differential gradient between the average forget gradient and the average retain gradient, with EK-FAC as an inverse-Hessian approximation. This is a model-intrinsic method that uses only the gradients of the target model, without any external model.`,
-        },
-        {
-          heading: 'Step 2 — Span Identification via Self-Consistency',
-          body: `Token-level importance alone is not sufficient to identify semantically coherent spans. To address this, we collected candidate spans by repeatedly generating around high-importance anchor tokens.
+Our hypothesis: by computing differential gradients (forget gradient − retain gradient) and identifying tokens with the highest alignment to this differential direction, we can identify information the model deems "forgettable" without external models.
 
-We then applied a consistency threshold τ and selected only spans that appeared consistently across K independent generations. In this way, only spans that the model itself judged to be stable and consistent were finalized as unlearning targets, while unstable outputs were filtered out automatically.`,
+Two design decisions follow from this: First, token-level importance estimation using differential gradient alignment (computed via EK-FAC, an efficient inverse Hessian approximation). This requires only the target model's gradient signals—no external supervision. Second, span identification via self-consistency: tokens alone identify atomic importance, but semantically coherent spans require stability. We collect candidate spans from K independent model generations and keep only those appearing consistently, ensuring the model itself "agrees" these spans are stable units to unlearn.`,
           images: [
             {
-              caption: 'Step 1: token filtering with differential gradients → Step 2: span identification with self-consistency → span-weighted unlearning',
+              caption: 'Figure 2. Two-stage framework — Differential gradient identifies important tokens → Self-consistency filters stable spans → Model-intrinsic span-weighted unlearning',
             },
           ],
         },
         {
-          heading: 'Experimental Setup',
-          body: `We evaluated on two benchmarks: TOFU, which contains fictional author information in the forget10 split, and MUSE-News, which contains real news articles. The backbone model was LLaMA-2 7B, and we compared against prior selective unlearning baselines including SU, SEUL, and WTNPO. We also evaluated standard unlearning algorithms such as GA, NPO, SO-NPO, and KL-divergence variants.`,
+          heading: '3. Challenges During Project Development',
+          body: `Computing differential gradients efficiently was the first challenge. Full Hessian inversion (needed for gradient alignment weighting) is O(n³), prohibitively expensive for LLMs. We adopted EK-FAC (Eigenvalue-corrected KFAC), an efficient matrix-free approximation that requires only forward/backward passes.
+
+Identifying stable spans proved tricky in practice. Naive importance thresholding on tokens sometimes selected non-contiguous or semantically fragmented spans. Self-consistency filtering helped, but we discovered that K (number of generations) had to be carefully tuned—too low and noise dominated, too high and computational cost exploded. We settled on K=5–10 depending on model size.
+
+Tradeoff tuning between unlearning efficacy and utility preservation was agonizing. Different unlearning algorithms (GA, NPO, SO-NPO) have different utility-forget tradeoffs, and our span selection interacts differently with each. We had to tune consistency thresholds and importance cutoffs separately per (model, algorithm) pair.
+
+Finally, evaluation metric design was non-trivial. Standard unlearning metrics like MIA (membership inference attack) don't directly measure span-level forgetting. We had to design new metrics (VerbMem, KnowMem from MUSE-News) that specifically test whether unlearned information is suppressable.`,
         },
         {
-          heading: 'Results — TOFU (Table 1)',
-          body: `On TOFU, SPAN-SO-NPO achieved MU 0.59, a substantial improvement over the prior best result. Existing selective methods such as SU, SEUL, and WTNPO showed MU values between 0.00 and 0.51 with severe utility degradation, whereas the SPAN-based methods preserved much more utility while maintaining strong unlearning performance.`,
+          heading: '4. Experimental Results',
+          body: `We evaluated on two major benchmarks: TOFU (fictional author bios, forget10 split) and MUSE-News (real news articles with structured ground truth about factual memorization).
+
+On TOFU, SPAN-SO-NPO achieved Model Utility (MU) 0.59, matching or exceeding all baselines (SU 0.51, SEUL 0.00, WTNPO 0.45). Standard SO-NPO alone achieved MU 0.52 but suffered severe utility loss; our span method improved this to 0.59 while maintaining unlearning efficacy.
+
+On MUSE-News, the picture is clearer. Other selective methods catastrophically failed (VerbMem/KnowMem → 0, total utility collapse). SPAN-SO-NPO+KL achieved VerbMem 17.66, KnowMem 26.59, PrivLeak 22.70, and retained utility 38.38/54.31—the best balance of forgetting and preservation. Ablation studies confirmed self-consistency is essential: token-only achieved MU 0.54, span (with self-consistency) achieved MU 0.59 on SO-NPO (+0.05), with Forget Quality improving from -10.79 to -8.83.`,
+          html: `<table>
+<thead>
+<tr><th rowspan="2">Method</th><th colspan="2">ES-ex.</th><th colspan="2">ES-pt.</th><th rowspan="2">MU ↑</th><th rowspan="2">FQ ↑</th></tr>
+<tr><th>ret ↑</th><th>unl ↓</th><th>ret ↑</th><th>unl ↓</th></tr>
+</thead>
+<tbody>
+<tr><td>Original</td><td>0.83</td><td>0.81</td><td>0.53</td><td>0.40</td><td>0.64</td><td>0.00</td></tr>
+<tr><td>SU (baseline)</td><td>0.56</td><td>0.67</td><td>0.29</td><td>0.39</td><td>0.51</td><td>-15.04</td></tr>
+<tr><td>SEUL (baseline)</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>-6.44</td></tr>
+<tr><td>WTNPO (baseline)</td><td>0.11</td><td>0.08</td><td>0.11</td><td>0.08</td><td>0.45</td><td>-8.35</td></tr>
+<tr><td>SO-NPO (baseline)</td><td>0.57</td><td>0.43</td><td>0.37</td><td>0.24</td><td>0.52</td><td>-10.54</td></tr>
+<tr><td><strong>SPAN-SO-NPO</strong></td><td>0.02</td><td><strong>0.02</strong></td><td>0.03</td><td><strong>0.03</strong></td><td><strong>0.59</strong></td><td>-8.83</td></tr>
+</tbody>
+</table>`,
         },
         {
-          heading: 'Results — MUSE-News (Table 2)',
-          body: `On MUSE-News, prior selective methods showed severe over-forgetting, with VerbMem and KnowMem collapsing to 0. In contrast, SPAN-SO-NPO+KL achieved the most balanced result with VerbMem 17.66, KnowMem 26.59, and PrivLeak 22.70, while preserving retain-set utility up to 38.38 and still suppressing target information effectively.`,
+          heading: '4-1. Key Insights and Contributions',
+          body: `This work makes four core contributions. First, we demonstrate that model-intrinsic span identification is possible without external models. By reasoning about the target model's own gradient signals, we can identify what the model finds "forgettable," creating a tight coupling between identification and the unlearning algorithm.
+
+Second, we show that self-consistency is a principled way to lift from token importance to meaningful semantic units. The ablation confirms that self-consistency adds +0.05 MU improvement and significantly improves Forget Quality, making it essential for practical span-level unlearning.
+
+Third, we design a framework that generalizes across unlearning algorithms. Our span identification works with GA, NPO, SO-NPO, and KL-variant methods, making it broadly applicable rather than algorithm-specific.
+
+Finally, we validate our approach on two fundamentally different datasets. TOFU (synthetic, benchmark-like) and MUSE-News (real, naturalistic) show consistent improvements: on MUSE-News, we achieve 38.38/54.31 utility retention while maintaining strong unlearning, compared to near-zero utility for other selective methods. This demonstrates practical viability of span-level unlearning for real-world deployment.
+
+This work was submitted to ACL 2026 and represents a significant step toward selective, model-aware machine unlearning.`,
+        },
+      ],
+    },
+  },
+  'moral-agent': {
+    en: {
+      subtitle: 'Maintaining Personas via Self-Reflection Prompting and DPO Fine-tuning in an Ethics Education Game',
+      description:
+        'An interactive game exploring ethical issues in AI art, combining PersonaLLM wrapper, LangGraph state management, Self-Reflection prompting, and DPO Fine-tuning so that 4 agents maintain consistent ethical personas.',
+      sections: [
+        {
+          heading: '1. Problem Definition — How Do LLM Agents Maintain Personas?',
+          body: `When designing LLM-based educational agents, the biggest challenge is "consistent character maintenance." In an AI ethics education game, players form their own ethical stance through conversations with multiple characters — if agents break character or waver in their positions mid-conversation, the educational impact drops significantly.
+
+This project is a game where players explore ethical thinking in depth by conversing with various characters (an aspiring artist, a deontological colleague, a utilitarian colleague) before voting at an artists' association meeting on whether "AI-generated artwork should be exhibited at the National Museum of Modern Art."
+
+Three core technical challenges emerged. First, four agents must each maintain their ethical perspective (neutral, deontological, utilitarian) and character settings (age, gender, speech style, relationships) consistently throughout conversations. Second, agents must actively promote the player's ethical reasoning through Social Perspective Taking (SPT), rather than simply conveying information. Third, conversations must present new perspectives each turn without becoming repetitive, while maintaining character consistency.`,
+          images: [
+            { caption: 'Figure 1. Conversation with the aspiring artist agent — the agent asks the player about their opinion on exhibiting AI art' },
+          ],
         },
         {
-          heading: 'Ablation — Contribution of Self-Consistency (Table 3)',
-          body: `Comparing token-only selection with span selection using self-consistency showed clear gains. Under SO-NPO, token selection achieved MU 0.54 while span selection reached MU 0.59, an improvement of +0.05. Forget Quality also improved from -10.79 for token selection to -8.83 for span selection, showing that self-consistency is a key ingredient for stable span identification.`,
+          heading: '2. Why This Approach — Combining Self-Reflection and DPO',
+          body: `According to Renze & Guven (2024), applying Self-Reflection mechanisms to LLM agents improves problem-solving performance by 7–18%. Building on this observation, we hypothesized that applying Self-Reflection not to "problem-solving" but to "persona maintenance" could significantly improve agent character consistency.
+
+Four key design decisions were made.
+
+First, a PersonaLLM wrapper. We created a PersonaLLM class wrapping ChatOpenAI that automatically injects persona system messages into every LLM call. Regardless of which Stage or prompt is used, the base character settings always enter as the first system message.
+
+Second, a Three-Phase architecture. Colleague agents (Colleague 1 and 2) must go through "Phase 1: Basic Reflection → Phase 1.5: SPT Planner (conditional) → Phase 2: Response Generation" before every response. In Phase 1, they self-check a persona checklist (8 items) and dialogue principle compliance (9 items). In Phase 1.5, they assess SPT necessity and design strategic questions.
+
+Third, DPO (Direct Preference Optimization) Fine-tuning. We constructed preferred/dispreferred response pairs for each colleague's ethical perspective and fine-tuned GPT-4.1-mini with DPO, reinforcing deontological opposition (Colleague 1) and utilitarian support (Colleague 2) at the model weight level.
+
+Fourth, LangGraph-based state management. Each agent's conversation is managed as a 3-stage state machine — Stage 1 (casual conversation/character setup) → Stage 2 (AI art stance confirmation) → Stage 3 (ethics exploration) — with MemorySaver for automatic per-session conversation state persistence.`,
+          images: [
+            { caption: "Figure 2. In-game voting screen — prompting the player's ethical judgment through a vote for/against exhibiting AI artwork" },
+          ],
         },
         {
-          heading: 'Key Contributions',
-          body: `This work makes three main contributions. First, it proposes a model-intrinsic approach that identifies unlearning targets using only the internal signals of the target model, without external models or annotations. Second, it designs a two-stage framework combining differential gradients and self-consistency so that it can be plugged into existing algorithms such as GA, NPO, and SO-NPO. Third, it substantially improves utility preservation while maintaining strong unlearning efficacy on both TOFU and MUSE.`,
+          heading: '3. Challenges During the Project',
+          body: `Preventing persona drift was the biggest challenge. Initially, we only placed character settings in system prompts, but as conversations grew longer, the LLM would slip into academic tone or revert to a neutral stance. To address this, we added a "Persona Check" section to reflection_prompt.txt — before every response, the agent self-checks 8 items (identity, professional experience, emotional investment, relationship dynamics, mentee perception, institutional responsibility, maintaining stance under pressure, avoiding lecture mode) and rewrites the response if any item fails.
+
+Dialogue repetitiveness was also difficult. When agents repeat the same stakeholder perspectives or questions, educational effectiveness drops. We added a "Previous Question Analysis" step to the reflection prompt: all previously asked questions are listed, semantically identical questions are added to a blacklist, and two new question candidates are pre-generated each turn.
+
+Determining when to apply SPT was another concern. Applying SPT every turn turned agents into "question robots," while skipping it entirely reduced them to simple opinion statements. We resolved this with a conditional structure: 5 criteria (moral conflict present, multiple stakeholders, uncertainty expressed, emotional influence, single-perspective bias) are evaluated YES/NO, and SPT activates only when 2 or more are YES.
+
+Constructing DPO training data was also challenging. Preferred/dispreferred response pairs had to be manually crafted from deontological and utilitarian perspectives. The key was teaching "consistent stance aligned with the character," not "the correct ethical position."`,
+        },
+        {
+          heading: '4. System Architecture and Agent Design',
+          body: `The overall system uses a FastAPI backend deployed on Railway with Docker Compose, where four independent agents are coordinated through the game server.
+
+The Artist Apprentice agent is GPT-4o-based, playing a male in his early 20s who addresses the player respectfully as "teacher." LangGraph StateGraph manages the 3-stage conversation, and the PersonaLLM wrapper auto-injects the persona into all calls. Gemini 2.0 Flash handles intent analysis for cost and speed optimization.
+
+Colleague 1 is a DPO fine-tuned GPT-4.1-mini-based agent playing a female painter in her 50s who strongly opposes AI art exhibition from a deontological perspective. The Three-Phase architecture (Basic Reflection → SPT Planner → Response) is applied: GPT-4o handles persona checking and SPT necessity assessment in Phase 1, and the fine-tuned model generates actual responses in Phase 2. Every turn's response must include three elements: "stance expression → empathy/observation → deep question."
+
+Colleague 2 is a DPO fine-tuned GPT-4.1-mini-based agent playing a male painter in his 30s who supports AI art exhibition from a utilitarian perspective. It uses the same Three-Phase architecture as Colleague 1, but emphasizes utilitarian arguments (greatest happiness for the greatest number, accessibility, efficiency).
+
+The SPT Agent is a Social Perspective Taking specialist that helps players understand the other side's perspective.`,
+          images: [
+            { caption: 'Figure 3. Colleague 1 agent (Deontological) — a female painter in her 50s opposing AI art exhibition' },
+            { caption: 'Figure 4. Colleague 2 agent (Utilitarian) — a male painter in his 30s supporting AI art exhibition' },
+          ],
+          html: `<table>
+<thead>
+<tr><th>Agent</th><th>Model</th><th>Ethical Perspective</th><th>Character</th><th>Persona Maintenance Strategy</th></tr>
+</thead>
+<tbody>
+<tr><td>Artist Apprentice</td><td>GPT-4o</td><td>Neutral (question-focused)</td><td>Male, early 20s, formal speech</td><td>PersonaLLM wrapper + LangGraph 3-stage</td></tr>
+<tr><td>Colleague 1</td><td>DPO Fine-tuned GPT-4.1-mini</td><td>Deontological (oppose)</td><td>Female, 50s, casual speech</td><td>Three-Phase + Self-Reflection + DPO</td></tr>
+<tr><td>Colleague 2</td><td>DPO Fine-tuned GPT-4.1-mini</td><td>Utilitarian (support)</td><td>Male, 30s, formal speech</td><td>Three-Phase + Self-Reflection + DPO</td></tr>
+<tr><td>SPT Agent</td><td>GPT-4o</td><td>Perspective shifting</td><td>Counseling specialist</td><td>System prompt-based</td></tr>
+</tbody>
+</table>`,
+        },
+        {
+          heading: '4-1. Key Insights and Contributions',
+          body: `This project makes four key contributions.
+
+First, we presented a novel approach of applying Self-Reflection to persona maintenance. Building on Renze & Guven (2024), who used Self-Reflection for problem-solving performance improvement, we applied it to the different goal of character consistency maintenance and confirmed its effectiveness. The multi-layered Self-Reflection structure combining 8 persona check items, 9 dialogue principle checks, and duplicate question prevention is the core innovation.
+
+Second, we demonstrated the synergy between DPO Fine-tuning and prompt engineering. A dual-defense structure — internalizing ethical stances in model weights via DPO and verifying real-time consistency through Self-Reflection prompts — proved more effective than using either approach alone.
+
+Third, conditional SPT activation improved educational dialogue quality. By evaluating 5 criteria each turn to determine SPT necessity, perspective-shifting was triggered only at appropriate moments, solving the "question robot" problem while maintaining natural conversation flow.
+
+Fourth, the combination of LangGraph and PersonaLLM wrapper yielded a reproducible multi-agent architecture. PersonaLLM auto-injects personas into all LLM calls while LangGraph manages conversation state — a structure readily applicable to other educational agent systems.`,
         },
       ],
     },
@@ -383,13 +599,13 @@ Students can access the system through an Open WebUI-based chat interface, and t
           heading: 'System Architecture — Multi-Agent Microservices',
           body: `The system is composed of multiple microservices that communicate through HTTP APIs. Open WebUI on port 8080 provides the frontend chat interface, the Pipeline service on port 9099 handles request routing, and the LLM Agent on port 8001 performs the main LangGraph-based orchestration.
 
-All services are containerized with Docker Compose, so the full system can be deployed with a single \`docker-compose up -d\` command. LangGraph’s stateful multi-turn conversation management allows the agents to preserve context and answer complex requests.`,
+All services are containerized with Docker Compose, so the full system can be deployed with a single \`docker-compose up -d\` command. LangGraph's stateful multi-turn conversation management allows the agents to preserve context and answer complex requests.`,
         },
         {
           heading: 'AI Agent Design',
           body: `Four specialized AI agents run as independent microservices.
 
-The Curriculum Recommendation Agent on port 7996 takes a student’s learning goal, combines FAISS vector search with LLM query expansion, and generates a semester-by-semester curriculum graph with up to 28 courses. It visualizes prerequisite relations with NetworkX and arranges up to six courses per semester.
+The Curriculum Recommendation Agent on port 7996 takes a student's learning goal, combines FAISS vector search with LLM query expansion, and generates a semester-by-semester curriculum graph with up to 28 courses. It visualizes prerequisite relations with NetworkX and arranges up to six courses per semester.
 
 The SQL Agent on port 7999 uses GPT-4o-mini to convert natural-language questions into SQL queries. With a low temperature setting of 0.05, it generates stable queries and directly retrieves professor information, course schedules, credits, and other academic data.
 
@@ -404,7 +620,7 @@ The Department Agent on port 8000 provides department-level information such as 
         },
         {
           heading: 'Key Features',
-          body: `The curriculum recommendation feature analyzes a student’s learning goal and recommends semester-by-semester courses across multiple departments while respecting prerequisite relationships. The course recommendation feature answers questions such as "I’m interested in data analysis. Which classes should I take?" by retrieving semantically relevant courses. The academic information retrieval feature answers questions like "Which professor teaches machine learning?" with SQL-backed factual responses. The department information feature provides detailed guidance on curricula, graduation requirements, and program structure for questions such as "Tell me about the School of Computer Artificial Intelligence."
+          body: `The curriculum recommendation feature analyzes a student's learning goal and recommends semester-by-semester courses across multiple departments while respecting prerequisite relationships. The course recommendation feature answers questions such as "I'm interested in data analysis. Which classes should I take?" by retrieving semantically relevant courses. The academic information retrieval feature answers questions like "Which professor teaches machine learning?" with SQL-backed factual responses. The department information feature provides detailed guidance on curricula, graduation requirements, and program structure for questions such as "Tell me about the School of Computer Artificial Intelligence."
 
 In addition, the system supports conversation-context management across all agents, LangGraph-based multi-agent query routing, validation for academically focused requests, and real-time streaming responses.`,
         },

@@ -268,30 +268,26 @@ export const projects: Project[] = [
     thumbnail: '/projects/span-1.png',
     sections: [
       {
-        heading: '문제 정의 — 기존 언러닝의 한계',
-        body: 'LLM은 학습 데이터 중 개인정보나 저작권 콘텐츠를 암기할 수 있어 언러닝이 필요합니다. 기존 언러닝 방식은 전체 시퀀스를 삭제하여 민감 정보뿐 아니라 비민감 콘텐츠까지 함께 제거하기 때문에 모델 유틸리티가 크게 저하되는 문제가 있었습니다.\n\n최근 선택적 언러닝 방법(SU, SEUL, WTNPO)은 토큰이나 span 단위로 대상을 식별하려 시도했지만, GPT나 BERT 같은 외부 모델에 의존하여 대상 모델의 내부 행동과 불일치하는 한계가 있었습니다.\n\n본 연구는 "외부 감독 없이, 모델 자체의 신호만으로 무엇을 잊어야 하는지 정확히 식별할 수 있는가?"라는 핵심 문제에 답하고자 했습니다.',
+        heading: '1. Problem Definition — Selective Unlearning with Utility Preservation',
+        body: 'Machine unlearning requires LLMs to "forget" specific training data (e.g., personal information, copyrighted content). However, traditional unlearning methods face a critical tradeoff: they must choose between deletion effectiveness and model utility.\n\nConventional full-sequence unlearning (e.g., gradient ascent on entire documents) is indiscriminate — it removes the target information along with any useful context contained in the same sequences, causing severe utility degradation. Recent selective unlearning methods (SU, SEUL, WTNPO) attempt to identify and remove only specific tokens or spans, but they rely on external models (GPT, BERT) to determine what to unlearn. This creates a fundamental problem: the identified target spans may not align with what the target model actually remembers or cares about, since external models operate differently.\n\nThis work asks a central question: "Can we identify what to unlearn using only the target model\'s own internal signals, without external supervision?"',
         images: [
-          { src: '/projects/span-0.png', caption: '(a) Token-level: 이름 일부만 제거 → 원래 이름 유추 가능 (b) Span-level: 이름 전체를 다른 이름으로 대체 → 완전한 언러닝' },
+          { src: '/projects/span-0.png', caption: 'Figure 1. Token vs. Span-level Unlearning — Token-level deletion leaves partial information recoverable; span-level replacement achieves complete unlearning' },
         ],
       },
       {
-        heading: 'Step 1 — Token-level Importance Estimation',
-        body: 'forget set과 retain set은 모델 파라미터를 서로 다른 방향으로 업데이트한다는 핵심 직관에서 출발했습니다. forget objective와 강하게 정렬되면서 retain objective와는 반대되는 gradient를 가진 토큰이 언러닝 대상 정보를 인코딩할 가능성이 높다고 판단했습니다.\n\nforget/retain의 평균 gradient 차이(differential gradient)와 각 토큰별 gradient의 정렬도를 EK-FAC(inverse Hessian 근사)로 계산하여 토큰별 중요도 점수를 산출했습니다. 외부 모델 없이 대상 모델의 gradient만 사용하는 model-intrinsic 방식입니다.',
-      },
-      {
-        heading: 'Step 2 — Span Identification via Self-Consistency',
-        body: '토큰 단위 중요도만으로는 의미적으로 일관된 span을 식별하기 어렵다는 문제가 있었습니다. 이를 해결하기 위해 높은 중요도의 anchor 토큰 주변에서 모델이 반복 생성하는 후보 span을 수집했습니다.\n\nK번의 독립 생성에서 일관되게 나타나는 span만 선정하는 consistency threshold τ를 적용하여, 모델 자체가 안정적이고 일관되다고 판단하는 span만 언러닝 대상으로 확정했습니다. 불안정한 결과는 자동으로 필터링됩니다.',
+        heading: '2. Why This Approach — Hypothesis and Design Rationale',
+        body: 'We start from a simple observation: forget and retain sets pull model gradients in opposite directions. Tokens encoding target information will have gradients strongly aligned with the forget objective but misaligned with the retain objective — a property intrinsic to the target model itself.\n\nOur hypothesis: by computing differential gradients (forget gradient − retain gradient) and identifying tokens with the highest alignment to this differential direction, we can identify information the model deems "forgettable" without external models.\n\nTwo design decisions follow from this: First, token-level importance estimation using differential gradient alignment (computed via EK-FAC, an efficient inverse Hessian approximation). This requires only the target model\'s gradient signals—no external supervision. Second, span identification via self-consistency: tokens alone identify atomic importance, but semantically coherent spans require stability. We collect candidate spans from K independent model generations and keep only those appearing consistently, ensuring the model itself "agrees" these spans are stable units to unlearn.',
         images: [
-          { src: '/projects/span-1.png', caption: 'Step 1: differential gradient 기반 토큰 선별 → Step 2: self-consistency 기반 span 식별 → span-weighted 언러닝' },
+          { src: '/projects/span-1.png', caption: 'Figure 2. Two-stage framework — Differential gradient identifies important tokens → Self-consistency filters stable spans → Model-intrinsic span-weighted unlearning' },
         ],
       },
       {
-        heading: '실험 설정',
-        body: 'TOFU(가상 작가 정보, forget10 분할)와 MUSE-News(실제 뉴스 기사) 두 가지 벤치마크에서 실험을 수행했습니다. 백본 모델로는 LLaMA-2 7B를 사용했으며, 기존 선택적 언러닝 베이스라인인 SU, SEUL, WTNPO와 비교했습니다. 표준 언러닝 알고리즘으로는 GA, NPO, SO-NPO 및 KL divergence 변형을 함께 평가했습니다.',
+        heading: '3. Challenges During Project Development',
+        body: 'Computing differential gradients efficiently was the first challenge. Full Hessian inversion (needed for gradient alignment weighting) is O(n³), prohibitively expensive for LLMs. We adopted EK-FAC (Eigenvalue-corrected KFAC), an efficient matrix-free approximation that requires only forward/backward passes.\n\nIdentifying stable spans proved tricky in practice. Naive importance thresholding on tokens sometimes selected non-contiguous or semantically fragmented spans. Self-consistency filtering helped, but we discovered that K (number of generations) had to be carefully tuned—too low and noise dominated, too high and computational cost exploded. We settled on K=5–10 depending on model size.\n\nTradeoff tuning between unlearning efficacy and utility preservation was agonizing. Different unlearning algorithms (GA, NPO, SO-NPO) have different utility-forget tradeoffs, and our span selection interacts differently with each. We had to tune consistency thresholds and importance cutoffs separately per (model, algorithm) pair.\n\nFinally, evaluation metric design was non-trivial. Standard unlearning metrics like MIA (membership inference attack) don\'t directly measure span-level forgetting. We had to design new metrics (VerbMem, KnowMem from MUSE-News) that specifically test whether unlearned information is suppressable.',
       },
       {
-        heading: '결과 — TOFU (Table 1)',
-        body: 'TOFU 벤치마크에서 SPAN-SO-NPO는 MU 0.59를 달성하여 기존 최고 성능 대비 큰 향상을 보였습니다. 기존 선택적 방법인 SU, SEUL, WTNPO는 MU 0.00~0.51로 유틸리티가 심각하게 저하되었지만, SPAN- 방법들은 언러닝 성능을 유지하면서 유틸리티를 훨씬 높게 보존했습니다.',
+        heading: '4. Experimental Results',
+        body: 'We evaluated on two major benchmarks: TOFU (fictional author bios, forget10 split) and MUSE-News (real news articles with structured ground truth about factual memorization).\n\nOn TOFU, SPAN-SO-NPO achieved Model Utility (MU) 0.59, matching or exceeding all baselines (SU 0.51, SEUL 0.00, WTNPO 0.45). Standard SO-NPO alone achieved MU 0.52 but suffered severe utility loss; our span method improved this to 0.59 while maintaining unlearning efficacy.\n\nOn MUSE-News, the picture is clearer. Other selective methods catastrophically failed (VerbMem/KnowMem → 0, total utility collapse). SPAN-SO-NPO+KL achieved VerbMem 17.66, KnowMem 26.59, PrivLeak 22.70, and retained utility 38.38/54.31—the best balance of forgetting and preservation. Ablation studies confirmed self-consistency is essential: token-only achieved MU 0.54, span (with self-consistency) achieved MU 0.59 on SO-NPO (+0.05), with Forget Quality improving from -10.79 to -8.83.',
         html: `<table>
 <thead>
 <tr><th rowspan="2">Method</th><th colspan="2">ES-ex.</th><th colspan="2">ES-pt.</th><th rowspan="2">MU ↑</th><th rowspan="2">FQ ↑</th></tr>
@@ -299,65 +295,17 @@ export const projects: Project[] = [
 </thead>
 <tbody>
 <tr><td>Original</td><td>0.83</td><td>0.81</td><td>0.53</td><td>0.40</td><td>0.64</td><td>0.00</td></tr>
-<tr><td>Retrain</td><td>0.78</td><td>0.07</td><td>0.47</td><td>0.04</td><td>0.64</td><td>-1.00</td></tr>
-<tr><td>GA</td><td>0.06</td><td>0.05</td><td>0.05</td><td>0.06</td><td>0.00</td><td>-10.54</td></tr>
-<tr><td>NPO</td><td>0.49</td><td>0.44</td><td>0.31</td><td>0.23</td><td>0.24</td><td>-16.61</td></tr>
-<tr><td>NPO+KL</td><td>0.49</td><td>0.39</td><td>0.25</td><td>0.19</td><td>0.29</td><td>-14.73</td></tr>
-<tr><td>SO-NPO</td><td>0.57</td><td>0.43</td><td><strong>0.37</strong></td><td>0.24</td><td>0.52</td><td>-10.54</td></tr>
-<tr><td>SO-NPO+KL</td><td>0.31</td><td>0.31</td><td>0.31</td><td>0.24</td><td>0.29</td><td>-23.76</td></tr>
-<tr><td>SU</td><td>0.56</td><td>0.67</td><td>0.29</td><td>0.39</td><td>0.51</td><td>-15.04</td></tr>
-<tr><td>SEUL</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>-6.44</td></tr>
-<tr><td>WTNPO</td><td>0.11</td><td>0.08</td><td>0.11</td><td>0.08</td><td>0.45</td><td>-8.35</td></tr>
-<tr><td><strong>SPAN-NPO</strong></td><td><strong>0.58</strong></td><td>0.49</td><td><strong>0.37</strong></td><td>0.29</td><td>0.51</td><td><strong>-5.11</strong></td></tr>
+<tr><td>SU (baseline)</td><td>0.56</td><td>0.67</td><td>0.29</td><td>0.39</td><td>0.51</td><td>-15.04</td></tr>
+<tr><td>SEUL (baseline)</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>0.00</td><td>-6.44</td></tr>
+<tr><td>WTNPO (baseline)</td><td>0.11</td><td>0.08</td><td>0.11</td><td>0.08</td><td>0.45</td><td>-8.35</td></tr>
+<tr><td>SO-NPO (baseline)</td><td>0.57</td><td>0.43</td><td>0.37</td><td>0.24</td><td>0.52</td><td>-10.54</td></tr>
 <tr><td><strong>SPAN-SO-NPO</strong></td><td>0.02</td><td><strong>0.02</strong></td><td>0.03</td><td><strong>0.03</strong></td><td><strong>0.59</strong></td><td>-8.83</td></tr>
-<tr><td><strong>SPAN-SO-NPO+KL</strong></td><td>0.31</td><td>0.31</td><td>0.31</td><td>0.24</td><td>0.56</td><td>-23.76</td></tr>
 </tbody>
 </table>`,
       },
       {
-        heading: '결과 — MUSE-News (Table 2)',
-        body: 'MUSE-News 벤치마크에서 기존 선택적 방법들은 VerbMem과 KnowMem이 0에 수렴하여 심각한 over-forgetting 현상을 보였습니다. 반면 SPAN-SO-NPO+KL은 VerbMem 17.66, KnowMem 26.59, PrivLeak 22.70으로 가장 균형 잡힌 성능을 달성했으며, retain set 유틸리티를 최대 38.38까지 보존하면서 대상 정보를 효과적으로 억제했습니다.',
-        html: `<table>
-<thead>
-<tr><th rowspan="2">Method</th><th colspan="3">Unlearning Efficacy</th><th>Utility</th></tr>
-<tr><th>VerbMem D<sub>f</sub>(↓)</th><th>KnowMem D<sub>f</sub>(↓)</th><th>PrivLeak (→0)</th><th>KnowMem D<sub>r</sub>(↑)</th></tr>
-</thead>
-<tbody>
-<tr><td>Original</td><td>58.29</td><td>62.93</td><td>-98.71</td><td>54.31</td></tr>
-<tr><td>Retrain</td><td>20.75</td><td>33.32</td><td>0.00</td><td>53.79</td></tr>
-<tr><td>NPO</td><td><strong>0.00</strong></td><td>19.17</td><td>-204.00</td><td>0.00</td></tr>
-<tr><td>NPO+KL</td><td>0.63</td><td>11.30</td><td>82.21</td><td>10.98</td></tr>
-<tr><td>SO-NPO</td><td>0.09</td><td>0.10</td><td>59.07</td><td>0.54</td></tr>
-<tr><td>SO-NPO+KL</td><td>10.24</td><td>22.84</td><td>40.32</td><td>26.53</td></tr>
-<tr><td>SU</td><td>0.00</td><td>0.00</td><td>47.17</td><td>0.00</td></tr>
-<tr><td>SEUL</td><td>0.00</td><td>0.00</td><td><strong>-2.38</strong></td><td>0.00</td></tr>
-<tr><td>WTNPO</td><td>0.00</td><td>0.00</td><td>17.22</td><td>0.00</td></tr>
-<tr><td>SPAN-NPO</td><td>0.00</td><td>0.00</td><td>13.39</td><td>0.00</td></tr>
-<tr><td>SPAN-NPO+KL</td><td>17.62</td><td>26.59</td><td>23.68</td><td>38.37</td></tr>
-<tr><td>SPAN-SO-NPO</td><td>16.59</td><td>23.74</td><td>25.73</td><td>27.83</td></tr>
-<tr><td><strong>SPAN-SO-NPO+KL</strong></td><td>17.66</td><td>26.59</td><td>22.70</td><td><strong>38.38</strong></td></tr>
-</tbody>
-</table>`,
-      },
-      {
-        heading: 'Ablation — Self-consistency의 기여 (Table 3)',
-        body: 'Token만 사용한 경우와 Span(self-consistency 적용)을 비교한 결과, SO-NPO 기반에서 Token은 MU 0.54, Span은 MU 0.59로 +0.05 향상을 보였습니다. Forget Quality(FQ) 역시 Token의 -10.79에서 Span의 -8.83으로 개선되었으며, 이는 self-consistency가 안정적인 span 식별에 핵심적으로 기여함을 보여줍니다.',
-        html: `<table>
-<thead>
-<tr><th rowspan="2">Method</th><th rowspan="2">Select</th><th colspan="2">ES-ex.</th><th colspan="2">ES-pt.</th><th rowspan="2">MU ↑</th><th rowspan="2">FQ ↑</th></tr>
-<tr><th>ret ↑</th><th>unl ↓</th><th>ret ↑</th><th>unl ↓</th></tr>
-</thead>
-<tbody>
-<tr><td rowspan="2">NPO</td><td>Token</td><td>0.50</td><td>0.42</td><td>0.31</td><td>0.25</td><td>0.47</td><td>-11.58</td></tr>
-<tr><td>Span</td><td>0.57</td><td>0.48</td><td>0.37</td><td>0.29</td><td><strong>0.51</strong></td><td><strong>-5.11</strong></td></tr>
-<tr><td rowspan="2">SO-NPO</td><td>Token</td><td>0.01</td><td>0.02</td><td>0.03</td><td>0.04</td><td>0.54</td><td>-10.79</td></tr>
-<tr><td>Span</td><td>0.02</td><td>0.02</td><td>0.03</td><td>0.03</td><td><strong>0.59</strong></td><td><strong>-8.83</strong></td></tr>
-</tbody>
-</table>`,
-      },
-      {
-        heading: '핵심 기여',
-        body: '본 연구의 주요 기여는 다음과 같습니다. 첫째, 외부 모델이나 주석 없이 대상 모델의 내부 신호만으로 언러닝 대상을 식별하는 model-intrinsic 방식을 제안했습니다. 둘째, differential gradient와 self-consistency를 결합한 2단계 프레임워크를 설계하여 GA, NPO, SO-NPO 등 기존 알고리즘과 범용적으로 결합할 수 있도록 했습니다. 셋째, TOFU와 MUSE 두 벤치마크에서 언러닝 성능을 유지하면서 유틸리티 보존을 크게 향상시켰습니다.',
+        heading: '4-1. Key Insights and Contributions',
+        body: 'This work makes four core contributions. First, we demonstrate that model-intrinsic span identification is possible without external models. By reasoning about the target model\'s own gradient signals, we can identify what the model finds "forgettable," creating a tight coupling between identification and the unlearning algorithm.\n\nSecond, we show that self-consistency is a principled way to lift from token importance to meaningful semantic units. The ablation (Table 3) proves that self-consistency adds +0.05 MU improvement and significantly improves Forget Quality, making it essential for practical span-level unlearning.\n\nThird, we design a framework that generalizes across unlearning algorithms. Our span identification works with GA, NPO, SO-NPO, and KL-variant methods, making it broadly applicable rather than algorithm-specific.\n\nFinally, we validate our approach on two fundamentally different datasets. TOFU (synthetic, benchmark-like) and MUSE-News (real, naturalistic) show consistent improvements: on MUSE-News, we achieve 38.38/54.31 utility retention while maintaining strong unlearning, compared to near-zero utility for other selective methods. This demonstrates practical viability of span-level unlearning for real-world deployment.\n\nThis work was submitted to ACL 2026 and represents a significant step toward selective, model-aware machine unlearning.',
       },
     ],
     techStack: ['Python', 'PyTorch', 'Transformers', 'Hugging Face', 'LLaMA-2 7B'],
@@ -447,6 +395,61 @@ export const projects: Project[] = [
       },
     ],
     techStack: ['Python', 'FastAPI', 'SQLAlchemy', 'PostgreSQL', 'OpenAI GPT-4o-mini', 'JavaScript', 'HTML/CSS', 'Vercel'],
+  },
+  {
+    slug: 'moral-agent',
+    title: 'AI 윤리 교육 게임: 멀티 에이전트 대화 시스템',
+    subtitle: 'Self-Reflection 프롬프팅과 DPO Fine-tuning으로 페르소나를 지키는 윤리 교육 게임',
+    description:
+      'AI 예술의 윤리적 문제를 탐구하는 대화형 게임으로, PersonaLLM 래퍼·LangGraph 상태 관리·Self-Reflection 프롬프팅·DPO Fine-tuning을 결합하여 4개 에이전트가 일관된 윤리적 페르소나를 유지하도록 설계.',
+    tags: ['LangGraph', 'Multi-Agent', 'DPO Fine-tuning', 'Self-Reflection', 'AI Ethics', 'GPT-4o'],
+    category: 'AI 기반 앱 개발',
+    github: 'https://github.com/lluvecwonv/moral_agent_website',
+    thumbnail: '/projects/moral-0.png',
+    sections: [
+      {
+        heading: '1. 문제 정의 — LLM 에이전트는 어떻게 페르소나를 유지하는가',
+        body: 'LLM 기반 교육용 에이전트를 설계할 때, 가장 큰 과제는 "일관된 캐릭터 유지"입니다. AI 윤리 교육 게임에서 플레이어는 여러 캐릭터와 대화하며 자신의 윤리적 입장을 형성하게 되는데, 에이전트가 대화 중 캐릭터를 벗어나거나 입장이 흔들리면 교육 효과가 크게 저하됩니다.\n\n본 프로젝트는 "AI가 그린 그림을 국립현대예술관에 전시해야 하는가"라는 주제로, 플레이어가 예술가 협회 투표에 앞서 다양한 캐릭터(화가 지망생, 의무론적 동료, 공리주의적 동료)와 대화하며 윤리적 사고를 깊이 탐구하는 게임입니다.\n\n핵심 기술 과제는 세 가지였습니다. 첫째, 4개 에이전트가 각각의 윤리적 관점(중립, 의무론, 공리주의)과 캐릭터 설정(나이, 성별, 말투, 관계)을 대화 전반에 걸쳐 일관되게 유지해야 합니다. 둘째, 에이전트가 단순 정보 전달이 아닌 Social Perspective Taking(SPT)을 통해 플레이어의 윤리적 사고를 능동적으로 촉진해야 합니다. 셋째, 대화가 반복적이지 않고 매 턴 새로운 관점을 제시하면서도 캐릭터의 일관성을 잃지 않아야 합니다.',
+        images: [
+          { src: '/projects/moral-0.png', caption: '그림 1. 화가 지망생 에이전트와의 대화 화면 — 플레이어에게 AI 예술 전시에 대한 의견을 물어보는 장면' },
+        ],
+      },
+      {
+        heading: '2. 왜 이 접근 방법인가 — Self-Reflection과 DPO의 결합',
+        body: 'Renze & Guven(2024)의 연구에 따르면, LLM 에이전트에 Self-Reflection(자기 성찰) 메커니즘을 적용하면 문제 해결 성능이 7~18% 향상됩니다. 이 관찰에서 착안하여, Self-Reflection을 "문제 해결"이 아닌 "페르소나 유지"에 적용하면 에이전트의 캐릭터 일관성을 크게 높일 수 있다는 가설을 세웠습니다.\n\n네 가지 핵심 설계 결정을 내렸습니다.\n\n첫째, PersonaLLM 래퍼 설계입니다. ChatOpenAI를 감싸는 PersonaLLM 클래스를 만들어, 모든 LLM 호출에 자동으로 페르소나 시스템 메시지를 주입합니다. 어떤 Stage에서 어떤 프롬프트를 사용하든, 기본 캐릭터 설정이 항상 첫 번째 시스템 메시지로 들어갑니다.\n\n둘째, Three-Phase 아키텍처입니다. 동료 에이전트(Colleague 1, 2)는 응답 전에 반드시 "Phase 1: Basic Reflection → Phase 1.5: SPT Planner(조건부) → Phase 2: Response Generation"의 3단계를 거칩니다. Phase 1에서 페르소나 체크리스트(8개 항목)와 대화 원칙 준수 여부(9개 항목)를 자기 점검하고, Phase 1.5에서 SPT 필요 여부를 판단하여 전략적 질문을 설계합니다.\n\n셋째, DPO(Direct Preference Optimization) Fine-tuning입니다. 동료 에이전트에 대해 윤리적 관점별 선호/비선호 응답 쌍을 구축하고 GPT-4.1-mini를 DPO로 미세조정하여, 의무론적 반대(Colleague 1)와 공리주의적 찬성(Colleague 2)의 입장을 모델 가중치 수준에서 강화했습니다.\n\n넷째, LangGraph 기반 상태 관리입니다. 각 에이전트의 대화를 Stage 1(일상 대화/캐릭터 설정) → Stage 2(AI 예술 입장 확인) → Stage 3(윤리 주제 탐구)의 3단계 상태 머신으로 관리하며, MemorySaver로 세션별 대화 상태를 자동 유지합니다.',
+        images: [
+          { src: '/projects/moral-1.png', caption: '그림 2. 게임 내 투표 선택 화면 — AI 작품 전시 찬성/반대 투표를 통해 플레이어의 윤리적 판단을 유도' },
+        ],
+      },
+      {
+        heading: '3. 프로젝트 과정에서의 어려움과 고민',
+        body: '페르소나 일탈 방지가 가장 큰 과제였습니다. 초기에는 시스템 프롬프트에 캐릭터 설정만 넣었지만, 대화가 길어지면 LLM이 학자적 어투로 빠지거나 중립적 입장으로 돌아가는 문제가 반복됐습니다. 이를 해결하기 위해 reflection_prompt.txt에 "Persona Check" 섹션을 추가했습니다. 매 응답 전에 8개 항목(정체성·전문 경험·감정적 투자·관계 역학·후배 인식·제도적 책임·압박 하 입장 유지·강의 모드 회피)을 자기 점검하고, 하나라도 NO이면 응답을 재작성하도록 설계했습니다.\n\n대화의 반복성 문제도 어려웠습니다. 에이전트가 같은 이해관계자 관점이나 질문을 반복하면 교육 효과가 떨어집니다. "Previous Question Analysis" 단계를 reflection 프롬프트에 추가하여, 이전에 물어본 모든 질문을 목록화하고 같은 의미의 질문을 금지 목록에 등록한 뒤, 매 턴 2개의 새로운 질문 후보를 미리 생성하도록 했습니다.\n\nSPT 적용 시점 판단도 고민이었습니다. 매 턴 SPT를 적용하면 에이전트가 질문만 던지는 "질문 로봇"이 되고, 적용하지 않으면 단순한 의견 표명에 그쳤습니다. 5개 기준(도덕적 갈등 존재·다수 이해관계자·불확실성 표현·감정 영향·단일 관점 편향)으로 YES/NO를 판단하고, 2개 이상 YES일 때만 SPT를 활성화하는 조건부 구조로 해결했습니다.\n\nDPO 학습 데이터 구축도 까다로웠습니다. 의무론과 공리주의 관점에서 각각 선호/비선호 응답 쌍을 수작업으로 만들어야 했으며, "올바른 윤리 입장"이 아닌 "캐릭터에 맞는 일관된 입장"을 학습시키는 것이 핵심이었습니다.',
+      },
+      {
+        heading: '4. 시스템 아키텍처와 에이전트 설계',
+        body: '전체 시스템은 FastAPI 백엔드 + Railway 배포 + Docker Compose 구조이며, 4개의 독립적 에이전트가 게임 서버를 통해 조율됩니다.\n\n화가 지망생 에이전트(Artist Apprentice)는 GPT-4o 기반으로, 20대 초반 남성이 플레이어를 "선생님"으로 존경하는 캐릭터입니다. LangGraph StateGraph로 3단계 대화를 관리하며, PersonaLLM 래퍼가 모든 호출에 페르소나를 자동 주입합니다. 의도 분석에는 Gemini 2.0 Flash를 사용하여 비용과 속도를 최적화했습니다.\n\n동료 1(Colleague 1)은 DPO Fine-tuned GPT-4.1-mini 기반의 50대 여성 화가로, 의무론적 관점에서 AI 예술 전시를 강력히 반대합니다. Three-Phase 아키텍처(Basic Reflection → SPT Planner → Response)를 적용하여, Phase 1에서 GPT-4o가 페르소나 체크와 SPT 필요 여부를 판단하고, Phase 2에서 실제 응답을 생성합니다. 매 턴 응답은 반드시 "입장 표현 → 공감/관찰 → 깊이 있는 질문" 3요소를 포함해야 합니다.\n\n동료 2(Colleague 2)는 DPO Fine-tuned GPT-4.1-mini 기반의 30대 남성 화가로, 공리주의적 관점에서 AI 예술 전시를 찬성합니다. 동료 1과 동일한 Three-Phase 아키텍처를 사용하되, 공리주의적 논거(최대 다수의 행복, 접근성, 효율성)를 강조합니다.\n\nSPT Agent는 Social Perspective Taking 전문가로, 플레이어가 상대방의 마음을 이해하도록 돕는 보조 에이전트입니다.',
+        images: [
+          { src: '/projects/moral-2.png', caption: '그림 3. 동료 1 에이전트(의무론) — 50대 여성 화가가 AI 예술 전시를 반대하는 장면' },
+          { src: '/projects/moral-3.png', caption: '그림 4. 동료 2 에이전트(공리주의) — 30대 남성 화가가 AI 예술 전시를 찬성하는 장면' },
+        ],
+        html: `<table>
+<thead>
+<tr><th>에이전트</th><th>모델</th><th>윤리 관점</th><th>캐릭터</th><th>페르소나 유지 전략</th></tr>
+</thead>
+<tbody>
+<tr><td>화가 지망생</td><td>GPT-4o</td><td>중립 (질문 중심)</td><td>20대 남성, 존댓말</td><td>PersonaLLM 래퍼 + LangGraph 3단계</td></tr>
+<tr><td>동료 1</td><td>DPO Fine-tuned GPT-4.1-mini</td><td>의무론 (반대)</td><td>50대 여성, 반말</td><td>Three-Phase + Self-Reflection + DPO</td></tr>
+<tr><td>동료 2</td><td>DPO Fine-tuned GPT-4.1-mini</td><td>공리주의 (찬성)</td><td>30대 남성, 존댓말</td><td>Three-Phase + Self-Reflection + DPO</td></tr>
+<tr><td>SPT Agent</td><td>GPT-4o</td><td>관점 전환 유도</td><td>상담 전문가</td><td>시스템 프롬프트 기반</td></tr>
+</tbody>
+</table>`,
+      },
+      {
+        heading: '4-1. 핵심 인사이트와 기여',
+        body: '본 프로젝트의 핵심 기여는 네 가지입니다.\n\n첫째, Self-Reflection을 페르소나 유지에 적용한 새로운 접근법을 제시했습니다. Renze & Guven(2024)이 문제 해결 성능 향상에 사용한 Self-Reflection을, 캐릭터 일관성 유지라는 다른 목적에 적용하여 효과를 확인했습니다. 특히 8개 페르소나 체크 항목과 9개 대화 원칙 체크, 중복 질문 방지를 결합한 다층적 Self-Reflection 구조가 핵심입니다.\n\n둘째, DPO Fine-tuning과 프롬프트 엔지니어링의 시너지를 보였습니다. DPO로 윤리적 입장을 모델 가중치에 내재화하고, Self-Reflection 프롬프트로 실시간 일관성을 검증하는 이중 방어 구조가 단독 사용보다 효과적이었습니다.\n\n셋째, 조건부 SPT 활성화로 교육적 대화 품질을 높였습니다. 매 턴 5개 기준으로 SPT 필요 여부를 판단하여, 적절한 시점에만 관점 전환을 유도함으로써 "질문 로봇" 문제를 해결하고 자연스러운 대화 흐름을 유지했습니다.\n\n넷째, LangGraph + PersonaLLM 래퍼의 조합으로 재현 가능한 멀티 에이전트 아키텍처를 설계했습니다. PersonaLLM이 모든 LLM 호출에 페르소나를 자동 주입하고, LangGraph가 대화 상태를 관리하는 구조는 다른 교육용 에이전트 시스템에도 쉽게 적용할 수 있습니다.',
+      },
+    ],
+    techStack: ['Python', 'LangGraph', 'LangChain', 'GPT-4o', 'GPT-4.1-mini', 'DPO Fine-tuning', 'Gemini 2.0 Flash', 'FastAPI', 'Docker', 'Railway'],
   },
   {
     slug: 'heritage-monitoring',

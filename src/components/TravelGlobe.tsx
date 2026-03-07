@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect, useCallback, type ChangeEvent } from 'react'
-import Globe from 'react-globe.gl'
+import mapboxgl from 'mapbox-gl'
+import 'mapbox-gl/dist/mapbox-gl.css'
 import {
   getSpots, saveSpots,
   buildArcs,
@@ -8,6 +9,8 @@ import { useAdminAuth } from '../context/AdminAuthContext'
 import { useBlogTheme } from '../context/BlogThemeContext'
 import type { TravelSpot } from '../data/travels'
 import styles from './TravelGlobe.module.css'
+
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN as string
 
 function createPinElement(name: string, color: string, isHome: boolean) {
   const wrapper = document.createElement('div')
@@ -334,7 +337,13 @@ function AddTravelForm({ onSubmit, onClose }: AddFormProps) {
 export default function TravelGlobe() {
   const { isAdmin } = useAdminAuth()
   const { isBlogLight } = useBlogTheme()
-  const globeRef = useRef<any>(null)
+  const mapRef = useRef<mapboxgl.Map | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const markersRef = useRef<mapboxgl.Marker[]>([])
+  const rotatingRef = useRef(true)
+  const animFrameRef = useRef<number>(0)
+  const selectedSpotRef = useRef<TravelSpot | null>(null)
+
   const [spots, setSpots] = useState(getSpots)
   const [selectedSpot, setSelectedSpot] = useState<TravelSpot | null>(null)
   const [photoIndex, setPhotoIndex] = useState(0)
@@ -342,6 +351,12 @@ export default function TravelGlobe() {
   const [showForm, setShowForm] = useState(false)
   const [panelSide, setPanelSide] = useState<'left' | 'right'>('left')
 
+  // selectedSpot을 ref로도 유지 (이벤트 핸들러 클로저용)
+  useEffect(() => {
+    selectedSpotRef.current = selectedSpot
+  }, [selectedSpot])
+
+  // 반응형 사이즈
   useEffect(() => {
     const updateSize = () => {
       const w = Math.min(window.innerWidth - 40, 900)
@@ -353,35 +368,242 @@ export default function TravelGlobe() {
     return () => window.removeEventListener('resize', updateSize)
   }, [])
 
+  // Mapbox 초기화
   useEffect(() => {
-    if (globeRef.current) {
-      const controls = globeRef.current.controls()
-      controls.autoRotate = true
-      controls.autoRotateSpeed = 0.4
-      controls.enableZoom = true
-      controls.minDistance = 150
-      globeRef.current.pointOfView({ lat: 36, lng: 128, altitude: 2.2 }, 1000)
+    if (!containerRef.current) return
+
+    const map = new mapboxgl.Map({
+      container: containerRef.current,
+      style: 'mapbox://styles/mapbox/satellite-streets-v12',
+      projection: 'globe',
+      center: [128, 36],
+      zoom: 2.2,
+      attributionControl: false,
+    })
+
+    map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right')
+
+    map.on('style.load', () => {
+      map.setFog({
+        color: 'rgb(186, 210, 235)',
+        'high-color': 'rgb(36, 92, 223)',
+        'horizon-blend': 0.02,
+        'space-color': 'rgb(11, 11, 25)',
+        'star-intensity': 0.6,
+      })
+    })
+
+    // 아크 레이어 추가
+    map.on('load', () => {
+      map.addSource('arcs', {
+        type: 'geojson',
+        lineMetrics: true,
+        data: { type: 'FeatureCollection', features: [] },
+      })
+
+      map.addLayer({
+        id: 'arc-bg',
+        type: 'line',
+        source: 'arcs',
+        paint: {
+          'line-color': 'rgba(79, 195, 247, 0.25)',
+          'line-width': 1.5,
+        },
+      })
+
+      map.addLayer({
+        id: 'arc-gradient',
+        type: 'line',
+        source: 'arcs',
+        paint: {
+          'line-width': 2.5,
+          'line-gradient': [
+            'interpolate', ['linear'], ['line-progress'],
+            0, '#ff6b9d',
+            1, '#4fc3f7',
+          ],
+          'line-opacity': 0.85,
+        },
+        layout: {
+          'line-cap': 'round',
+          'line-join': 'round',
+        },
+      })
+
+      // 아크 호버 툴팁
+      const popup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false, offset: 10 })
+
+      map.on('mouseenter', 'arc-gradient', (e) => {
+        map.getCanvas().style.cursor = 'pointer'
+        const props = e.features?.[0]?.properties
+        if (props) {
+          popup
+            .setLngLat(e.lngLat)
+            .setHTML(`<div style="color:#fff;font-size:12px;background:rgba(0,0,0,0.7);padding:4px 8px;border-radius:4px;">${props.fromName} → ${props.toName}</div>`)
+            .addTo(map)
+        }
+      })
+
+      map.on('mouseleave', 'arc-gradient', () => {
+        map.getCanvas().style.cursor = ''
+        popup.remove()
+      })
+    })
+
+    // 자동 회전
+    function spinGlobe() {
+      if (map && !map._removed && rotatingRef.current) {
+        const center = map.getCenter()
+        center.lng -= 0.05
+        map.setCenter(center)
+      }
+      animFrameRef.current = requestAnimationFrame(spinGlobe)
+    }
+
+    map.on('load', () => {
+      spinGlobe()
+    })
+
+    // 인터랙션 시 회전 일시정지
+    map.on('mousedown', () => { rotatingRef.current = false })
+    map.on('touchstart', () => { rotatingRef.current = false })
+    map.on('mouseup', () => {
+      if (!selectedSpotRef.current) {
+        setTimeout(() => { rotatingRef.current = true }, 3000)
+      }
+    })
+    map.on('touchend', () => {
+      if (!selectedSpotRef.current) {
+        setTimeout(() => { rotatingRef.current = true }, 3000)
+      }
+    })
+
+    mapRef.current = map
+
+    return () => {
+      cancelAnimationFrame(animFrameRef.current)
+      map.remove()
+      mapRef.current = null
     }
   }, [])
+
+  // 반응형 리사이즈
+  useEffect(() => {
+    if (mapRef.current) {
+      mapRef.current.resize()
+    }
+  }, [dimensions.width, dimensions.height])
+
+  // 테마 전환
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !map.isStyleLoaded()) return
+
+    if (isBlogLight) {
+      map.setFog({
+        color: 'rgb(220, 230, 240)',
+        'high-color': 'rgb(130, 170, 220)',
+        'horizon-blend': 0.04,
+        'space-color': 'rgb(210, 220, 235)',
+        'star-intensity': 0,
+      })
+    } else {
+      map.setFog({
+        color: 'rgb(186, 210, 235)',
+        'high-color': 'rgb(36, 92, 223)',
+        'horizon-blend': 0.02,
+        'space-color': 'rgb(11, 11, 25)',
+        'star-intensity': 0.6,
+      })
+    }
+  }, [isBlogLight])
+
+  // 마커 관리
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map) return
+
+    // 기존 마커 제거
+    markersRef.current.forEach((m) => m.remove())
+    markersRef.current = []
+
+    // 핀 데이터 생성
+    const pinMap = new Map<string, { lat: number; lng: number; name: string; isHome: boolean }>()
+    spots.forEach((s) => {
+      const depKey = `${s.departureLat},${s.departureLng}`
+      if (!pinMap.has(depKey)) {
+        pinMap.set(depKey, { lat: s.departureLat, lng: s.departureLng, name: s.departureName, isHome: true })
+      }
+      pinMap.set(s.id, { lat: s.lat, lng: s.lng, name: s.name, isHome: false })
+    })
+
+    // Mapbox 마커 생성
+    pinMap.forEach((pin, key) => {
+      const el = createPinElement(pin.name, pin.isHome ? '#ff6b9d' : '#4fc3f7', pin.isHome)
+      el.addEventListener('click', () => {
+        const spot = spots.find((s) => s.id === key)
+        if (spot) selectSpot(spot)
+      })
+      const marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' })
+        .setLngLat([pin.lng, pin.lat])
+        .addTo(map)
+      markersRef.current.push(marker)
+    })
+  }, [spots]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 아크 데이터 업데이트
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map) return
+
+    const updateArcs = () => {
+      const source = map.getSource('arcs') as mapboxgl.GeoJSONSource | undefined
+      if (!source) return
+
+      const arcs = buildArcs(spots)
+      source.setData({
+        type: 'FeatureCollection',
+        features: arcs.map((arc) => ({
+          type: 'Feature' as const,
+          properties: { fromName: arc.fromName, toName: arc.toName },
+          geometry: {
+            type: 'LineString' as const,
+            coordinates: [[arc.startLng, arc.startLat], [arc.endLng, arc.endLat]],
+          },
+        })),
+      })
+    }
+
+    if (map.isStyleLoaded()) {
+      updateArcs()
+    } else {
+      map.on('load', updateArcs)
+    }
+  }, [spots])
 
   const selectSpot = useCallback((spot: TravelSpot) => {
     setSelectedSpot(spot)
     setPhotoIndex(0)
-    if (globeRef.current) {
-      // 화면 좌표로 좌/우 판단
-      const coords = globeRef.current.getScreenCoords(spot.lat, spot.lng)
-      if (coords) {
-        const centerX = dimensions.width / 2
-        setPanelSide(coords.x < centerX ? 'left' : 'right')
-      }
-      globeRef.current.pointOfView({ lat: spot.lat, lng: spot.lng, altitude: 1.5 }, 800)
-      globeRef.current.controls().autoRotate = false
+
+    if (mapRef.current) {
+      const point = mapRef.current.project([spot.lng, spot.lat])
+      const containerWidth = mapRef.current.getContainer().clientWidth
+      setPanelSide(point.x < containerWidth / 2 ? 'left' : 'right')
+
+      mapRef.current.flyTo({
+        center: [spot.lng, spot.lat],
+        zoom: 4,
+        duration: 800,
+        essential: true,
+      })
+
+      rotatingRef.current = false
     }
-  }, [dimensions.width])
+  }, [])
 
   const closePanel = () => {
     setSelectedSpot(null)
-    if (globeRef.current) globeRef.current.controls().autoRotate = true
+    rotatingRef.current = true
   }
 
   const handleAddSpot = (spot: TravelSpot) => {
@@ -406,19 +628,6 @@ export default function TravelGlobe() {
     if (selectedSpot?.id === id) closePanel()
   }
 
-  // 핀 마커 데이터 — 출발지 + 도착지 모두 표시 (중복 제거)
-  const pinMap = new Map<string, { lat: number; lng: number; name: string; isHome: boolean }>()
-  spots.forEach((s) => {
-    const depKey = `${s.departureLat},${s.departureLng}`
-    if (!pinMap.has(depKey)) {
-      pinMap.set(depKey, { lat: s.departureLat, lng: s.departureLng, name: s.departureName, isHome: true })
-    }
-    pinMap.set(s.id, { lat: s.lat, lng: s.lng, name: s.name, isHome: false })
-  })
-  const htmlData = Array.from(pinMap.entries()).map(([key, v]) => ({ ...v, id: key }))
-
-  const arcs = buildArcs(spots)
-
   return (
     <div className={`${styles.container} ${isBlogLight ? styles.light : ''}`}>
       <div className={styles.topBar}>
@@ -442,7 +651,7 @@ export default function TravelGlobe() {
       <p className={styles.hint}>지구본을 돌려보세요 — 핀을 클릭하면 사진을 볼 수 있어요</p>
 
       <div className={styles.globeArea}>
-        {/* 왼쪽 사이드 패널 */}
+        {/* 사이드 패널 */}
         {selectedSpot && (
           <div className={`${styles.sidePanel} ${panelSide === 'right' ? styles.sidePanelRight : ''}`}>
             <div className={styles.panelHeader}>
@@ -503,35 +712,9 @@ export default function TravelGlobe() {
 
         {/* 지구본 */}
         <div className={styles.globeWrap}>
-          <Globe
-            ref={globeRef}
-            width={dimensions.width}
-            height={dimensions.height}
-            globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
-            bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
-            backgroundImageUrl="//unpkg.com/three-globe/example/img/night-sky.png"
-            htmlElementsData={htmlData}
-            htmlElement={(d: any) => {
-              const el = createPinElement(d.name, d.isHome ? '#ff6b9d' : '#4fc3f7', d.isHome)
-              el.addEventListener('click', () => {
-                const spot = spots.find((s) => s.id === d.id)
-                if (spot) selectSpot(spot)
-              })
-              return el
-            }}
-            htmlAltitude={0.01}
-            arcsData={arcs}
-            arcColor={() => ['#ff6b9d', '#4fc3f7']}
-            arcStroke={0.7}
-            arcDashLength={0.5}
-            arcDashGap={0.3}
-            arcDashAnimateTime={2000}
-            arcAltitudeAutoScale={0.4}
-            arcLabel={(d: any) =>
-              `<div style="color:#fff;font-size:12px;background:rgba(0,0,0,0.7);padding:4px 8px;border-radius:4px;">${d.fromName} → ${d.toName}</div>`
-            }
-            atmosphereColor="#4a90d9"
-            atmosphereAltitude={0.2}
+          <div
+            ref={containerRef}
+            style={{ width: dimensions.width, height: dimensions.height }}
           />
         </div>
       </div>
