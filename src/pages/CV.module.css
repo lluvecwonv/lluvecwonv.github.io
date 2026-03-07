@@ -1,0 +1,164 @@
+.main {
+  min-height: 100vh;
+  padding-top: calc(var(--nav-height) + 60px);
+  padding-bottom: 80px;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.header {
+  margin-bottom: 40px;
+  padding-bottom: 24px;
+  border-bottom: 2px solid var(--text-primary);
+}
+
+.name {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.info {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.contactLinks {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.contactLinks a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.dot {
+  color: var(--text-tertiary);
+}
+
+.section {
+  margin-bottom: 32px;
+}
+
+.sectionTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.text {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.entry {
+  margin-bottom: 16px;
+}
+
+.entryHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.entryHeader strong {
+  font-weight: 600;
+}
+
+.entryDetail {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.entryDetail a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.date {
+  font-size: 13px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.pubList {
+  list-style: none;
+  padding: 0;
+}
+
+.pubList li {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  padding-left: 16px;
+  position: relative;
+}
+
+.pubList li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--text-tertiary);
+}
+
+.pubList li strong {
+  color: var(--text-primary);
+}
+
+.pubList li em {
+  font-style: italic;
+}
+
+.skillList {
+  list-style: none;
+  padding: 0;
+}
+
+.skillList li {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  padding-left: 16px;
+  position: relative;
+}
+
+.skillList li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--text-tertiary);
+}
+
+@media (max-width: 600px) {
+  .name {
+    font-size: 28px;
+  }
+
+  .entryHeader {
+    flex-direction: column;
+    gap: 2px;
+  }
+}

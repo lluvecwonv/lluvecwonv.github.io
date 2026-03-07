@@ -1,0 +1,183 @@
+/* ── Grid view ── */
+.cardWrap {
+  position: relative;
+}
+
+.card {
+  display: block;
+  text-decoration: none;
+}
+
+.inner {
+  background: var(--blog-surface);
+  border: 1px solid var(--blog-border);
+  border-radius: 8px;
+  padding: 28px;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  height: 100%;
+}
+
+.inner:hover {
+  border-color: var(--blog-card-hover);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+.category {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--blog-card-summary);
+  margin-bottom: 12px;
+  display: block;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--blog-card-title);
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.summary {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--blog-card-summary);
+  margin-bottom: 16px;
+}
+
+.date {
+  font-size: 13px;
+  color: var(--blog-card-date);
+}
+
+/* 그리드 삭제 버튼 */
+.deleteBtnGrid {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 6px;
+  border-radius: 4px;
+  color: var(--blog-delete);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  opacity: 0;
+  display: flex;
+  align-items: center;
+}
+
+.cardWrap:hover .deleteBtnGrid {
+  opacity: 1;
+}
+
+.deleteBtnGrid:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* ── List view ── */
+.listRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.listCard {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 90px 80px 1fr;
+  grid-template-rows: auto auto;
+  gap: 0 16px;
+  align-items: baseline;
+  padding: 16px 20px;
+  border-radius: 8px;
+  transition: background var(--transition-fast);
+}
+
+.listCard:hover {
+  background: var(--blog-active-bg);
+}
+
+.listDate {
+  grid-row: 1;
+  font-size: 13px;
+  color: var(--blog-card-date);
+  white-space: nowrap;
+}
+
+.listCategory {
+  grid-row: 1;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--blog-card-summary);
+}
+
+.listTitle {
+  grid-row: 1;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--blog-card-title);
+  line-height: 1.4;
+}
+
+.listSummary {
+  grid-column: 3;
+  grid-row: 2;
+  font-size: 13px;
+  color: var(--blog-card-summary);
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+/* 리스트 삭제 버튼 */
+.deleteBtn {
+  padding: 6px;
+  border-radius: 4px;
+  color: var(--blog-delete);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  opacity: 0;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.listRow:hover .deleteBtn {
+  opacity: 1;
+}
+
+.deleteBtn:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+@media (max-width: 700px) {
+  .listCard {
+    grid-template-columns: 1fr;
+    gap: 4px;
+    padding: 14px 16px;
+  }
+
+  .listDate {
+    grid-row: auto;
+    order: 3;
+  }
+
+  .listCategory {
+    grid-row: auto;
+    order: -1;
+  }
+
+  .listTitle {
+    grid-row: auto;
+  }
+
+  .listSummary {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .deleteBtn,
+  .deleteBtnGrid {
+    opacity: 1;
+  }
+}

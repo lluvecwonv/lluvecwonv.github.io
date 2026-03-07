@@ -1,0 +1,377 @@
+.main {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  padding-top: calc(var(--nav-height) + 20px);
+  padding-bottom: 60px;
+  transition: background var(--transition-normal);
+}
+
+.light {
+  background: #ffffff;
+}
+
+.container {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.header {
+  margin-bottom: 20px;
+}
+
+.backBtn {
+  font-size: 14px;
+  color: var(--dark-text-secondary);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+
+.light .backBtn {
+  color: var(--text-secondary);
+}
+
+.backBtn:hover {
+  color: #f3f4f6;
+}
+
+.light .backBtn:hover {
+  color: var(--text-primary);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── 제목 ── */
+.titleInput {
+  width: 100%;
+  padding: 16px 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #f3f4f6;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-family: inherit;
+  outline: none;
+}
+
+.light .titleInput {
+  color: var(--text-primary);
+  border-bottom-color: var(--border);
+}
+
+.titleInput::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.light .titleInput::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* ── 메타 ── */
+.meta {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.light .meta {
+  border-bottom-color: var(--border);
+}
+
+.select,
+.tagInput {
+  padding: 6px 10px;
+  font-size: 13px;
+  color: #f3f4f6;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  font-family: inherit;
+  outline: none;
+}
+
+.light .select,
+.light .tagInput {
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border-color: var(--border);
+}
+
+.tagInput {
+  flex: 1;
+}
+
+.tagInput::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.light .tagInput::placeholder {
+  color: var(--text-tertiary);
+}
+
+.select option {
+  background: #1a1a2e;
+  color: #f3f4f6;
+}
+
+.light .select option {
+  background: #fff;
+  color: var(--text-primary);
+}
+
+/* ── 툴바 ── */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-wrap: wrap;
+  position: sticky;
+  top: var(--nav-height);
+  z-index: 10;
+  background: var(--dark-bg);
+}
+
+.light .toolbar {
+  border-bottom-color: var(--border);
+  background: #fff;
+}
+
+.toolGroup {
+  display: flex;
+  gap: 2px;
+}
+
+.toolBtn {
+  padding: 6px 10px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.light .toolBtn {
+  color: var(--text-secondary);
+}
+
+.toolBtn:hover {
+  color: #f3f4f6;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.light .toolBtn:hover {
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+}
+
+.toolDivider {
+  width: 1px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0 4px;
+}
+
+.light .toolDivider {
+  background: var(--border);
+}
+
+.themeToggle {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 5px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.light .themeToggle {
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+/* ── 에디터 ── */
+.editor {
+  min-height: 500px;
+  padding: 24px 4px;
+  font-size: 16px;
+  line-height: 1.8;
+  color: #f3f4f6;
+  outline: none;
+  font-family: inherit;
+  transition: all var(--transition-normal);
+}
+
+.editor:empty::before {
+  content: attr(data-placeholder);
+  color: rgba(255, 255, 255, 0.2);
+  pointer-events: none;
+}
+
+.editorLight {
+  color: var(--text-primary);
+}
+
+.editorLight:empty::before {
+  color: var(--text-tertiary);
+}
+
+/* 에디터 내부 스타일 */
+.editor h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 24px 0 12px;
+}
+
+.editor h2 {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 20px 0 10px;
+}
+
+.editor h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 16px 0 8px;
+}
+
+.editor p {
+  margin: 0 0 12px;
+}
+
+.editor ul,
+.editor ol {
+  padding-left: 24px;
+  margin: 0 0 12px;
+}
+
+.editor li {
+  margin-bottom: 4px;
+}
+
+.editor blockquote {
+  border-left: 3px solid rgba(255, 255, 255, 0.2);
+  padding-left: 16px;
+  margin: 12px 0;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.editorLight blockquote {
+  border-left-color: var(--border);
+  color: var(--text-secondary);
+}
+
+.editor img {
+  max-width: 100%;
+  border-radius: 8px;
+  margin: 16px 0;
+}
+
+.editor a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+/* ── 하단 ── */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 8px;
+}
+
+.light .footer {
+  border-top-color: var(--border);
+}
+
+.info {
+  font-size: 13px;
+  color: var(--dark-text-secondary);
+}
+
+.light .info {
+  color: var(--text-secondary);
+}
+
+.info code {
+  font-family: var(--font-mono), monospace;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #f3f4f6;
+  font-size: 12px;
+}
+
+.light .info code {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.downloadBtn,
+.copyBtn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.downloadBtn {
+  background: var(--accent);
+  color: #fff;
+}
+
+.copyBtn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #f3f4f6;
+}
+
+.light .copyBtn {
+  background: var(--bg-secondary);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+.downloadBtn:hover,
+.copyBtn:hover {
+  opacity: 0.85;
+}
+
+@media (max-width: 600px) {
+  .meta {
+    flex-direction: column;
+  }
+
+  .footer {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .titleInput {
+    font-size: 22px;
+  }
+}

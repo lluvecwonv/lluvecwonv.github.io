@@ -1,0 +1,595 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 0;
+  --travel-surface: rgba(255, 255, 255, 0.06);
+  --travel-surface-strong: rgba(15, 15, 30, 0.95);
+  --travel-surface-soft: rgba(255, 255, 255, 0.03);
+  --travel-border: rgba(255, 255, 255, 0.1);
+  --travel-border-strong: rgba(255, 255, 255, 0.15);
+  --travel-text: #ffffff;
+  --travel-text-secondary: rgba(255, 255, 255, 0.6);
+  --travel-text-muted: rgba(255, 255, 255, 0.35);
+  --travel-text-subtle: rgba(255, 255, 255, 0.3);
+  --travel-overlay: rgba(0, 0, 0, 0.7);
+  --travel-panel-shadow: 0 24px 60px rgba(15, 23, 42, 0.28);
+  --travel-input-bg: rgba(255, 255, 255, 0.06);
+  --travel-input-placeholder: rgba(255, 255, 255, 0.25);
+  --travel-search-bg: #222244;
+  --travel-search-hover: rgba(255, 107, 157, 0.15);
+  --travel-globe-shell: rgba(255, 255, 255, 0.03);
+}
+
+.light {
+  --travel-surface: #ffffff;
+  --travel-surface-strong: rgba(255, 255, 255, 0.96);
+  --travel-surface-soft: #f8fafc;
+  --travel-border: rgba(15, 23, 42, 0.08);
+  --travel-border-strong: rgba(15, 23, 42, 0.12);
+  --travel-text: var(--text-primary);
+  --travel-text-secondary: var(--text-secondary);
+  --travel-text-muted: var(--text-secondary);
+  --travel-text-subtle: var(--text-tertiary);
+  --travel-overlay: rgba(148, 163, 184, 0.24);
+  --travel-panel-shadow: 0 20px 48px rgba(15, 23, 42, 0.12);
+  --travel-input-bg: #ffffff;
+  --travel-input-placeholder: var(--text-tertiary);
+  --travel-search-bg: #ffffff;
+  --travel-search-hover: rgba(99, 102, 241, 0.08);
+  --travel-globe-shell: #f8fafc;
+}
+
+/* 상단바 */
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 900px;
+}
+
+.stats {
+  display: flex;
+  gap: 28px;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.statNumber {
+  color: #ff6b9d;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.statLabel {
+  color: var(--travel-text-secondary);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.addBtn {
+  background: rgba(255, 107, 157, 0.15);
+  border: 1px solid rgba(255, 107, 157, 0.4);
+  color: #ff6b9d;
+  padding: 8px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.addBtn:hover {
+  background: rgba(255, 107, 157, 0.25);
+}
+
+.hint {
+  color: var(--travel-text-muted);
+  font-size: 13px;
+  text-align: center;
+  margin: 0;
+}
+
+/* 지구본 영역 (사이드패널 + 글로브) */
+.globeArea {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0;
+  width: 100%;
+  position: relative;
+}
+
+.globeWrap {
+  display: flex;
+  justify-content: center;
+  border-radius: 16px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--travel-globe-shell);
+  border: 1px solid var(--travel-border);
+  box-shadow: var(--travel-panel-shadow);
+}
+
+/* ─── 왼쪽 사이드 패널 ─── */
+.sidePanel {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 380px;
+  background: var(--travel-surface-strong);
+  border: 1px solid var(--travel-border);
+  border-radius: 14px;
+  padding: 24px;
+  z-index: 10;
+  backdrop-filter: blur(12px);
+  max-height: 650px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: var(--travel-panel-shadow);
+}
+
+.panelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.panelTitle {
+  color: var(--travel-text);
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.panelCountry {
+  color: var(--travel-text-secondary);
+  font-size: 13px;
+  margin-right: 8px;
+}
+
+.panelDate {
+  color: var(--travel-text-subtle);
+  font-size: 12px;
+}
+
+.panelRoute {
+  color: #4fc3f7;
+  font-size: 13px;
+  font-weight: 500;
+  background: rgba(79, 195, 247, 0.1);
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+
+.panelPhotos {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.panelPhoto {
+  width: 100%;
+  height: auto;
+  max-height: 320px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.panelCaption {
+  color: var(--travel-text-secondary);
+  font-size: 12px;
+  text-align: center;
+  margin: 0;
+}
+
+.deleteBtn {
+  background: none;
+  border: none;
+  color: rgba(255, 80, 80, 0.6);
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+  padding: 0;
+  margin-top: 4px;
+}
+
+.deleteBtn:hover {
+  color: #ff5050;
+}
+
+/* 사진 네비게이션 */
+.photoNav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.navBtn {
+  background: var(--travel-surface);
+  border: 1px solid var(--travel-border-strong);
+  color: var(--travel-text);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.navBtn:hover {
+  background: var(--travel-search-hover);
+}
+
+.photoCount {
+  color: var(--travel-text-secondary);
+  font-size: 13px;
+}
+
+.noPhotos {
+  color: var(--travel-text-subtle);
+  text-align: center;
+  padding: 30px 0;
+  font-size: 13px;
+}
+
+/* 닫기 버튼 (공통) */
+.closeBtn {
+  background: none;
+  border: none;
+  color: var(--travel-text-secondary);
+  font-size: 24px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+
+.closeBtn:hover {
+  color: var(--travel-text);
+}
+
+/* 방문 장소 목록 */
+.spotList {
+  width: 100%;
+  max-width: 700px;
+}
+
+.spotListTitle {
+  color: var(--travel-text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  margin: 0 0 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.spotTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.spotTag {
+  background: var(--travel-surface);
+  border: 1px solid var(--travel-border);
+  color: var(--travel-text);
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.spotTag:hover {
+  background: rgba(255, 107, 157, 0.12);
+  border-color: rgba(255, 107, 157, 0.35);
+}
+
+.spotDate {
+  font-size: 11px;
+  color: var(--travel-text-subtle);
+}
+
+/* ─── 여행 추가 폼 ─── */
+.formOverlay {
+  position: fixed;
+  inset: 0;
+  background: var(--travel-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.formPanel {
+  background: var(--travel-surface-strong);
+  border: 1px solid var(--travel-border);
+  border-radius: 16px;
+  width: 420px;
+  max-width: 95vw;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--travel-panel-shadow);
+}
+
+.formHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px 0;
+}
+
+.formHeader h3 {
+  color: var(--travel-text);
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.formBody {
+  padding: 16px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  color: var(--travel-text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+.input {
+  width: 100%;
+  background: var(--travel-input-bg);
+  border: 1px solid var(--travel-border-strong);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--travel-text);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  border-color: rgba(255, 107, 157, 0.5);
+}
+
+.input::placeholder {
+  color: var(--travel-input-placeholder);
+}
+
+.fileInput {
+  display: none;
+}
+
+.photoActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.uploadBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(79, 195, 247, 0.25);
+  background: rgba(79, 195, 247, 0.08);
+  color: #4fc3f7;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s, border-color 0.2s;
+}
+
+.uploadBtn:hover {
+  transform: translateY(-1px);
+  background: rgba(79, 195, 247, 0.14);
+  border-color: rgba(79, 195, 247, 0.45);
+}
+
+.photoStatus {
+  color: var(--travel-text-secondary);
+  font-size: 12px;
+  text-align: right;
+}
+
+.photoPreview {
+  width: 100%;
+  max-height: 180px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--travel-border);
+}
+
+.helperText {
+  color: var(--travel-text-subtle);
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 2px 0 0;
+}
+
+.errorText {
+  color: #ef4444;
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.linkBtn {
+  background: none;
+  border: none;
+  color: #4fc3f7;
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+  padding: 4px 0;
+}
+
+.linkBtn:hover {
+  color: #81d4fa;
+}
+
+/* 장소 검색 자동완성 */
+.searchWrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.searchHint {
+  color: var(--travel-text-subtle);
+  font-size: 12px;
+  margin: 0;
+}
+
+.searchResults {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--travel-search-bg);
+  border: 1px solid var(--travel-border-strong);
+  border-radius: 8px;
+  max-height: 180px;
+  overflow-y: auto;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.16);
+}
+
+.searchItem {
+  padding: 10px 12px;
+  color: var(--travel-text);
+  font-size: 13px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--travel-border);
+  transition: background 0.15s;
+}
+
+.searchItem:last-child {
+  border-bottom: none;
+}
+
+.searchItem:hover {
+  background: var(--travel-search-hover);
+}
+
+.searchPicked {
+  color: #4fc3f7;
+  font-size: 12px;
+  margin: 0;
+}
+
+.photoInput {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  background: var(--travel-surface-soft);
+  border: 1px solid var(--travel-border);
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.removeBtn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: none;
+  border: none;
+  color: rgba(255, 80, 80, 0.6);
+  font-size: 18px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.submitBtn {
+  margin: 0 24px 20px;
+  background: linear-gradient(135deg, #ff6b9d, #c44dff);
+  border: none;
+  color: #fff;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.submitBtn:hover {
+  opacity: 0.9;
+}
+
+.light .addBtn {
+  background: rgba(255, 107, 157, 0.08);
+}
+
+.light .panelRoute {
+  background: rgba(79, 195, 247, 0.08);
+}
+
+.light .uploadBtn {
+  background: rgba(79, 195, 247, 0.06);
+  border-color: rgba(79, 195, 247, 0.2);
+}
+
+/* 모바일 */
+@media (max-width: 768px) {
+  .topBar {
+    padding: 0 10px;
+  }
+
+  .sidePanel {
+    position: fixed;
+    left: 0;
+    top: auto;
+    bottom: 0;
+    width: 100%;
+    max-height: 50vh;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .formPanel {
+    width: 100%;
+    max-height: 90vh;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .globeArea {
+    flex-direction: column;
+  }
+
+  .photoActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .photoStatus {
+    text-align: left;
+  }
+}
