@@ -350,6 +350,7 @@ export default function TravelGlobe({ compact = false }: { compact?: boolean }) 
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 })
   const [showForm, setShowForm] = useState(false)
   const [panelSide, setPanelSide] = useState<'left' | 'right'>('left')
+  const [loadError, setLoadError] = useState('')
 
   // Supabase에서 여행 데이터 로딩
   useEffect(() => {
@@ -382,15 +383,26 @@ export default function TravelGlobe({ compact = false }: { compact?: boolean }) 
   // Mapbox 초기화
   useEffect(() => {
     if (!containerRef.current) return
+    if (!mapboxgl.supported()) {
+      setLoadError('현재 브라우저/환경에서는 3D 지도를 사용할 수 없습니다.')
+      return
+    }
 
-    const map = new mapboxgl.Map({
-      container: containerRef.current,
-      style: 'mapbox://styles/mapbox/satellite-streets-v12',
-      projection: 'globe',
-      center: [128, 36],
-      zoom: 2.2,
-      attributionControl: false,
-    })
+    let map: mapboxgl.Map
+
+    try {
+      map = new mapboxgl.Map({
+        container: containerRef.current,
+        style: 'mapbox://styles/mapbox/satellite-streets-v12',
+        projection: 'globe',
+        center: [128, 36],
+        zoom: 2.2,
+        attributionControl: false,
+      })
+    } catch {
+      setLoadError('지도를 초기화하지 못했습니다. 글 목록은 계속 볼 수 있습니다.')
+      return
+    }
 
     map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right')
 
@@ -665,6 +677,7 @@ export default function TravelGlobe({ compact = false }: { compact?: boolean }) 
           </div>
 
           <p className={styles.hint}>지구본을 돌려보세요 — 핀을 클릭하면 사진을 볼 수 있어요</p>
+          {loadError && <p className={styles.hint}>{loadError}</p>}
         </>
       )}
 
