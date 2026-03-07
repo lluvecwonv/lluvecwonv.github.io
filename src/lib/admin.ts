@@ -1,6 +1,6 @@
 import { supabase } from './supabase'
 
-const ADMIN_EMAIL = (import.meta.env.VITE_ADMIN_EMAIL as string) || ''
+const ADMIN_EMAIL = ((import.meta.env.VITE_ADMIN_EMAIL as string) || '').trim()
 
 export async function signInAdmin(password: string) {
   const { error } = await supabase.auth.signInWithPassword({
