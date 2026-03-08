@@ -27,11 +27,11 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       setIsAdmin(!!session)
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const authListener = supabase?.auth.onAuthStateChange((_event, session) => {
       setIsAdmin(!!session)
     })
 
-    return () => subscription.unsubscribe()
+    return () => authListener?.data.subscription.unsubscribe()
   }, [])
 
   useEffect(() => {

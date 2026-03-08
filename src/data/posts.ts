@@ -12,6 +12,7 @@ export interface Post {
   tags: string[]
   category: Category
   content: string
+  source?: 'remote' | 'local'
 }
 
 interface PostRow {
@@ -34,10 +35,125 @@ function rowToPost(row: PostRow): Post {
     tags: row.tags ?? [],
     category: (row.category || '일상') as Category,
     content: row.content,
+    source: 'remote',
   }
 }
 
+const localPostModules = import.meta.glob('../posts/*.md', {
+  eager: true,
+  import: 'default',
+  query: '?raw',
+}) as Record<string, string>
+
+function isCategory(value: string): value is Category {
+  return categories.includes(value as Category)
+}
+
+function stripWrappingQuotes(value: string) {
+  return value.replace(/^['"]/, '').replace(/['"]$/, '').trim()
+}
+
+function parseTags(rawValue: string | undefined) {
+  if (!rawValue) return []
+
+  const value = rawValue.trim()
+  if (!value.startsWith('[') || !value.endsWith(']')) {
+    const singleTag = stripWrappingQuotes(value)
+    return singleTag ? [singleTag] : []
+  }
+
+  return value
+    .slice(1, -1)
+    .split(',')
+    .map((tag) => stripWrappingQuotes(tag.trim()))
+    .filter(Boolean)
+}
+
+function parseFrontmatter(raw: string) {
+  const normalized = raw.replace(/\r\n/g, '\n')
+  const match = normalized.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/)
+
+  if (!match) {
+    return {
+      frontmatter: {} as Record<string, string>,
+      content: normalized.trim(),
+    }
+  }
+
+  const frontmatter = match[1]
+    .split('\n')
+    .reduce<Record<string, string>>((acc, line) => {
+      const separatorIndex = line.indexOf(':')
+      if (separatorIndex === -1) return acc
+
+      const key = line.slice(0, separatorIndex).trim()
+      const value = line.slice(separatorIndex + 1).trim()
+      if (key) {
+        acc[key] = value
+      }
+      return acc
+    }, {})
+
+  return {
+    frontmatter,
+    content: match[2].trim(),
+  }
+}
+
+function buildSummary(content: string) {
+  return content
+    .replace(/!\[[^\]]*\]\([^)]+\)/g, ' ')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/[`#>*_~-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 120)
+}
+
+function parseLocalPost(filepath: string, raw: string): Post | null {
+  const slugMatch = filepath.match(/\/([^/]+)\.md$/)
+  if (!slugMatch) return null
+
+  const { frontmatter, content } = parseFrontmatter(raw)
+  const categoryValue = stripWrappingQuotes(frontmatter.category || '일상')
+
+  return {
+    slug: slugMatch[1],
+    title: stripWrappingQuotes(frontmatter.title || slugMatch[1]),
+    date: stripWrappingQuotes(frontmatter.date || '1970-01-01'),
+    summary: stripWrappingQuotes(frontmatter.summary || '') || buildSummary(content),
+    tags: parseTags(frontmatter.tags),
+    category: isCategory(categoryValue) ? categoryValue : '일상',
+    content,
+    source: 'local',
+  }
+}
+
+const localPosts = Object.entries(localPostModules)
+  .map(([filepath, raw]) => parseLocalPost(filepath, raw))
+  .filter((post): post is Post => post !== null)
+
+function sortPosts(posts: Post[]) {
+  return [...posts].sort((left, right) => right.date.localeCompare(left.date))
+}
+
+function mergePosts(remotePosts: Post[]) {
+  const mergedPosts = new Map(localPosts.map((post) => [post.slug, post]))
+  remotePosts.forEach((post) => {
+    mergedPosts.set(post.slug, post)
+  })
+  return sortPosts([...mergedPosts.values()])
+}
+
+function getLocalPost(slug: string) {
+  return localPosts.find((post) => post.slug === slug) ?? null
+}
+
 export async function getPosts(): Promise<Post[]> {
+  if (!supabase) {
+    return sortPosts(localPosts)
+  }
+
   const { data, error } = await supabase
     .from('posts')
     .select('*')
@@ -46,13 +162,19 @@ export async function getPosts(): Promise<Post[]> {
 
   if (error) {
     console.error('Failed to fetch posts:', error)
-    return []
+    return sortPosts(localPosts)
   }
 
-  return (data as PostRow[]).map(rowToPost)
+  return mergePosts((data as PostRow[]).map(rowToPost))
 }
 
 export async function getPost(slug: string): Promise<Post | null> {
+  const localPost = getLocalPost(slug)
+
+  if (!supabase) {
+    return localPost
+  }
+
   const { data, error } = await supabase
     .from('posts')
     .select('*')
@@ -61,6 +183,7 @@ export async function getPost(slug: string): Promise<Post | null> {
     .single()
 
   if (error) {
+    if (localPost) return localPost
     console.error('Failed to fetch post:', error)
     return null
   }
@@ -69,6 +192,11 @@ export async function getPost(slug: string): Promise<Post | null> {
 }
 
 export async function createPost(post: Post): Promise<boolean> {
+  if (!supabase) {
+    console.error('Failed to create post: Supabase is not configured')
+    return false
+  }
+
   const { error } = await supabase
     .from('posts')
     .insert({
@@ -90,6 +218,11 @@ export async function createPost(post: Post): Promise<boolean> {
 }
 
 export async function deletePost(slug: string): Promise<boolean> {
+  if (!supabase) {
+    console.error('Failed to delete post: Supabase is not configured')
+    return false
+  }
+
   const { error } = await supabase
     .from('posts')
     .delete()

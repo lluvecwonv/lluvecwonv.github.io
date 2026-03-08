@@ -63,6 +63,8 @@ function spotToRow(spot: TravelSpot): Omit<SpotRow, 'id'> & { id: string } {
 }
 
 export async function getSpots(): Promise<TravelSpot[]> {
+  if (!supabase) return []
+
   const { data, error } = await supabase
     .from('travel_spots')
     .select('*')
@@ -77,6 +79,8 @@ export async function getSpots(): Promise<TravelSpot[]> {
 }
 
 export async function addSpot(spot: TravelSpot): Promise<boolean> {
+  if (!supabase) return false
+
   const { error } = await supabase
     .from('travel_spots')
     .insert(spotToRow(spot))
@@ -89,6 +93,8 @@ export async function addSpot(spot: TravelSpot): Promise<boolean> {
 }
 
 export async function deleteSpot(id: string): Promise<boolean> {
+  if (!supabase) return false
+
   const { error } = await supabase
     .from('travel_spots')
     .delete()

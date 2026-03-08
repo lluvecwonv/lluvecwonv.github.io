@@ -154,7 +154,7 @@ export default function Blog() {
                     post={post}
                     index={i}
                     viewMode={viewMode}
-                    onDelete={isAdmin ? () => handleDelete(post.slug, post.title) : undefined}
+                    onDelete={isAdmin && post.source !== 'local' ? () => handleDelete(post.slug, post.title) : undefined}
                   />
                 ))}
                 {filteredPosts.length === 0 && (
