@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import InteractiveBackground from '../components/InteractiveBackground'
 import { useBlogTheme } from '../context/BlogThemeContext'
 import { getPost } from '../data/posts'
@@ -79,7 +80,7 @@ export default function BlogPost() {
           </header>
 
           <div className={styles.content}>
-            <ReactMarkdown>{post.content}</ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
           </div>
         </motion.article>
       </main>
