@@ -291,6 +291,36 @@ Figure 3 결과는 단순하다.
 ![Figure 4: contamination rate distribution](/posts/detect-pretraining-figure4-books-contamination.png)
 *Figure 4. 100권의 오염률 분포. 80~100% 구간에 많은 책이 몰려 있다. 이미지 출처: Shi et al., ICLR 2024.*
 
+### 5.1 책 오염도(contamination rate)란 무엇인가
+
+여기서 **책 오염도**는 각 책에서 무작위로 뽑은 `100개 snippet` 중,
+몇 개가 "이 텍스트는 GPT-3 pretraining에서 이미 본 것 같다"라고 탐지되었는지를 퍼센트로 표현한 값이다.
+
+즉,
+
+- `100% contamination`이면 그 책에서 뽑은 100개 snippet 전부가 pretraining member로 판정된 것
+- `50% contamination`이면 절반 정도의 snippet이 pretraining 흔적을 보인 것
+
+이 정의로 보면 Figure 4의 의미가 더 선명해진다.
+
+- 책 단위로 봐도 contamination이 낮은 예외보다 **높은 책이 훨씬 많다**
+- 특히 **80~100% 구간에 밀집**되어 있어서, GPT-3가 일부 짧은 문장만 스쳐 본 것이 아니라 도서 텍스트를 넓게 흡수했을 가능성을 시사한다
+- 논문이 직접 적었듯이 **거의 90%의 책이 50% 초과 contamination rate**를 보인다
+
+### 5.2 오염도가 높은 책들
+
+Table 2를 보면 상위 오염 도서들은 거의 모두 `98~100%` 구간에 있다.
+즉, 탐지기가 "책 전체에서 일관되게 pretraining 흔적이 보인다"라고 판단한 셈이다.
+
+특히 눈에 띄는 포인트는 다음이다.
+
+- 상위 7권은 **오염도 100%**
+- 상위 20권 전체가 **98% 이상**
+- 특정 장르 한쪽에만 치우친 게 아니라 소설, 논픽션, 리더십/교양서가 함께 섞여 있다
+
+이 점 때문에 이 사례 연구는 단순한 anecdote가 아니라,
+**Books3 계열 저작권 텍스트가 실제 대규모 사전학습에 포함되었을 가능성**을 꽤 강하게 뒷받침한다.
+
 논문 원문의 Table 2는 상위 20권을 보여준다. 길이가 너무 길어 두 표로 나눠 옮긴다.
 
 | Contamination % | Book Title | Author | Year |
