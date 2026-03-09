@@ -13,6 +13,8 @@ When Supabase env vars are present:
 - blog posts are read from `posts`
 - travel spots are read from `travel_spots`
 - admin login uses Supabase email/password auth
+- paper figure assets should be uploaded to Supabase Storage `blog-images/papers/` and post content should reference those public URLs
+- do not add paper figures under `public/posts` for new research notes
 
 When Supabase is not configured:
 - blog posts fall back to local markdown files in `src/posts`
