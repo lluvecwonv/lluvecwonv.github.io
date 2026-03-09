@@ -22,7 +22,7 @@ category: 연구노트
 
 학습 데이터를 타겟 문자열보다 **짧은 프롬프트**로 재현할 수 있다면, 그것은 모델이 해당 데이터를 **memorize**한 것이다 — 이 직관을 ACR이라는 메트릭으로 정형화하고, 기존 unlearning 기법들의 "준수 착각(illusion of compliance)"을 폭로했다.
 
-![Figure 1: ACR 개요 — 타겟 문자열보다 짧은 프롬프트로 재현 가능하면 memorized로 판정](/images/papers/acr-memorization/fig1-acr-overview-crop.png)
+![Figure 1: ACR 개요 — 타겟 문자열보다 짧은 프롬프트로 재현 가능하면 memorized로 판정](/images/papers/acr-memorization/fig1-acr-overview.png)
 *Figure 1: ACR의 핵심 아이디어. 타겟 문자열(12 tokens)을 4 tokens 프롬프트로 재현 가능 → High ACR, memorized. 반대로 26 tokens 타겟을 45 tokens으로만 재현 가능 → Low ACR, not memorized.*
 
 ## 1. 서론 — 왜 새로운 Memorization 정의가 필요한가
@@ -159,7 +159,7 @@ GCG 대신 random search를 사용했을 때도 동일한 트렌드가 나타남
 
 가장 흥미로운 실험이다. **In-Context Unlearning (ICUL)**이 실제로 memorization을 제거하는지 검증한다.
 
-![Figure 2: In-Context Unlearning은 completion은 막지만 compression은 못 막는다](/images/papers/acr-memorization/fig2-icul-crop.png)
+![Figure 2: In-Context Unlearning은 completion은 막지만 compression은 못 막는다](/images/papers/acr-memorization/fig2-icul-compression.png)
 *Figure 2: (상단) MiniPrompt가 유명 명언을 2개 토큰으로 압축. (중단) ICUL 시스템 프롬프트로 completion 차단 성공. (하단) 그럼에도 MiniPrompt는 여전히 해당 명언을 압축 가능 — ICUL은 completion을 막지만 memorization 자체를 제거하지 못한다.*
 
 ICUL은 시스템 프롬프트에 "유명 명언을 말하지 마라" 같은 지시를 넣는 방식이다. 결과적으로 일반적인 completion 요청은 막지만, MiniPrompt로 최적화된 adversarial suffix를 붙이면 동일한 명언이 여전히 출력된다.
@@ -170,7 +170,7 @@ ICUL은 시스템 프롬프트에 "유명 명언을 말하지 마라" 같은 지
 
 TOFU 데이터셋(200명의 가상 저자 프로필, 각 20개 QA 쌍)에서 Phi-1.5를 finetuning 후 gradient ascent로 unlearning을 수행했다.
 
-![Figure 3: Completion vs Compression 비교 — TOFU 데이터](/images/papers/acr-memorization/fig3-tofu-crop.png)
+![Figure 3: Completion vs Compression 비교 — TOFU 데이터](/images/papers/acr-memorization/fig3-tofu-completion-vs-compression.png)
 *Figure 3: (좌) Unlearning step에 따른 memorized 비율. Completion(빨강)은 16 step만에 0으로 떨어지지만, Compression(파랑)은 상당 부분 유지된다. (우) 20 step 후 실제 생성 예시 — 답이 틀리지만 모델은 여전히 합리적으로 동작한다.*
 
 이 그래프가 보여주는 것: **completion 기반 테스트는 16 unlearning step만에 "완전히 잊었다"고 판정**하지만, compression 기반 테스트는 상당한 양의 데이터가 여전히 압축 가능함(= memorized)을 보여준다. Completion 메트릭을 memorization의 척도로 사용하면 안 되는 이유가 여기에 있다.
@@ -185,7 +185,7 @@ Eldan & Russinovich (2023)의 "Who's Harry Potter?" 연구를 검증한다.
 1. **러시아어로 질문**: unlearning된 모델에 러시아어로 Harry Potter 질문을 하면 정확히 답한다
 2. **Loss 분석**: 정답의 loss가 오답보다 여전히 낮다
 
-![Figure 4: Harry Potter 데이터의 Negative Log-likelihood 분포](/images/papers/acr-memorization/fig4-harry-potter-crop.png)
+![Figure 4: Harry Potter 데이터의 Negative Log-likelihood 분포](/images/papers/acr-memorization/fig4-harry-potter-loss.png)
 *Figure 4: (좌) 원본 Llama2-chat, (우) unlearning 후. 정답(파랑)과 오답(빨강)의 loss 분포가 여전히 뚜렷이 구분된다. KS-test p값: 각각 9.7e-24, 5.9e-14.*
 
 3. **Adversarial 압축**: 57%의 Harry Potter 관련 텍스트가 원본 모델에서, 50%가 unlearning 모델에서 압축 가능
@@ -194,14 +194,14 @@ Eldan & Russinovich (2023)의 "Who's Harry Potter?" 연구를 검증한다.
 
 ### 5.4 Bigger Models Memorize More
 
-![Figure 5: Pythia 모델 크기별 memorization 추이](/images/papers/acr-memorization/fig5-pythia-scale-crop.png)
+![Figure 5: Pythia 모델 크기별 memorization 추이](/images/papers/acr-memorization/fig5-pythia-memorization-scale.png)
 *Figure 5: 410M → 1.4B → 6.9B → 12B로 갈수록 Average Compression Ratio(좌)와 Memorized 비율(우) 모두 증가. "큰 모델일수록 더 많이 외운다"는 기존 발견을 ACR 정의에서도 확인.*
 
 기존 연구(Carlini et al., 2023)에서 "큰 모델이 더 많이 memorize한다"는 발견이 있었는데, ACR 정의에서도 동일한 트렌드가 나타난다. Famous Quotes 데이터셋에서 Pythia 410M은 15%만 memorized인 반면, 12B는 56%가 memorized로 나타났다.
 
 ### 5.5 네 가지 데이터 카테고리로 검증
 
-![Figure 6: Pythia-1.4B에서 네 가지 데이터 유형별 ACR](/images/papers/acr-memorization/fig6-validation-crop.png)
+![Figure 6: Pythia-1.4B에서 네 가지 데이터 유형별 ACR](/images/papers/acr-memorization/fig6-validation.png)
 *Figure 6: (좌) 평균 Compression Ratio, (우) Memorized 비율. Famous Quotes가 가장 높고, Random과 AP(학습 후 발행된 뉴스)는 0 — ACR이 기대에 부합하는 sanity check 결과.*
 
 네 가지 데이터 유형에서의 결과:
@@ -215,7 +215,7 @@ Random과 AP 데이터에서 **단 한 건도 memorized로 판정되지 않은**
 
 ### 5.6 ACR vs 시퀀스 길이
 
-![Figure 7: ACR과 타겟 문자열 길이의 관계](/images/papers/acr-memorization/fig7-acr-length-crop.png)
+![Figure 7: ACR과 타겟 문자열 길이의 관계](/images/papers/acr-memorization/fig7-acr-vs-length.png)
 *Figure 7: 긴 시퀀스일수록 더 높은 compression ratio를 달성할 수 있지만, 짧은 시퀀스에서도 ACR은 유의미하게 동작한다.*
 
 ## 6. Discussion — 한계점과 시사점
