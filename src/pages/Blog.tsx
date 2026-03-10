@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from 'react'
+import { useState, useEffect, useMemo, lazy, Suspense } from 'react'
 import { useNavigate } from 'react-router-dom'
 import InteractiveBackground from '../components/InteractiveBackground'
 import BlogCard from '../components/BlogCard'
@@ -46,11 +46,14 @@ export default function Blog() {
   }
 
   // For 연구노트 category, filter by selected language; for others show all (default: ko posts only)
-  const filteredPosts = (activeCategory === '전체'
-    ? posts
-    : posts.filter((p) => p.category === activeCategory)
-  ).filter((p) =>
-    p.category === '연구노트' ? p.language === blogLocale : p.language === 'ko'
+  const filteredPosts = useMemo(() =>
+    (activeCategory === '전체'
+      ? posts
+      : posts.filter((p) => p.category === activeCategory)
+    ).filter((p) =>
+      p.category === '연구노트' ? p.language === blogLocale : p.language === 'ko'
+    ),
+    [posts, activeCategory, blogLocale]
   )
 
   return (
@@ -108,7 +111,7 @@ export default function Blog() {
           {/* Hero: Cat photo (left) + Globe (right) — both sticky */}
           <div className={styles.heroRow}>
             <div className={styles.heroPhoto}>
-              <img src={CAT_PHOTO_URL} alt="금비" className={styles.catImg} />
+              <img src={CAT_PHOTO_URL} alt="금비" className={styles.catImg} loading="lazy" />
               <span className={styles.catCaption}>우리집 최강 귀요미, 해피바이러스. 금비를 소개함돠</span>
             </div>
             <div className={styles.heroGlobe}>

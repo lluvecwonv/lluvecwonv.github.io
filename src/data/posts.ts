@@ -162,12 +162,23 @@ function getLocalPost(slug: string) {
   return localPosts.find((post) => post.slug === slug) ?? null
 }
 
+// Simple cache to avoid redundant fetches within the same session
+let postsCache: { key: string; data: Post[]; ts: number } | null = null
+const CACHE_TTL = 60_000 // 1 minute
+
 export async function getPosts(language?: PostLanguage): Promise<Post[]> {
+  const cacheKey = language ?? '__all__'
+  if (postsCache && postsCache.key === cacheKey && Date.now() - postsCache.ts < CACHE_TTL) {
+    return postsCache.data
+  }
+
   const filterByLang = (posts: Post[]) =>
     language ? posts.filter((p) => p.language === language) : posts
 
   if (!supabase) {
-    return sortPosts(filterByLang(localPosts))
+    const result = sortPosts(filterByLang(localPosts))
+    postsCache = { key: cacheKey, data: result, ts: Date.now() }
+    return result
   }
 
   let query = supabase
@@ -184,10 +195,14 @@ export async function getPosts(language?: PostLanguage): Promise<Post[]> {
 
   if (error) {
     console.error('Failed to fetch posts:', error)
-    return sortPosts(filterByLang(localPosts))
+    const result = sortPosts(filterByLang(localPosts))
+    postsCache = { key: cacheKey, data: result, ts: Date.now() }
+    return result
   }
 
-  return mergePosts((data as PostRow[]).map(rowToPost), language)
+  const result = mergePosts((data as PostRow[]).map(rowToPost), language)
+  postsCache = { key: cacheKey, data: result, ts: Date.now() }
+  return result
 }
 
 export async function getPost(slug: string): Promise<Post | null> {

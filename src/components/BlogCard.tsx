@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Link } from 'react-router-dom'
 import type { Post } from '../data/posts'
 import styles from './BlogCard.module.css'
@@ -9,7 +10,7 @@ interface Props {
   onDelete?: () => void
 }
 
-export default function BlogCard({ post, viewMode = 'grid', onDelete }: Props) {
+const BlogCard = memo(function BlogCard({ post, viewMode = 'grid', onDelete }: Props) {
   const handleDelete = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -55,4 +56,6 @@ export default function BlogCard({ post, viewMode = 'grid', onDelete }: Props) {
       )}
     </div>
   )
-}
+})
+
+export default BlogCard

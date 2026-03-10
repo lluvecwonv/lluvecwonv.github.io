@@ -25,15 +25,16 @@ export default function BlogPost() {
   useEffect(() => {
     window.scrollTo(0, 0)
     if (slug) {
-      getPost(slug).then((p) => {
+      // Fetch post and alternate-language version in parallel
+      const altSlugEn = `${slug}-en`
+      const altSlugKo = slug.replace(/-en$/, '')
+      const altSlug = slug.endsWith('-en') ? altSlugKo : altSlugEn
+
+      Promise.all([getPost(slug), getPost(altSlug)]).then(([p, alt]) => {
         setPost(p)
         setLoading(false)
-        if (p) {
-          setBlogLocale(p.language)
-          // Check if alternate language version exists
-          const altSlug = getAlternateSlug(slug, p.language)
-          getPost(altSlug).then((alt) => setHasAlternate(!!alt))
-        }
+        setHasAlternate(!!alt)
+        if (p) setBlogLocale(p.language)
       })
     }
   }, [slug])
@@ -106,7 +107,14 @@ export default function BlogPost() {
           </header>
 
           <div className={styles.content}>
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                img: ({ node, ...props }) => (
+                  <img {...props} loading="lazy" decoding="async" />
+                ),
+              }}
+            >{post.content}</ReactMarkdown>
           </div>
         </motion.article>
       </main>
