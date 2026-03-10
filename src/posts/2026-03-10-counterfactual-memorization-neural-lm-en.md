@@ -24,7 +24,7 @@ The key insight: train multiple models on random subsets of training data, then 
 
 ## 1. Introduction: The Memorization Problem
 
-![Figure 1: Per-token accuracy of RealNews training examples — IN models (including the example) vs. OUT models (excluding it). Points above the diagonal indicate the example benefits from being in the training set.](/images/papers/counterfactual-memorization/fig1_scatter_realnews.png)
+![Figure 1: Per-token accuracy of training examples — IN models (including the example) vs. OUT models (excluding it), for RealNews, C4, and Wiki40B:en. Points above the diagonal indicate the example benefits from being in the training set.](/images/papers/counterfactual-memorization/fig1_scatter_all.png)
 
 Language models demonstrably memorize parts of their training data. We see this most clearly in *exact* memorization—models can reproduce long strings from training verbatim, which is a privacy and copyright concern. But what does "memorization" actually mean?
 
@@ -101,7 +101,7 @@ This design is elegant: the 400 models give a distribution of possible model ins
 
 ### 4.1 Distribution of Memorization Across Examples
 
-![Figure 2: Joint distribution of counterfactual memorization (X-axis) and simplicity (Y-axis, overall accuracy across all models) for RealNews. Intermediate-difficulty examples show the highest memorization.](/images/papers/counterfactual-memorization/fig2_mem_simplicity_realnews.png)
+![Figure 2: Joint distribution of counterfactual memorization (X-axis) and simplicity (Y-axis, overall accuracy across all models) for RealNews, C4, and Wiki40B:en. Intermediate-difficulty examples show the highest memorization.](/images/papers/counterfactual-memorization/fig2_mem_simplicity_all.png)
 
 A striking finding: **memorization isn't uniformly distributed**. Instead, there's an "intermediate difficulty" peak:
 
@@ -113,9 +113,7 @@ This mirrors human memory: you don't "memorize" trivial facts (everyone knows th
 
 ### 4.2 Per-Domain Analysis
 
-![Figure 3a: 95th percentile memorization score per web domain vs. number of examples from that domain (RealNews). Memorization levels vary significantly across domains.](/images/papers/counterfactual-memorization/fig3a_url_scatter_realnews.png)
-
-![Figure 3b: Memorization distributions for representative domains (RealNews). Domain characteristics strongly predict memorization patterns.](/images/papers/counterfactual-memorization/fig3c_url_hist_realnews.png)
+![Figure 3: Per-domain memorization analysis. (a) 95th percentile memorization vs. number of examples per domain for RealNews, (b) same for C4, (c) memorization distributions of representative domains in RealNews, (d) same for C4.](/images/papers/counterfactual-memorization/fig3_url_analysis_all.png)
 
 Analyzing examples by domain reveals fascinating patterns:
 
@@ -128,30 +126,13 @@ Analyzing examples by domain reveals fascinating patterns:
 
 The key insight: **structured data, multilingual text, and unique formatting** tend to be counterfactually memorized, even if duplicates appear. In contrast, **large, diverse publishers** with editorial templates show low memorization (context helps prediction).
 
-### 4.3 Convergence Analysis
+### 4.3 Convergence, Training Dynamics, and Duplication
 
-![Figure 4: Spearman's R between memorization rankings from m models and the full set of 400 models. Rankings stabilize quickly — 192 models achieve R ≥ 0.992 across all datasets.](/images/papers/counterfactual-memorization/fig7_spearman_convergence.png)
+![Figure 4: (a) Spearman's R between memorization rankings from disjoint sets of m models — rankings converge by ~192 models. (b) Distribution of memorization across training epochs for RealNews — memorization grows with training. (c) Fraction of examples above memorization thresholds across epochs. (d) Memorization scores vs. number of near-duplicates — the surprising negative correlation (r = -0.39).](/images/papers/counterfactual-memorization/fig4_composite.png)
 
-How many models (m) are needed for stable estimates?
+**Convergence (a):** How many models (m) are needed for stable estimates? Testing Spearman correlation: m=32 gives ~0.85, m=96 gives ~0.98, m=400 gives ~0.99. Practically, ~96-192 models suffice for stable ranking, but 400 provides excellent precision.
 
-Testing Spearman correlation between different numbers of models (32, 64, 96, 192, 400):
-- **m = 32**: Correlation ~0.85
-- **m = 96**: Correlation ~0.98
-- **m = 400**: Correlation ~0.99
-
-Practically, ~96-192 models suffice for stable ranking, but 400 provides excellent precision.
-
-### 4.4 Training Dynamics
-
-![Figure 5: Evolution of counterfactual memorization across training epochs (RealNews). Memorization generally increases as training progresses.](/images/papers/counterfactual-memorization/fig6_evolution_mem.png)
-
-Memorization isn't static:
-
-- **With training epochs**: Counterfactual memorization generally increases from epoch 1 to 60
-- **Distribution shift**: Early epochs show high variance; later epochs more stable
-- **Monotonicity**: 59% of examples show consistently increasing memorization with epochs (no phase transitions or sudden drops for most examples)
-
-This suggests memorization is a continuous, cumulative process rather than a discrete "learning" event.
+**Training Dynamics (b, c):** Memorization isn't static. Counterfactual memorization generally increases from epoch 1 to 60. 59% of examples show consistently increasing memorization with epochs (no phase transitions or sudden drops for most examples). This suggests memorization is a continuous, cumulative process rather than a discrete "learning" event.
 
 ---
 
@@ -159,7 +140,7 @@ This suggests memorization is a continuous, cumulative process rather than a dis
 
 ### 5.1 Key Finding
 
-![Figure 6: Relationship between duplication count and counterfactual memorization. The surprising negative correlation (r = -0.39) shows that more duplicated examples have lower per-copy causal importance.](/images/papers/counterfactual-memorization/fig4_mem_vs_dup.png)
+**Panel (d) above** shows one of the paper's most striking results:
 
 One of the paper's most striking results:
 
@@ -202,7 +183,9 @@ infl(x → x') = E[M(A(S), x') | x ∈ S] - E[M(A(S), x') | x ∉ S]
 
 Note: `mem(x) = infl(x → x)` (self-influence is memorization).
 
-![Figure 7: (Left) Histogram of influence from all training examples on specific test examples. Most influences are near-zero, but outliers indicate strong training-test connections. (Right) Joint distribution of memorization score and maximum influence on any validation example.](/images/papers/counterfactual-memorization/fig5_mem_infl_realnews.png)
+![Figure 5: (Left) Histogram of influence from all training examples on specific test examples — most influences are near-zero, but outliers indicate strong training-test connections. (Right) Joint distribution of memorization score and maximum influence on any validation example for RealNews.](/images/papers/counterfactual-memorization/fig5_mem_infl_main.png)
+
+![Figure 5 (extended): Joint distribution of memorization and max-influence across all three datasets — RealNews, C4, and Wiki40B:en.](/images/papers/counterfactual-memorization/fig5_mem_infl_all.png)
 
 ### 6.2 Empirical Findings
 
