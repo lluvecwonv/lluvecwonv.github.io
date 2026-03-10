@@ -82,7 +82,7 @@ export default function BlogPost() {
               </svg>
               {t.backToList}
             </Link>
-            {hasAlternate && (
+            {hasAlternate && post.category === '연구노트' && (
               <LocaleToggle
                 value={blogLocale as ProjectLocale}
                 onChange={(v) => {

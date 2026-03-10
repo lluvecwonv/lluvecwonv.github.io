@@ -30,8 +30,8 @@ export default function Blog() {
 
   useEffect(() => {
     window.scrollTo(0, 0)
-    getPosts(blogLocale).then(setPosts)
-  }, [blogLocale])
+    getPosts().then(setPosts)
+  }, [])
 
   const handleDelete = async (slug: string, title: string) => {
     if (!confirm(t.deleteConfirm(title))) return
@@ -45,9 +45,13 @@ export default function Blog() {
     }
   }
 
-  const filteredPosts = activeCategory === '전체'
+  // For 연구노트 category, filter by selected language; for others show all (default: ko posts only)
+  const filteredPosts = (activeCategory === '전체'
     ? posts
     : posts.filter((p) => p.category === activeCategory)
+  ).filter((p) =>
+    p.category === '연구노트' ? p.language === blogLocale : p.language === 'ko'
+  )
 
   return (
     <>
@@ -65,10 +69,12 @@ export default function Blog() {
                 </p>
               </div>
               <div className={styles.headerActions}>
-                <LocaleToggle
-                  value={blogLocale as ProjectLocale}
-                  onChange={(v) => setBlogLocale(v as 'ko' | 'en')}
-                />
+                {activeCategory === '연구노트' && (
+                  <LocaleToggle
+                    value={blogLocale as ProjectLocale}
+                    onChange={(v) => setBlogLocale(v as 'ko' | 'en')}
+                  />
+                )}
                 <button
                   type="button"
                   className={styles.themeBtn}
