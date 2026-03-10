@@ -1,11 +1,10 @@
-# Template-Based Financial Report Generation in Agentic and Decomposed Information Retrieval 논문 정리
-
+---
+title: "Template-Based Financial Report Generation in Agentic and Decomposed Information Retrieval — 논문 정리"
 date: 2026-03-09
-summary: SIGIR 2025 논문. LLM 기반 템플릿 재무 보고서 생성을 위한 두 가지 접근법—AgenticIR(멀티 에이전트 프레임워크)과 DecomposedIR(프롬프트 체이닝 기반 분해 방식)—을 체계적으로 비교 분석하고, DecomposedIR이 4가지 핵심 특성 모두에서 통계적으로 유의미하게 우수한 성능을 보임을 실증한 연구입니다.
+summary: "SIGIR 2025 논문. LLM 기반 템플릿 재무 보고서 생성을 위한 두 가지 접근법—AgenticIR(멀티 에이전트 프레임워크)과 DecomposedIR(프롬프트 체이닝 기반 분해 방식)—을 체계적으로 비교 분석하고, DecomposedIR이 4가지 핵심 특성 모두에서 통계적으로 유의미하게 우수한 성능을 보임을 실증한 연구."
 tags: [LLM, Financial Report, Agentic Framework, Decomposed Prompting, RAG, SIGIR, 연구노트]
 category: 연구노트
 language: ko
-
 ---
 
 이번 연구노트는 SIGIR 2025 논문 **Template-Based Financial Report Generation in Agentic and Decomposed Information Retrieval**을 정리한 글이다.

@@ -4,7 +4,7 @@
 INSERT INTO public.posts (slug, title, date, summary, tags, category, content, published, language)
 VALUES (
   '2026-03-09-template-financial-report-agentic-decomposed-ir',
-  'Template-Based Financial Report Generation in Agentic and Decomposed Information Retrieval 논문 정리',
+  'Template-Based Financial Report Generation in Agentic and Decomposed Information Retrieval — 논문 정리',
   '2026-03-09',
   'SIGIR 2025 논문. LLM 기반 템플릿 재무 보고서 생성을 위한 두 가지 접근법—AgenticIR(멀티 에이전트 프레임워크)과 DecomposedIR(프롬프트 체이닝 기반 분해 방식)—을 체계적으로 비교 분석하고, DecomposedIR이 4가지 핵심 특성 모두에서 통계적으로 유의미하게 우수한 성능을 보임을 실증한 연구입니다.',
   ARRAY['LLM', 'Financial Report', 'Agentic Framework', 'Decomposed Prompting', 'RAG', 'SIGIR', '연구노트'],
