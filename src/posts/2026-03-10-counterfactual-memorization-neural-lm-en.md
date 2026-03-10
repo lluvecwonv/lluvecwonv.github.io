@@ -24,6 +24,8 @@ The key insight: train multiple models on random subsets of training data, then 
 
 ## 1. Introduction: The Memorization Problem
 
+![Figure 1: Per-token accuracy of RealNews training examples — IN models (including the example) vs. OUT models (excluding it). Points above the diagonal indicate the example benefits from being in the training set.](/images/papers/counterfactual-memorization/fig1_scatter_realnews.png)
+
 Language models demonstrably memorize parts of their training data. We see this most clearly in *exact* memorization—models can reproduce long strings from training verbatim, which is a privacy and copyright concern. But what does "memorization" actually mean?
 
 Existing metrics (like extraction attacks, next-token prediction, or duplicate-based heuristics) typically measure whether models have learned information that appears frequently or in a concentrated form. If a passage appears 100 times in training, of course the model "knows" it. The question becomes: what about rare, specific information? What about documents that appear only once?
@@ -99,6 +101,8 @@ This design is elegant: the 400 models give a distribution of possible model ins
 
 ### 4.1 Distribution of Memorization Across Examples
 
+![Figure 2: Joint distribution of counterfactual memorization (X-axis) and simplicity (Y-axis, overall accuracy across all models) for RealNews. Intermediate-difficulty examples show the highest memorization.](/images/papers/counterfactual-memorization/fig2_mem_simplicity_realnews.png)
+
 A striking finding: **memorization isn't uniformly distributed**. Instead, there's an "intermediate difficulty" peak:
 
 - **Easy examples**: Low memorization (the model learns them even without that specific example)
@@ -108,6 +112,10 @@ A striking finding: **memorization isn't uniformly distributed**. Instead, there
 This mirrors human memory: you don't "memorize" trivial facts (everyone knows them), but you do memorize specific, moderately surprising information. Extremely obscure data that even with help is hard to learn shows low memorization.
 
 ### 4.2 Per-Domain Analysis
+
+![Figure 3a: 95th percentile memorization score per web domain vs. number of examples from that domain (RealNews). Memorization levels vary significantly across domains.](/images/papers/counterfactual-memorization/fig3a_url_scatter_realnews.png)
+
+![Figure 3b: Memorization distributions for representative domains (RealNews). Domain characteristics strongly predict memorization patterns.](/images/papers/counterfactual-memorization/fig3c_url_hist_realnews.png)
 
 Analyzing examples by domain reveals fascinating patterns:
 
@@ -122,6 +130,8 @@ The key insight: **structured data, multilingual text, and unique formatting** t
 
 ### 4.3 Convergence Analysis
 
+![Figure 4: Spearman's R between memorization rankings from m models and the full set of 400 models. Rankings stabilize quickly — 192 models achieve R ≥ 0.992 across all datasets.](/images/papers/counterfactual-memorization/fig7_spearman_convergence.png)
+
 How many models (m) are needed for stable estimates?
 
 Testing Spearman correlation between different numbers of models (32, 64, 96, 192, 400):
@@ -132,6 +142,8 @@ Testing Spearman correlation between different numbers of models (32, 64, 96, 19
 Practically, ~96-192 models suffice for stable ranking, but 400 provides excellent precision.
 
 ### 4.4 Training Dynamics
+
+![Figure 5: Evolution of counterfactual memorization across training epochs (RealNews). Memorization generally increases as training progresses.](/images/papers/counterfactual-memorization/fig6_evolution_mem.png)
 
 Memorization isn't static:
 
@@ -146,6 +158,8 @@ This suggests memorization is a continuous, cumulative process rather than a dis
 ## 5. Duplicates and Memorization: The Surprising Inverse Correlation
 
 ### 5.1 Key Finding
+
+![Figure 6: Relationship between duplication count and counterfactual memorization. The surprising negative correlation (r = -0.39) shows that more duplicated examples have lower per-copy causal importance.](/images/papers/counterfactual-memorization/fig4_mem_vs_dup.png)
 
 One of the paper's most striking results:
 
@@ -188,6 +202,8 @@ infl(x → x') = E[M(A(S), x') | x ∈ S] - E[M(A(S), x') | x ∉ S]
 
 Note: `mem(x) = infl(x → x)` (self-influence is memorization).
 
+![Figure 7: (Left) Histogram of influence from all training examples on specific test examples. Most influences are near-zero, but outliers indicate strong training-test connections. (Right) Joint distribution of memorization score and maximum influence on any validation example.](/images/papers/counterfactual-memorization/fig5_mem_infl_realnews.png)
+
 ### 6.2 Empirical Findings
 
 1. **Sparsity**: Most training examples have negligible influence on validation examples (distribution heavily skewed toward near-zero).
@@ -200,6 +216,8 @@ Note: `mem(x) = infl(x → x)` (self-influence is memorization).
 3. **Asymmetry**: A → B influence differs from B → A influence (one direction might matter more if B is "earlier" in training or more distinctive).
 
 ### 6.3 Influence on Generated Texts
+
+![Figure 8: Histogram of max-influence on Grover-Mega generated examples from RealNews training data. Generative tasks show different sensitivity patterns compared to discriminative evaluation.](/images/papers/counterfactual-memorization/fig8_grover_influence.png)
 
 Testing on Grover-Mega (a generative model), influence patterns shift:
 - Generative tasks show different sensitivity to training examples
