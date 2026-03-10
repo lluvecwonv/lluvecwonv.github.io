@@ -1,4 +1,4 @@
-insert into public.posts (slug, title, date, summary, tags, category, content, published)
+insert into public.posts (slug, title, date, summary, tags, category, content, published, language)
 values (
   '2026-03-09-medium-ai-course-manus',
   'Deterministic Enterprise Governance: Medium 최신 AI 거버넌스 글 정리',
@@ -60,7 +60,8 @@ values (
 
 엔터프라이즈 AI의 경쟁력은 모델 성능 단독이 아니라,
 **결정론적 통제 + 감사 가능한 실행 로그**를 운영 기본값으로 갖췄는지에서 갈린다.$$,
-  true
+  true,
+  'ko'
 )
 on conflict (slug)
 do update set

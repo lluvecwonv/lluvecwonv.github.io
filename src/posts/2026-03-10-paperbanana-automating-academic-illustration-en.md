@@ -1,0 +1,341 @@
+---
+title: "PaperBanana: Automating Academic Illustration for AI Scientists — Paper Summary"
+date: 2026-03-10
+summary: "A joint study by Google Cloud AI Research and Peking University. PaperBanana proposes a reference-driven agentic framework that orchestrates 5 specialized agents (Retriever, Planner, Stylist, Visualizer, Critic) to automatically generate methodology diagrams and statistical plots for academic papers. Demonstrated significant improvements over baselines on the NeurIPS 2025-based PaperBananaBench."
+tags: [Academic Illustration, Methodology Diagram, Statistical Plot, Multi-Agent, VLM, Image Generation, Agentic Framework, NeurIPS, Research Note]
+category: 연구노트
+language: en
+---
+
+This research note summarizes the paper **PaperBanana: Automating Academic Illustration for AI Scientists** (arXiv:2601.23265).
+Authors: Dawei Zhu, Xiyu Wei, Sujian Li (Peking University) and Rui Meng, Yale Song, Tomas Pfister, Jinsung Yoon (Google Cloud AI Research).
+
+The core question is:
+
+**"Can an AI scientist automatically generate publication-ready methodology diagrams and statistical plots for academic papers?"**
+
+Existing code-based approaches (TikZ, Python-PPTX, SVG) are effective for structured content but struggle to express complex visual elements such as specialized icons and custom shapes. State-of-the-art image generation models produce high-quality visual outputs but cannot consistently generate illustrations that meet academic standards. PaperBanana proposes a **reference-driven agentic framework** to bridge this gap.
+
+Paper link: https://arxiv.org/abs/2601.23265
+Project page: https://dwzhu-pku.github.io/PaperBanana/
+
+## TL;DR
+
+Five specialized agents (Retriever, Planner, Stylist, Visualizer, Critic) collaborate through a pipeline of **reference retrieval → content planning → style optimization → image generation → self-critique iteration** to automatically generate academic illustrations. On the NeurIPS 2025-based benchmark, PaperBanana achieved improvements of Faithfulness +2.8%, Conciseness +37.2%, Readability +12.9%, Aesthetics +6.6%, and Overall +17.0% over the strongest baseline.
+
+## 1. Introduction — Why Automate Academic Illustration?
+
+With the advancement of LLMs, many aspects of the research lifecycle — literature review, idea generation, experimental iteration — have been automated. However, generating illustrations (diagrams, plots) that visually communicate scientific discoveries remains a labor-intensive bottleneck.
+
+Why methodology diagram generation is particularly challenging:
+- It requires **both content fidelity and visual aesthetics**
+- Code-based approaches (TikZ, Python-PPTX, SVG) have limitations in expressing complex visual elements such as specialized icons or custom shapes
+- State-of-the-art image generation models (Nano-Banana-Pro, GPT-Image, etc.) produce high-quality visual outputs but struggle to consistently generate illustrations that meet academic standards
+- The specialized expertise required for professional illustration tools constrains researchers' ability to freely express their ideas
+
+### Key Contributions
+
+- **PaperBanana**: A fully automated agentic framework that orchestrates specialized agents to automatically generate publication-ready academic illustrations
+- **PaperBananaBench**: A comprehensive benchmark for evaluating the quality of academic illustrations, particularly methodology diagrams (292 test cases based on NeurIPS 2025)
+- Comprehensive experiments demonstrating significant performance improvements over existing baselines
+
+## 2. Task Formulation
+
+Automated academic illustration generation is defined as learning a mapping from **source context (S)** and **communicative intent (C)** to a visual representation:
+
+```
+I = f(S, C)
+```
+
+- **S** (Source Context): Source context containing core information such as methodology section text
+- **C** (Communicative Intent): Caption specifying the desired scope and focus of the illustration
+- **I**: Generated illustration
+
+A set of N reference examples ε = {E_n} supports few-shot learning, where each example E_n = (S_n, C_n, I_n) is a tuple of context, caption, and reference illustration. The unified task:
+
+```
+I = f(S, C, ε)
+```
+
+When ε is empty, this becomes zero-shot generation.
+
+## 3. Methodology — PaperBanana Framework
+
+PaperBanana is a **reference-driven agentic framework** that cooperatively orchestrates five specialized agents to transform raw scientific content into publication-quality diagrams and plots. The overall framework consists of two stages: a **Linear Planning Phase** and an **Iterative Refinement Loop**.
+
+### 3.1 Retriever Agent
+
+Given source context S and communicative intent C, identifies the N most relevant examples from a fixed reference set R.
+
+```
+ε = VLM_Ret(S, C, {(S_i, C_i)}_{E_i ∈ R})
+```
+
+Employs **generative retrieval** leveraging VLM reasoning capabilities, matching research fields (e.g., Agent & Reasoning) and diagram types (e.g., pipeline, architecture), **prioritizing visual structural similarity over topical similarity**.
+
+Key design principles:
+- Same topic + same visual intent → best match
+- Different topic + same visual intent → acceptable (structure matters more than topic)
+- Same topic + different visual intent → avoid
+
+### 3.2 Planner Agent
+
+The **cognitive core** of the system. Takes source context S, communicative intent C, and retrieved examples ε as input, and through in-context learning transforms unstructured data into a comprehensive and detailed textual description (P) of the target illustration.
+
+```
+P = VLM_plan(S, C, {(S_i, C_i, I_i)}_{E_i ∈ ε})
+```
+
+The description should be as detailed as possible — semantically specifying each element and connection, and including formal details such as background style, colors, line thickness, icon styles, etc. Vague or underspecified descriptions degrade the quality of generated images.
+
+### 3.3 Stylist Agent
+
+Acts as a **design consultant**. Explores the entire reference collection R to automatically synthesize an **Aesthetic Guideline G** covering the following key dimensions:
+- Color palettes
+- Shapes and containers
+- Lines and arrows
+- Layout and composition
+- Typography and icons
+
+This guideline transforms the initial description P into a stylistically optimized version P*:
+
+```
+P* = VLM_style(P, G)
+```
+
+Stylist's core design principles:
+1. If the input description already depicts high-quality aesthetics, **preserve** it
+2. Only intervene when the description appears lacking or outdated
+3. Respect domain-specific style diversity
+4. For plain inputs, enrich them with the guideline's visual attributes
+5. **Never alter semantic content, logic, or structure** — perform purely aesthetic editing
+
+### 3.4 Visualizer Agent
+
+Receives the stylistically optimized description P* and leverages an image generation model to transform the textual description into visual output.
+
+```
+I_t = Image-Gen(P_t),  initial P_0 = P*
+```
+
+### 3.5 Critic Agent
+
+Forms a **closed-loop refinement mechanism** with the Visualizer. Compares the generated image I_t against the original source context (S, C) to identify factual inconsistencies, visual defects, and areas for improvement, then produces a revised description P_{t+1}.
+
+```
+P_{t+1} = VLM_critic(I_t, S, C, P_t)
+```
+
+Critic's critique rubric:
+- **Content**: Fidelity & Alignment, Text QA, Validation of Examples, Caption Exclusion
+- **Presentation**: Clarity & Readability, Legend Management
+
+The Visualizer-Critic loop iterates **T=3 times**, with the final output being I = I_T. Additional iterations further improve all metrics while ensuring a balance between aesthetics and technical accuracy.
+
+### 3.6 Extension to Statistical Plots
+
+For statistical plots where numerical precision is essential, the Visualizer adopts a **code-based approach**, converting the description P_t into **executable Python Matplotlib code**:
+
+```
+I_t = VLM_code(P_t)
+```
+
+The Critic evaluates the rendered plot and generates revised descriptions addressing inaccuracies or incompleteness. The same T=3 iteration process applies.
+
+## 4. Benchmark Construction (PaperBananaBench)
+
+### 4.1 Data Curation
+
+**Collection and Parsing**: Randomly sampled 2,000 out of 5,275 papers from NeurIPS 2025, retrieved PDFs, and used the MinerU toolkit to extract methodology section text, all diagrams, and captions.
+
+**Filtering**:
+- Excluded papers without methodology diagrams → 1,359 valid candidates
+- Constrained aspect ratio (w:h) to [1.5, 2.5]:
+  - Below 1.5: insufficient horizontal layout for logical flows
+  - Above 2.5: unsupported by current image models
+  - Including outliers would introduce bias in side-by-side evaluations, revealing human originals
+- → 610 valid candidates. Each candidate is a (S, I, C) tuple: S=methodology description, I=methodology diagram, C=caption
+
+**Categorization**: Classified into 4 classes based on visual topology and content:
+- **Agent & Reasoning** (31.5%): LLM agents, multi-agent, reasoning, planning, tool use, code generation
+- **Vision & Perception** (25.0%): Computer vision, 3D reconstruction, rendering, depth estimation
+- **Generative & Learning** (25.0%): Diffusion models, GANs, VAEs, reinforcement learning, optimization
+- **Science & Applications** (18.5%): AI for Science, GNNs, theoretical analysis
+
+Categorization performed using Gemini-3-Pro.
+
+**Human Curation**: Annotators verified/corrected extracted methodology descriptions and captions, validated diagram classification accuracy, and filtered diagrams with insufficient visual quality (overly simplistic, cluttered, abstract designs, etc.). Result: **584 valid samples** → evenly split into test set (N=292) and reference set (N=292). Mean source context/caption length: 3,020.1 / 70.4 words.
+
+### 4.2 Evaluation Protocol
+
+Adopts a **VLM-as-a-Judge** approach with **referenced comparison**, comparing model-generated diagrams against human-drawn diagrams.
+
+**Evaluation Dimensions** (based on Quispel et al., 2018):
+- **Content - Faithfulness**: Alignment with source context (methodology description) and communicative intent (caption). Must preserve core logic flows and module interactions, factually accurate without fabrication
+- **Content - Conciseness**: "Visual Signal-to-Noise Ratio". Focus on core information without visual clutter. Distill complex logic into clean blocks, flowcharts, and icons
+- **Presentation - Readability**: Easy-to-understand layout, legible text, no excessive crossing lines
+- **Presentation - Aesthetics**: Adherence to academic paper style norms (NeurIPS, CVPR, etc.)
+
+**Reference-based Scoring**: For each dimension, VLM judges compare model-generated diagrams against human references, assigning Model wins (100), Human wins (0), or Tie (50).
+
+**Hierarchical Aggregation Strategy**: Sets Faithfulness and Readability as **primary** dimensions, Conciseness and Aesthetics as **secondary**, ensuring content fidelity and clarity are prioritized over aesthetics. If a clear winner emerges in primary dimensions, this determines the final winner; ties defer to secondary dimensions with the same rule.
+
+## 5. Experiments
+
+### 5.1 Experimental Settings
+
+**Baseline Methods and Models**:
+
+| Method | Description |
+|--------|------------|
+| **(1) Vanilla** | Direct prompting of image generation models with input context (methodology description + caption) |
+| **(2) Few-shot** | Vanilla + 10 few-shot examples (methodology description, caption, diagram tuples) for in-context learning |
+| **(3) Paper2Any** (Liu et al., 2025) | Agentic framework for generating diagrams from high-level paper ideas. Closest existing work to this evaluation setting |
+
+**Model Configuration**:
+- VLM backbone: **Gemini-3-Pro** (default)
+- Image generation model: **Nano-Banana-Pro** (primary), **GPT-Image-1.5** (comparison)
+- Generation temperature: **1** (all experiments)
+- Generated image aspect ratio: matched to ground-truth diagram ratios (Nano-Banana-Pro: rounded to nearest among 3:2, 16:9, 21:9)
+
+**Evaluation Settings**:
+- VLM-as-a-Judge using **Gemini-3-Pro**
+- Reliability validation: 50 randomly sampled cases (25 Vanilla + 25 PaperBanana) with two-stage verification:
+  - **Inter-Model Agreement (Consistency)**: Kendall's tau correlation between Gemini-3-Pro judgments and Gemini-3-Flash/GPT-5
+    - Gemini-3-Flash: Faithfulness 0.51, Conciseness 0.60, Readability 0.45, Aesthetics 0.56, Aggregate 0.55
+    - GPT-5: 0.43, 0.47, 0.44, 0.42, Aggregate 0.45
+    - → Confirms protocol consistency across different judge models (Kendall tau > 0.4 considered relatively strong agreement)
+  - **Human Alignment (Validity)**: 2 experienced researchers independently performed reference-based scoring on the same 50 samples, then reached consensus through discussion
+    - Kendall tau between Gemini-3-Pro and human evaluation: 0.43, 0.57, 0.45, 0.41, Aggregate 0.45
+    - → Well-aligned with human perception
+
+### 5.2 Main Results
+
+| Method | Faithfulness ↑ | Conciseness ↑ | Readability ↑ | Aesthetic ↑ | Overall ↑ |
+|--------|:---:|:---:|:---:|:---:|:---:|
+| *Vanilla Settings* | | | | | |
+| GPT-Image-1.5 | 4.5 | 37.5 | 30.0 | 37.0 | 11.5 |
+| Nano-Banana-Pro | 43.0 | 43.5 | 38.5 | 65.5 | 43.2 |
+| Few-shot Nano-Banana-Pro | 41.6 | 49.6 | 37.6 | 60.5 | 41.8 |
+| *Agentic Frameworks* | | | | | |
+| Paper2Any (w/ Nano-Banana-Pro) | 6.5 | 44.0 | 20.5 | 40.0 | 8.5 |
+| **PaperBanana (Ours)** | | | | | |
+| w/ GPT-Image-1.5 | 16.0 | 65.0 | 33.0 | 56.0 | 19.0 |
+| **w/ Nano-Banana-Pro** | **45.8** | **80.7** | **51.4** | **72.1** | **60.2** |
+| Human | 50.0 | 50.0 | 50.0 | 50.0 | 50.0 |
+
+PaperBanana (w/ Nano-Banana-Pro) vs. Vanilla Nano-Banana-Pro:
+- **Faithfulness**: +2.8% (45.8 vs. 43.0)
+- **Conciseness**: +37.2% (80.7 vs. 43.5)
+- **Readability**: +12.9% (51.4 vs. 38.5)
+- **Aesthetics**: +6.6% (72.1 vs. 65.5)
+- **Overall**: +17.0% (60.2 vs. 43.2)
+
+GPT-Image-1.5 showed weaker instruction following and text rendering capabilities compared to Nano-Banana-Pro. Paper2Any prioritizes high-level idea expression, falling short in representing specific methodology flows.
+
+**Category-wise Performance**: Agent & Reasoning achieved the highest Overall score (69.9%), followed by Scientific & Application (58.8%), Generative & Learning (57.0%), and Vision & Perception with the lowest (52.1%).
+
+**Blind Human Evaluation**: In a blind A/B test by 3 human evaluators on 50 cases, PaperBanana vs. Vanilla Nano-Banana-Pro achieved an average **win/tie/loss = 72.7% / 20.7% / 6.6%**.
+
+### 5.3 Ablation Study
+
+| # | Retriever | Planner | Stylist | Visualizer | Critic | Faith. ↑ | Conc. ↑ | Read. ↑ | Aesth. ↑ | Overall ↑ |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| ① | ✓ | ✓ | ✓ | ✓ | 3 iters | **45.8** | **80.7** | **51.4** | 72.1 | **60.2** |
+| ② | ✓ | ✓ | ✓ | ✓ | 1 iter | 38.3 | 75.2 | 50.6 | 68.9 | 51.8 |
+| ③ | ✓ | ✓ | ✓ | ✓ | - | 30.7 | 79.2 | 47.0 | 72.1 | 45.6 |
+| ④ | ✓ | ✓ | - | ✓ | - | 39.2 | 61.7 | 47.9 | 67.4 | 49.2 |
+| ⑤ | ○ | - | ✓ | ✓ | - | 37.3 | 62.7 | 51.1 | 65.6 | 48.3 |
+| ⑥ | - | ✓ | - | ✓ | - | 41.9 | 58.6 | 43.1 | 62.9 | 44.2 |
+
+(○ = Random Retriever, - = component absent)
+
+**Impact of Retriever Agent**: Without reference examples (⑥), the Planner defaults to verbose and expendable descriptions, significantly degrading Conciseness, Readability, and Aesthetics. Interestingly, a random retriever (⑤) achieves comparable performance to the semantic approach, suggesting that **providing general structural/stylistic patterns matters more than exact content matching**.
+
+**Impact of Stylist Agent**: Comparing ③ and ④, the Stylist improves Conciseness (+17.5%) and Aesthetics (+4.7%) but degrades Faithfulness (-8.5%) — technical details may be omitted during the visual polishing process.
+
+**Impact of Critic Agent**: Comparing ① vs. ③, the Critic Agent (3 iterations) effectively bridges the Faithfulness gap introduced by the Stylist, improving all metrics and **ensuring a balance between aesthetics and technical accuracy**. 1 iteration (②) vs. 3 iterations (①): 3 iterations yield better performance across all dimensions.
+
+### 5.4 Statistical Plot Generation
+
+**Test Set Construction**: Reused the ChartMimic (Yang et al., 2025b) dataset to construct 240 test cases and 240 reference examples. Stratified by 7 plot categories (bar chart, line chart, tree & pie chart, scatter plot, heatmap, radar chart, miscellaneous) and 2 complexity levels (easy, hard).
+
+**Results**: PaperBanana outperforms Vanilla Gemini-3-Pro across all dimensions:
+- Faithfulness +1.4%, Conciseness +5.0%, Readability +3.1%, Aesthetics +4.0%, Overall +4.1%
+- **Slightly exceeds human performance** in Conciseness, Readability, and Aesthetics, while remaining competitive in Faithfulness
+
+**Code vs. Image Generation Comparison**: Comparing code-based (Gemini-3-Pro) and image generation-based (Nano-Banana-Pro) approaches:
+- Image generation excels in presentation (Readability, Aesthetics) but falls short in content fidelity (Faithfulness, Conciseness)
+- Image models faithfully render sparse plots but exhibit numerical hallucinations or element repetition errors on dense or complex data
+- → **A hybrid approach using image generation for sparse visualizations and code for dense plots** provides the optimal balance
+
+## 6. Discussion
+
+### 6.1 Enhancing Aesthetics of Human-Authored Diagrams
+
+Explored whether the synthesized Aesthetic Guideline G can improve the aesthetic quality of existing human-authored diagrams. Implemented a pipeline where Gemini-3-Pro generates up to 10 actionable suggestions (color palettes, fonts, icons, connectors, line weights, shapes, etc.) and Nano-Banana-Pro refines the images. On 292 test cases, aesthetics **win/tie/loss = 56.2% / 6.8% / 37.0%**, confirming significant improvement.
+
+### 6.2 Code vs. Image Generation Comparison
+
+Trade-offs between code-based and image generation-based approaches for statistical plots:
+- Image generation: Superior in Readability and Aesthetics, inferior in Faithfulness and Conciseness
+- Manual inspection: Image models render sparse plots well but exhibit numerical hallucinations or element repetition on dense/complex data
+- Conclusion: A hybrid approach using image generation for sparse visualizations and code for dense plots provides optimal balance
+
+## 7. Related Work
+
+### 7.1 Automated Academic Diagram Generation
+
+Prior work primarily adopted code-based approaches using TikZ (Belouadi and Eger, 2024; Belouadi et al., 2025) or Python-PPT (Pang et al., 2025; Zheng et al., 2025). Effective for structured content but limited for complex visual elements. Recent image generation models have emerged as alternatives, with concurrent work AutoFigure (Anonymous, 2026) converting scientific content to symbolic representations via GPT-Image before rendering to images. PaperBanana offers broader generalization and scalability through adaptive retrieval and academic-style transfer.
+
+SridBench (Chang et al., 2025) evaluates automatic diagram generation from method sections and captions across CS and natural science domains.
+
+### 7.2 Code-Based Data Visualization
+
+Evolution from LSTM-based models (Data2vis, Dibia & Demiralp, 2019) → few-shot/zero-shot coding approaches (Dibia, 2023; Galimzyanov et al., 2025) → ChatGPT-based large backbone utilization (Li et al., 2024; Tian et al., 2024) → agentic frameworks (Chen et al., 2025; Goswami et al., 2025; Yang et al., 2024) and test-time scaling (Snell et al., 2024), self-reflection (Shinn et al., 2023).
+
+## 8. Conclusion
+
+PaperBanana is an agentic framework that orchestrates five specialized agents — Retriever, Planner, Stylist, Visualizer, and Critic — to transform scientific content into high-fidelity methodology diagrams and statistical plots. The paper presents PaperBananaBench, a comprehensive benchmark curated from top AI venues, and through extensive experiments demonstrates significant improvements over existing baselines across all dimensions of faithfulness, conciseness, readability, and aesthetics. This work paves the way for AI scientists to autonomously communicate discoveries with expert-level visualizations.
+
+## 9. Limitations & Future Directions
+
+### 9.1 Editable Illustrations
+
+PaperBanana's outputs are raster images, making editing inherently difficult. While 4K resolution output is a workaround, it does not fundamentally solve the post-generation modification problem.
+
+Future directions:
+- **Minor adjustments**: Image editing models (Nano-Banana-Pro)
+- **Structural modifications**: OCR+SAM3-based reconstruction pipeline (Paper2Any, Edit Banana) — extract text with OCR, segment patterns with SAM3, then reassemble on presentation slides
+- **Advanced methods**: GUI Agents that autonomously operate vector design software such as Adobe Illustrator
+
+### 9.2 Style Standardization vs. Diversity Trade-off
+
+While a unified style guide ensures adherence to academic norms, it inevitably reduces stylistic diversity. More dynamic style adaptation mechanisms need to be explored.
+
+### 9.3 Challenges in Fine-Grained Fidelity
+
+PaperBanana excels in aesthetics but still exhibits a performance gap compared to human experts in faithfulness. The most common failure mode is **connection errors** (misaligned start/end points, incorrect arrow directions), often undetected by the critic model. Improvement depends on advances in foundation VLMs' fine-grained visual perception capabilities.
+
+### 9.4 Advancing Evaluation Paradigms
+
+Limitations of the VLM-as-a-Judge approach: difficulty assessing fine-grained structural accuracy in faithfulness, and text prompting alone cannot fully align VLMs with human preferences on subjective dimensions like aesthetics. Fine-grained, structure-based metrics and customized reward model training are future directions.
+
+### 9.5 Test-Time Scaling for Diverse Preferences
+
+From current single-output generation, extensible to a **generate-and-select** approach where diverse style/composition candidates are generated and selected by users or VLM-based preference models.
+
+### 9.6 Extension to Broader Domains
+
+The paradigm of separating structural planning through retrieval from aesthetic rendering through automatic style summarization has potential applications in **UI/UX design, patent drawings, industrial schematics**, and other professional domains requiring strict adherence to community norms.
+
+---
+
+## Related Links
+
+- **Project Page**: [https://dwzhu-pku.github.io/PaperBanana/](https://dwzhu-pku.github.io/PaperBanana/)
+- **arXiv**: [https://arxiv.org/abs/2601.23265](https://arxiv.org/abs/2601.23265)
+- **Paper2Any**: [https://github.com/OpenDCAI/Paper2Any](https://github.com/OpenDCAI/Paper2Any)
+- **Edit Banana**: [https://github.com/BIT-DataLab/Edit-Banana](https://github.com/BIT-DataLab/Edit-Banana)
+- **ChartMimic (Benchmark)**: Yang et al., 2025b — chart-to-code generation dataset
+- **SridBench (Related Benchmark)**: Chang et al., 2025 — arXiv:2505.22126

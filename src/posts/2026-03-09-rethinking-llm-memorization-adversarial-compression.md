@@ -4,6 +4,7 @@ date: 2026-03-09
 summary: NeurIPS 2024 논문. LLM의 memorization을 adversarial compression 관점에서 재정의하고, Adversarial Compression Ratio(ACR)와 MiniPrompt 알고리즘을 통해 기존 unlearning 기법의 한계를 실증적으로 보여준 연구를 상세 분석했습니다.
 tags: [LLM, Memorization, Adversarial Compression, Unlearning, Privacy, NeurIPS, 연구노트]
 category: 연구노트
+language: ko
 ---
 
 이번 연구노트는 NeurIPS 2024 논문 **Rethinking LLM Memorization through the Lens of Adversarial Compression**을 정리한 글이다.

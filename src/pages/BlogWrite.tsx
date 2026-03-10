@@ -132,6 +132,7 @@ export default function BlogWrite() {
       tags: tagList,
       category,
       content,
+      language: 'ko',
     })
     setSaving(false)
 

@@ -4,6 +4,7 @@ date: 2026-03-09
 summary: 2026-03-09 Medium AI 최신 글을 바탕으로, 에이전트 운영에서 결정론적 거버넌스와 프로세스 인텔리전스 아키텍처의 실무 포인트를 정리했습니다.
 tags: [AI, Medium, 거버넌스, Agent, Enterprise]
 category: AI/개발
+language: ko
 ---
 
 오늘은 Medium AI 태그의 최신 피드(2026-03-09 UTC 기준)에서 확인된 글,

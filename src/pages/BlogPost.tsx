@@ -1,19 +1,26 @@
 import { useEffect, useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import InteractiveBackground from '../components/InteractiveBackground'
+import LocaleToggle from '../components/LocaleToggle'
 import { useBlogTheme } from '../context/BlogThemeContext'
-import { getPost } from '../data/posts'
+import { getPost, getAlternateSlug } from '../data/posts'
 import type { Post } from '../data/posts'
+import { useBlogLocale, getBlogPageText } from '../lib/blogI18n'
+import type { ProjectLocale } from '../data/projectTranslations'
 import styles from './BlogPost.module.css'
 
 export default function BlogPost() {
   const { slug } = useParams()
+  const navigate = useNavigate()
   const { isBlogLight } = useBlogTheme()
+  const [blogLocale, setBlogLocale] = useBlogLocale()
+  const t = getBlogPageText(blogLocale)
   const [post, setPost] = useState<Post | null>(null)
   const [loading, setLoading] = useState(true)
+  const [hasAlternate, setHasAlternate] = useState(false)
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -21,6 +28,12 @@ export default function BlogPost() {
       getPost(slug).then((p) => {
         setPost(p)
         setLoading(false)
+        if (p) {
+          setBlogLocale(p.language)
+          // Check if alternate language version exists
+          const altSlug = getAlternateSlug(slug, p.language)
+          getPost(altSlug).then((alt) => setHasAlternate(!!alt))
+        }
       })
     }
   }, [slug])
@@ -31,7 +44,7 @@ export default function BlogPost() {
         {!isBlogLight && <InteractiveBackground />}
         <main className={`${styles.main} ${isBlogLight ? styles.light : ''}`}>
           <div className={styles.container}>
-            <p>로딩중...</p>
+            <p>{t.loading}</p>
           </div>
         </main>
       </>
@@ -44,8 +57,8 @@ export default function BlogPost() {
         {!isBlogLight && <InteractiveBackground />}
         <main className={`${styles.main} ${isBlogLight ? styles.light : ''}`}>
           <div className={styles.container}>
-            <h1 className={styles.notFound}>글을 찾을 수 없습니다</h1>
-            <Link to="/blog" className={styles.backLink}>블로그로 돌아가기</Link>
+            <h1 className={styles.notFound}>{t.notFound}</h1>
+            <Link to="/blog" className={styles.backLink}>{t.backToList}</Link>
           </div>
         </main>
       </>
@@ -62,12 +75,25 @@ export default function BlogPost() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <Link to="/blog" className={styles.backLink}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m15 18-6-6 6-6"/>
-            </svg>
-            블로그로 돌아가기
-          </Link>
+          <div className={styles.topBar}>
+            <Link to="/blog" className={styles.backLink}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m15 18-6-6 6-6"/>
+              </svg>
+              {t.backToList}
+            </Link>
+            {hasAlternate && (
+              <LocaleToggle
+                value={blogLocale as ProjectLocale}
+                onChange={(v) => {
+                  if (post && v !== post.language) {
+                    const altSlug = getAlternateSlug(post.slug, post.language)
+                    navigate(`/blog/${altSlug}`)
+                  }
+                }}
+              />
+            )}
+          </div>
 
           <header className={styles.header}>
             <div className={styles.tags}>

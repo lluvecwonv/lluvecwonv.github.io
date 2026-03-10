@@ -7,6 +7,7 @@ create table if not exists public.posts (
   category text not null,
   content text not null,
   published boolean not null default true,
+  language text not null default 'ko',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

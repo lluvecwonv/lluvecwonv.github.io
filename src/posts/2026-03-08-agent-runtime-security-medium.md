@@ -4,6 +4,7 @@ date: 2026-03-08
 summary: Medium의 최신 AI 에이전트 보안 글을 바탕으로, 런타임 통제와 비용·보안 통합 운영 포인트를 정리했습니다.
 tags: [AI, Agent, Security, FinOps, Medium]
 category: AI/개발
+language: ko
 ---
 
 오늘은 Medium에서 본 글 중, **AI 에이전트 보안 운영을 실무 관점으로 다시 정리한 글**을 골랐습니다.

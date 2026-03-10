@@ -1,4 +1,4 @@
-insert into public.posts (slug, title, date, summary, tags, category, content, published)
+insert into public.posts (slug, title, date, summary, tags, category, content, published, language)
 values (
   '2026-03-10-medium-gpt4o-mini-scaling-laws',
   'Medium AI 최신 글: GPT-4o mini가 바꾸는 제품 설계 포인트',
@@ -57,7 +57,8 @@ values (
 
 2026년의 AI 제품 설계는 "가장 강한 모델 1개"보다,
 **작은 모델을 중심으로 비용-지연시간-품질을 운영적으로 최적화하는 팀**이 더 빠르게 이긴다.$$,
-  true
+  true,
+  'ko'
 )
 on conflict (slug)
 do update set

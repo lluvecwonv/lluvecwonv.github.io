@@ -38,13 +38,19 @@
   padding: 0 24px;
 }
 
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+
 .backLink {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   font-size: 14px;
   color: var(--blog-post-body);
-  margin-bottom: 32px;
   transition: color var(--transition-fast);
 }
 

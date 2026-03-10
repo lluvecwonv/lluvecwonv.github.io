@@ -1,7 +1,7 @@
 -- PaperBanana 연구노트 seed SQL
 -- Generated: 2026-03-10
 
-INSERT INTO public.posts (slug, title, date, summary, tags, category, content, published)
+INSERT INTO public.posts (slug, title, date, summary, tags, category, content, published, language)
 VALUES (
   '2026-03-10-paperbanana-automating-academic-illustration',
   'PaperBanana: Automating Academic Illustration for AI Scientists 논문 정리',
@@ -341,7 +341,8 @@ Retrieval을 활용한 구조 계획 + 자동 스타일 요약을 통한 미학 
 - **Edit Banana**: [https://github.com/BIT-DataLab/Edit-Banana](https://github.com/BIT-DataLab/Edit-Banana)
 - **ChartMimic (벤치마크)**: Yang et al., 2025b — chart-to-code generation 데이터셋
 - **SridBench (관련 벤치마크)**: Chang et al., 2025 — arXiv:2505.22126$$,
-  true
+  true,
+  'ko'
 )
 ON CONFLICT (slug) DO UPDATE SET
   title = EXCLUDED.title,

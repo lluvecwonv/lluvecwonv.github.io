@@ -4,6 +4,8 @@ export type Category = '전체' | 'AI/개발' | '연구노트' | '인사이트' 
 
 export const categories: Category[] = ['전체', 'AI/개발', '연구노트', '인사이트', '여행', '일상']
 
+export type PostLanguage = 'ko' | 'en'
+
 export interface Post {
   slug: string
   title: string
@@ -12,6 +14,7 @@ export interface Post {
   tags: string[]
   category: Category
   content: string
+  language: PostLanguage
   source?: 'remote' | 'local'
 }
 
@@ -24,6 +27,11 @@ interface PostRow {
   category: string
   content: string
   published: boolean
+  language: string
+}
+
+function isPostLanguage(value: string): value is PostLanguage {
+  return value === 'ko' || value === 'en'
 }
 
 function rowToPost(row: PostRow): Post {
@@ -35,6 +43,7 @@ function rowToPost(row: PostRow): Post {
     tags: row.tags ?? [],
     category: (row.category || '일상') as Category,
     content: row.content,
+    language: isPostLanguage(row.language) ? row.language : 'ko',
     source: 'remote',
   }
 }
@@ -117,6 +126,8 @@ function parseLocalPost(filepath: string, raw: string): Post | null {
   const { frontmatter, content } = parseFrontmatter(raw)
   const categoryValue = stripWrappingQuotes(frontmatter.category || '일상')
 
+  const langValue = stripWrappingQuotes(frontmatter.language || 'ko')
+
   return {
     slug: slugMatch[1],
     title: stripWrappingQuotes(frontmatter.title || slugMatch[1]),
@@ -125,6 +136,7 @@ function parseLocalPost(filepath: string, raw: string): Post | null {
     tags: parseTags(frontmatter.tags),
     category: isCategory(categoryValue) ? categoryValue : '일상',
     content,
+    language: isPostLanguage(langValue) ? langValue : 'ko',
     source: 'local',
   }
 }
@@ -137,8 +149,9 @@ function sortPosts(posts: Post[]) {
   return [...posts].sort((left, right) => right.date.localeCompare(left.date))
 }
 
-function mergePosts(remotePosts: Post[]) {
-  const mergedPosts = new Map(localPosts.map((post) => [post.slug, post]))
+function mergePosts(remotePosts: Post[], language?: PostLanguage) {
+  const filteredLocal = language ? localPosts.filter((p) => p.language === language) : localPosts
+  const mergedPosts = new Map(filteredLocal.map((post) => [post.slug, post]))
   remotePosts.forEach((post) => {
     mergedPosts.set(post.slug, post)
   })
@@ -149,23 +162,32 @@ function getLocalPost(slug: string) {
   return localPosts.find((post) => post.slug === slug) ?? null
 }
 
-export async function getPosts(): Promise<Post[]> {
+export async function getPosts(language?: PostLanguage): Promise<Post[]> {
+  const filterByLang = (posts: Post[]) =>
+    language ? posts.filter((p) => p.language === language) : posts
+
   if (!supabase) {
-    return sortPosts(localPosts)
+    return sortPosts(filterByLang(localPosts))
   }
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('posts')
     .select('*')
     .eq('published', true)
     .order('date', { ascending: false })
 
-  if (error) {
-    console.error('Failed to fetch posts:', error)
-    return sortPosts(localPosts)
+  if (language) {
+    query = query.eq('language', language)
   }
 
-  return mergePosts((data as PostRow[]).map(rowToPost))
+  const { data, error } = await query
+
+  if (error) {
+    console.error('Failed to fetch posts:', error)
+    return sortPosts(filterByLang(localPosts))
+  }
+
+  return mergePosts((data as PostRow[]).map(rowToPost), language)
 }
 
 export async function getPost(slug: string): Promise<Post | null> {
@@ -208,6 +230,7 @@ export async function createPost(post: Post): Promise<boolean> {
       category: post.category,
       content: post.content,
       published: true,
+      language: post.language || 'ko',
     })
 
   if (error) {
@@ -215,6 +238,14 @@ export async function createPost(post: Post): Promise<boolean> {
     return false
   }
   return true
+}
+
+/** Get the alternate-language slug for a post (convention: EN posts have `-en` suffix) */
+export function getAlternateSlug(slug: string, currentLang: PostLanguage): string {
+  if (currentLang === 'en') {
+    return slug.replace(/-en$/, '')
+  }
+  return `${slug}-en`
 }
 
 export async function deletePost(slug: string): Promise<boolean> {

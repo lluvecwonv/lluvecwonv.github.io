@@ -2,10 +2,13 @@ import { useState, useEffect, lazy, Suspense } from 'react'
 import { useNavigate } from 'react-router-dom'
 import InteractiveBackground from '../components/InteractiveBackground'
 import BlogCard from '../components/BlogCard'
+import LocaleToggle from '../components/LocaleToggle'
 import { useAdminAuth } from '../context/AdminAuthContext'
 import { useBlogTheme } from '../context/BlogThemeContext'
 import { getPosts, deletePost, categories } from '../data/posts'
 import type { Post, Category } from '../data/posts'
+import { useBlogLocale, getBlogPageText } from '../lib/blogI18n'
+import type { ProjectLocale } from '../data/projectTranslations'
 import styles from './Blog.module.css'
 
 const TravelGlobe = lazy(() => import('../components/TravelGlobe'))
@@ -18,6 +21,8 @@ export default function Blog() {
   const navigate = useNavigate()
   const { isAdmin } = useAdminAuth()
   const { isBlogLight, toggleBlogTheme } = useBlogTheme()
+  const [blogLocale, setBlogLocale] = useBlogLocale()
+  const t = getBlogPageText(blogLocale)
   const [activeCategory, setActiveCategory] = useState<Category>('전체')
   const [viewMode, setViewMode] = useState<ViewMode>('grid')
   const [posts, setPosts] = useState<Post[]>([])
@@ -25,18 +30,18 @@ export default function Blog() {
 
   useEffect(() => {
     window.scrollTo(0, 0)
-    getPosts().then(setPosts)
-  }, [])
+    getPosts(blogLocale).then(setPosts)
+  }, [blogLocale])
 
   const handleDelete = async (slug: string, title: string) => {
-    if (!confirm(`"${title}" 글을 삭제하시겠습니까?`)) return
+    if (!confirm(t.deleteConfirm(title))) return
     const ok = await deletePost(slug)
     if (ok) {
       setPosts((prev) => prev.filter((p) => p.slug !== slug))
-      setToast(`"${title}" 삭제됨`)
+      setToast(t.deleted(title))
       setTimeout(() => setToast(''), 3000)
     } else {
-      alert('삭제에 실패했어요.')
+      alert(t.deleteFailed)
     }
   }
 
@@ -54,17 +59,22 @@ export default function Blog() {
               <div>
                 <h1 className={styles.title}>Blog</h1>
                 <p className={styles.subtitle}>
-                  목적은 AI, 개발, 연구에 대한 기록과 인사이트를 공유하려고 만든 공간.<br />
-                  실사용은 고양이 자랑 공간, 너만없어 고양이.
+                  {t.subtitle.split('\n').map((line, i) => (
+                    <span key={i}>{line}{i === 0 && <br />}</span>
+                  ))}
                 </p>
               </div>
               <div className={styles.headerActions}>
+                <LocaleToggle
+                  value={blogLocale as ProjectLocale}
+                  onChange={(v) => setBlogLocale(v as 'ko' | 'en')}
+                />
                 <button
                   type="button"
                   className={styles.themeBtn}
                   onClick={toggleBlogTheme}
-                  aria-label={isBlogLight ? '다크 모드로 전환' : '라이트 모드로 전환'}
-                  title={isBlogLight ? '다크 모드' : '라이트 모드'}
+                  aria-label={isBlogLight ? t.darkMode : t.lightMode}
+                  title={isBlogLight ? t.darkMode : t.lightMode}
                 >
                   {isBlogLight ? (
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -82,7 +92,7 @@ export default function Blog() {
                 </button>
                 {isAdmin && (
                   <button onClick={() => navigate('/blog/write')} className={styles.writeBtn}>
-                    글쓰기
+                    {t.write}
                   </button>
                 )}
               </div>
@@ -96,7 +106,7 @@ export default function Blog() {
               <span className={styles.catCaption}>우리집 최강 귀요미, 해피바이러스. 금비를 소개함돠</span>
             </div>
             <div className={styles.heroGlobe}>
-              <Suspense fallback={<p className={styles.empty}>지구본 로딩중...</p>}>
+              <Suspense fallback={<p className={styles.empty}>{t.globeLoading}</p>}>
                 <TravelGlobe compact />
               </Suspense>
             </div>
@@ -143,7 +153,7 @@ export default function Blog() {
             </div>
 
             {activeCategory === '여행' ? (
-              <Suspense fallback={<p className={styles.empty}>지구본 로딩중...</p>}>
+              <Suspense fallback={<p className={styles.empty}>{t.globeLoading}</p>}>
                 <TravelGlobe />
               </Suspense>
             ) : (
@@ -158,7 +168,7 @@ export default function Blog() {
                   />
                 ))}
                 {filteredPosts.length === 0 && (
-                  <p className={styles.empty}>아직 이 카테고리에 글이 없습니다.</p>
+                  <p className={styles.empty}>{t.empty}</p>
                 )}
               </div>
             )}

@@ -4,6 +4,7 @@ date: 2026-03-07
 summary: Medium AI 주간 리포트 기반으로, Claude의 메모리 가져오기 기능이 사용자 전환 비용을 어떻게 낮추는지 정리했습니다.
 tags: [AI, Claude, Anthropic, Medium, 생산성]
 category: AI/개발
+language: ko
 ---
 
 오늘은 Medium의 AI 뉴스레터를 읽다가, 실제 사용자 경험에 바로 영향을 주는 소식을 하나 골랐습니다.
