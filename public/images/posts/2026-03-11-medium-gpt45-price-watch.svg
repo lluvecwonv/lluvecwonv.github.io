@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">GPT-4.5 price watch</title>
+  <desc id="desc">AI model launch signal, price tag, and product decision checklist.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#0b1220"/>
+      <stop offset="100%" stop-color="#162b46"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0%" stop-color="#1f3a5f"/>
+      <stop offset="100%" stop-color="#274b77"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="675" fill="url(#bg)"/>
+
+  <circle cx="1050" cy="110" r="170" fill="#2e5f9b" opacity="0.18"/>
+  <circle cx="140" cy="590" r="200" fill="#5ea3ff" opacity="0.14"/>
+
+  <text x="80" y="110" fill="#dcecff" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="46" font-weight="700">
+    Medium AI Watch: GPT-4.5 가격 이슈
+  </text>
+  <text x="80" y="160" fill="#9fc5f8" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="26">
+    모델 성능보다 중요한 건 제품 단위 비용 구조와 라우팅 전략
+  </text>
+
+  <rect x="80" y="220" width="1040" height="360" rx="24" fill="url(#card)" stroke="#6fa8ff" stroke-opacity="0.35"/>
+
+  <text x="130" y="290" fill="#ffffff" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="30" font-weight="700">핵심 관찰</text>
+  <text x="130" y="335" fill="#d7e8ff" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="24">1) 신규 고성능 모델 출시 = 가격 민감도 재점화</text>
+  <text x="130" y="375" fill="#d7e8ff" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="24">2) 트래픽이 큰 서비스는 토큰 단가보다 전체 아키텍처가 비용을 좌우</text>
+  <text x="130" y="415" fill="#d7e8ff" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="24">3) mini/full 2단 라우팅 + 캐시 정책이 실무 승부처</text>
+
+  <text x="130" y="485" fill="#ffffff" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="28" font-weight="700">실행 체크</text>
+  <text x="130" y="525" fill="#d7e8ff" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="22">비용 상한, 품질 기준선, 롤백 플래그를 같은 대시보드에서 관리</text>
+
+  <rect x="930" y="110" width="180" height="52" rx="26" fill="#74b2ff"/>
+  <text x="1020" y="145" text-anchor="middle" fill="#0d2744" font-family="Pretendard, Apple SD Gothic Neo, sans-serif" font-size="24" font-weight="700">2026-03-11</text>
+</svg>
