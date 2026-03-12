@@ -194,15 +194,18 @@
 }
 
 .content table {
-  display: block;
-  width: max-content;
-  min-width: 100%;
+  display: table;
+  width: 100%;
+  max-width: 100%;
   overflow-x: auto;
   border-collapse: collapse;
   margin: 24px 0;
   border: 1px solid var(--blog-post-pre-border);
   border-radius: 14px;
   background: var(--blog-post-pre-bg);
+  table-layout: auto;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 .content thead {
@@ -211,17 +214,21 @@
 
 .content th,
 .content td {
-  padding: 12px 14px;
+  padding: 10px 12px;
   border-bottom: 1px solid var(--blog-post-pre-border);
   text-align: left;
   vertical-align: top;
   color: var(--blog-post-body);
-  white-space: nowrap;
+  white-space: normal;
+  word-break: keep-all;
+  min-width: 60px;
 }
 
 .content th {
   color: var(--blog-post-title);
   font-weight: 700;
+  white-space: nowrap;
+  font-size: 0.9em;
 }
 
 .content tr:last-child td {
@@ -231,5 +238,18 @@
 @media (max-width: 768px) {
   .title {
     font-size: 26px;
+  }
+
+  .content table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .content th,
+  .content td {
+    padding: 8px 10px;
+    font-size: 0.85em;
+    min-width: 50px;
   }
 }
