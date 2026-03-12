@@ -42,7 +42,9 @@ LLM은 학습 데이터의 일부를 기억하고 그대로 재생성할 수 있
 즉, prefix-suffix 관계를 완전히 삭제하는 것이 아니라, 의미적으로 유사하지만 원본과 **다른** suffix를 생성하도록 모델을 미세조정한다.
 
 ![DeMem 파이프라인](/images/papers/demem/figure_1_pipeline.png)
-*Figure 1: DeMem 프레임워크 개요. LLM을 대규모 코퍼스로 사전학습(중복 제거 적용)한 후, 학습 코퍼스의 부분집합을 사용해 음수 유사도 피드백으로 DeMem 정책을 학습한다.*
+*Figure 1: DeMem 프레임워크의 2단계 파이프라인.*
+
+Figure 1은 DeMem의 전체 파이프라인을 보여준다. **상단**은 일반적인 LLM 사전학습 과정으로, 대규모 코퍼스(Deduplication 적용)로 모델을 학습시킨다. **하단**이 DeMem의 핵심인 RL Fine-tuning 단계다. 학습 코퍼스의 부분집합(Subset)을 DeMem-Policy-LLM에 입력하면 생성된 출력(Generated)이 나오고, 이를 Reward Function에 통과시켜 **Negative Similarity** 점수를 계산한다. 이 점수가 다시 정책 모델로 피드백되어, 원본과 다른 출력을 생성하도록 모델을 업데이트하는 순환 구조다.
 
 ---
 
@@ -118,7 +120,9 @@ $$KL(\theta || \theta_c) = \sum_{i \in [1,t]} \pi_\theta(a_i|s_i) \cdot \log \fr
 ### 3.2 시퀀스 분할
 
 ![시퀀스 분할](/images/papers/demem/figure_2_sequence_splitting.png)
-*Figure 2: 학습/평가 데이터의 시퀀스 분할. 200토큰 = Pre-Prefix(100) + Prefix(50) + Suffix(50).*
+*Figure 2: 200토큰 시퀀스의 3분할 구조.*
+
+Figure 2는 각 학습 샘플을 어떻게 분할하는지 보여준다. 전체 200토큰 시퀀스를 3개 구간으로 나눈다:
 
 | 구간 | 토큰 수 | 용도 |
 |------|---------|------|
@@ -126,9 +130,10 @@ $$KL(\theta || \theta_c) = \sum_{i \in [1,t]} \pi_\theta(a_i|s_i) \cdot \log \fr
 | Prefix | 50 | 학습 + 평가 (입력) |
 | Suffix | 50 | 학습 + 평가 (타겟) |
 
-**평가 세팅 2가지:**
-1. **Prefix만:** 50토큰 prefix로 suffix 예측
-2. **Pre-Prefix + Prefix:** 150토큰 context로 suffix 예측 (discoverability 공격 시뮬레이션)
+그림에서 **Evaluation** 괄호는 Pre-Prefix 영역을 가리키고, **Train & Evaluation** 괄호는 Prefix+Suffix를 가리킨다. 학습 시에는 Prefix→Suffix만 사용하고, 평가 시에는 두 가지 세팅을 적용한다:
+
+1. **Prefix만 (50토큰):** 기본 forgetting 성능 측정
+2. **Pre-Prefix + Prefix (150토큰):** longer context를 제공하는 **discoverability 공격** 시뮬레이션. 컨텍스트가 길어질수록 메모리제이션이 더 쉽게 추출되는 현상을 테스트한다.
 
 ### 3.3 모델
 
@@ -224,12 +229,13 @@ $$KL(\theta || \theta_c) = \sum_{i \in [1,t]} \pi_\theta(a_i|s_i) \cdot \log \fr
 ### 4.3 샘플 수, 안정성, Universal Policy
 
 ![성능 비교](/images/papers/demem/figure_3_performance.png)
-*Figure 3: 잊기 샘플 수(32/128/256)에 따른 NEO 모델별 평균 LM 성능. DeMem(파란 점선)은 안정적, UL(빨간 실선)은 급격한 성능 하락.*
+*Figure 3: 잊기 샘플 수(32/128/256)에 따른 NEO (125M, 1.3B, 2.7B) 모델의 평균 LM 성능.*
 
-핵심 차이점:
-- **UL:** 샘플 수가 증가하면 성능이 급격히 하락 (NEO 2.7B: 49.5→39.4)
-- **DeMem:** 샘플 수에 **무관하게 안정적** (NEO 2.7B: 52.5±0.3)
-- DeMem은 **1회 파인튜닝**으로 **무제한** 샘플에 대한 universal policy를 학습
+Figure 3은 DeMem의 가장 강력한 장점인 **안정성**을 시각적으로 보여준다. 가로축은 한 번에 잊는 샘플 수(32, 128, 256), 세로축은 8개 벤치마크 평균 성능이다.
+
+**파란 점선 (DeMem):** 세 그래프 모두에서 거의 수평선이다. 125M에서 ~43.3, 1.3B에서 ~49.4, 2.7B에서 ~52.5로, 샘플 수에 관계없이 일관된 성능을 유지한다. 이는 DeMem이 **universal policy**를 학습하기 때문이다 — 1회 파인튜닝으로 테스트 셋의 모든 샘플에 대응한다.
+
+**빨간 실선 (UL):** 샘플 수가 증가할수록 급격한 하락을 보인다. 특히 1.3B에서 48.5→41.0, 2.7B에서 49.5→39.4로 떨어진다. UL은 같은 샘플에 대해 gradient ascent를 반복하므로, 샘플이 많을수록 모델 파라미터가 크게 훼손된다.
 
 ### 4.4 Deduplication + DeMem 조합
 
@@ -266,7 +272,13 @@ Longer context (Pre-Prefix 100 + Prefix 50 = 150 토큰)를 사용한 공격에 
 ### 4.6 Approximate Memorization 임계값 분석
 
 ![임계값 분석](/images/papers/demem/figure_4_threshold.png)
-*Figure 4: NEO 2.7B Longer Context에서 DeMem 적용 전후 SacreBLEU 분포. 빨간 영역이 75% 임계값 이상(메모리제이션 판정) 구간.*
+*Figure 4: NEO 2.7B (Longer Context)에서 DeMem 적용 전(좌)·후(우)의 SacreBLEU 히스토그램.*
+
+Figure 4는 NEO 2.7B 모델에서 longer context(150토큰) 조건의 SacreBLEU 분포를 보여준다. 가로축이 SacreBLEU 점수, 세로축이 샘플 수다.
+
+**좌측 (Before DeMem):** 분포가 오른쪽(높은 SacreBLEU, 즉 높은 메모리제이션)에 집중되어 있다. **빨간 영역**이 75% 임계값 이상으로, 이 구간의 샘플은 approximate memorization으로 판정된다.
+
+**우측 (After DeMem):** 분포가 왼쪽으로 이동하면서 고르게 퍼졌다. 빨간 영역(75%+)의 샘플이 크게 줄어들었다.
 
 SacreBLEU ≥ 75% 기준 memorized 샘플 수 변화:
 
@@ -275,28 +287,33 @@ SacreBLEU ≥ 75% 기준 memorized 샘플 수 변화:
 | NEO 1.3B | 910 | 497 | **45.4%** |
 | NEO 2.7B | 1,036 | 321 | **69.0%** |
 
-DeMem 적용 후 분포가 75% 임계값 아래로 고르게 분산된다.
+NEO 2.7B에서는 메모리제이션 판정 샘플이 1,036개에서 321개로 약 70% 감소했다. 이는 DeMem이 단순히 평균 SacreBLEU를 낮추는 것이 아니라, 위험 구간(75%+)에 있는 샘플들을 집중적으로 안전 구간으로 이동시킨다는 것을 보여준다.
 
 ### 4.7 정성적 결과
 
 ![정성적 예시](/images/papers/demem/figure_5_qualitative.png)
-*Figure 5: DeMem 적용 전후 생성 suffix 비교. 초록색 = 원본과 일치(메모리제이션), 빨간색 = 원본과 다른 부분.*
+*Figure 5: DeMem 적용 전후 생성 suffix의 정성적 비교. 4개 샘플에 대한 Prefix, True Suffix, Generated Suffix (Before/After), N-SacreBLEU, PPL 값을 보여준다.*
 
-대표 사례:
+Figure 5는 실제 샘플에서 DeMem이 어떻게 작동하는지를 직관적으로 보여준다. 각 행이 하나의 샘플이며, **초록색 하이라이트**는 True Suffix와 일치하는 부분(메모리제이션), **빨간색 하이라이트**는 다르게 생성된 부분을 나타낸다.
 
 **사례 1: 번역 메타데이터 (이메일 주소 포함)**
 - Prefix: `"POT-Creation-Date: 2017-02-24..."`
-- True Suffix: `-Translator: FULL NAME <EMAIL>...`
-- Before: 거의 그대로 재생성 (N-SacreBLEU: 12.97)
-- **After:** Language-Team을 다르게 패러프레이즈 (N-SacreBLEU: **62.38**)
+- Before(Generated Suffix-Before): True Suffix와 거의 동일 — `FULL NAME <EMAIL@ADDRESS>`, `Language-Team: LANGUAGE`까지 그대로 재생성. N-SacreBLEU 12.97 (거의 완벽 메모리제이션)
+- **After(Generated Suffix-After):** Language-Team을 `"English (India)"`로, 뒤에 Transifex URL을 붙이는 등 **구조는 유지하되 내용은 완전히 다르게** 생성. N-SacreBLEU **62.38**
 
-**사례 2: 오픈소스 라이선스 텍스트**
-- Prefix: `"Free Software Foundation..."`
-- True Suffix: `-sdk is distributed...`
-- Before: 유사하게 재생성 (N-SacreBLEU: 16.41)
-- **After:** 완전히 다르게 생성 (N-SacreBLEU: **99.95**)
+**사례 2: 오픈소스 라이선스 (GPL)**
+- Before: `.org is distributed in the hope...WITHOUT ANY WARRANTY` — 원본 라이선스 문구를 거의 그대로 재생성
+- **After:** 완전히 다른 내용 생성. N-SacreBLEU **99.95** (사실상 완전 forgetting)
 
-핵심: DeMem은 메모리제이션된 개인 데이터(이메일 주소 등)를 효과적으로 패러프레이즈하지만, 일부 경우 perplexity가 증가할 수 있다.
+**사례 3: 이메일 주소 체인**
+- Before: 마스킹된 이메일 주소들을 그대로 재생성 (N-SacreBLEU: 69.87)
+- **After:** 이메일 패턴은 유지하되 구체적 주소는 다르게 생성 (N-SacreBLEU: **86.04**)
+
+**사례 4: SSL 코드 라이선스**
+- Before: 저작권 고지의 원본 내용 재생성 (N-SacreBLEU: 80.12)
+- **After:** 다른 내용으로 패러프레이즈, PPL은 1.56→6.64로 증가. N-SacreBLEU: **96.52**
+
+주목할 점은 Before의 PPL이 모두 1.68~3.80으로 매우 낮은데(학습 데이터와 동일하니까 당연), After에서도 1.98~6.64 범위로 크게 증가하지 않는다는 것이다. 다만 사례 4처럼 PPL이 다소 올라가는 경우가 있어, 이는 DeMem의 trade-off다.
 
 ---
 
