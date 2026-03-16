@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OLMo: Accelerating the Science of Language Models | 논문 분석</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap');
+
+  :root {
+    --bg: #fafaf9;
+    --surface: #ffffff;
+    --text: #1c1917;
+    --text-secondary: #57534e;
+    --accent: #2563eb;
+    --accent-light: #eff6ff;
+    --border: #e7e5e4;
+    --tag-bg: #f1f5f9;
+    --tag-text: #475569;
+    --highlight: #fef3c7;
+    --green: #059669;
+    --green-light: #ecfdf5;
+    --orange: #ea580c;
+    --orange-light: #fff7ed;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.75;
+    font-size: 16px;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* Header */
+  .hero {
+    text-align: center;
+    padding: 60px 0 40px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 48px;
+  }
+
+  .hero .venue {
+    display: inline-block;
+    background: var(--accent);
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+
+  .hero h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+
+  .hero .subtitle {
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto 20px;
+  }
+
+  .hero .meta {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+
+  /* Language Toggle */
+  .lang-toggle {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 48px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    padding: 16px 0;
+    z-index: 100;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .lang-btn {
+    padding: 8px 24px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+
+  .lang-btn.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+
+  .lang-btn:hover:not(.active) {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .lang-section { display: none; }
+  .lang-section.active { display: block; }
+
+  /* Sections */
+  .section {
+    margin-bottom: 48px;
+  }
+
+  .section-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    line-height: 1.3;
+  }
+
+  h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    margin-top: 28px;
+    color: var(--text);
+  }
+
+  p {
+    margin-bottom: 16px;
+    color: var(--text-secondary);
+  }
+
+  /* Key Insight Box */
+  .insight-box {
+    background: var(--accent-light);
+    border-left: 3px solid var(--accent);
+    padding: 20px 24px;
+    border-radius: 0 10px 10px 0;
+    margin: 24px 0;
+  }
+
+  .insight-box p {
+    color: var(--text);
+    margin: 0;
+    font-weight: 500;
+  }
+
+  /* Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 24px 0;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .stat-card .number {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--accent);
+    display: block;
+  }
+
+  .stat-card .label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 4px;
+  }
+
+  /* Table */
+  .table-wrapper {
+    overflow-x: auto;
+    margin: 24px 0;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+
+  th {
+    background: var(--tag-bg);
+    font-weight: 600;
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  tr.highlight-row {
+    background: var(--accent-light);
+    font-weight: 600;
+  }
+
+  /* Architecture List */
+  .arch-list {
+    list-style: none;
+    margin: 20px 0;
+  }
+
+  .arch-list li {
+    padding: 12px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 8px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .arch-list li .icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: var(--accent-light);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .arch-list li .content {
+    flex: 1;
+  }
+
+  .arch-list li strong {
+    color: var(--text);
+    display: block;
+    margin-bottom: 2px;
+    font-size: 0.9rem;
+  }
+
+  .arch-list li span {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+  }
+
+  /* Tags */
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 16px 0;
+  }
+
+  .tag {
+    background: var(--tag-bg);
+    color: var(--tag-text);
+    font-size: 0.8rem;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-weight: 500;
+  }
+
+  /* Release Box */
+  .release-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 24px 0;
+  }
+
+  .release-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+
+  .release-card .title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .release-card .desc {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .check { color: var(--green); margin-right: 4px; }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 48px 0;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 1.5rem; }
+    .stats-grid { grid-template-columns: 1fr; }
+    .release-grid { grid-template-columns: 1fr; }
+    .container { padding: 24px 16px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="venue">ACL 2024 Long Paper</div>
+    <h1>OLMo: Accelerating the Science of Language Models</h1>
+    <p class="subtitle">Allen Institute for AI (AI2)가 발표한 진정한 오픈 언어 모델 프레임워크에 대한 분석</p>
+    <p class="meta">Paper by Groeneveld, Beltagy, Walsh et al. &middot; Analysis by Chaewon Yoon</p>
+  </div>
+
+  <!-- Language Toggle -->
+  <div class="lang-toggle">
+    <button class="lang-btn active" onclick="switchLang('en')">English</button>
+    <button class="lang-btn" onclick="switchLang('ko')">한국어</button>
+  </div>
+
+  <!-- ======================== ENGLISH ======================== -->
+  <div id="lang-en" class="lang-section active">
+
+    <div class="section">
+      <div class="section-label">TL;DR</div>
+      <h2>What is OLMo?</h2>
+      <p>OLMo (Open Language Model) is a truly open language model framework released by the Allen Institute for AI (AI2). Unlike other "open" models that only release model weights, OLMo provides the complete package: training data, training code, evaluation code, intermediate checkpoints, and training logs &mdash; all under the Apache 2.0 License.</p>
+      <div class="insight-box">
+        <p>The core thesis: the most powerful language models have become closed off behind proprietary interfaces, making scientific study nearly impossible. OLMo aims to change that by being fully transparent at every stage of the pipeline.</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">At a Glance</div>
+      <h2>Key Numbers</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="number">7B</span>
+          <span class="label">Parameters (largest)</span>
+        </div>
+        <div class="stat-card">
+          <span class="number">2.46T</span>
+          <span class="label">Training Tokens</span>
+        </div>
+        <div class="stat-card">
+          <span class="number">500+</span>
+          <span class="label">Intermediate Checkpoints</span>
+        </div>
+      </div>
+      <div class="tags">
+        <span class="tag">Decoder-only Transformer</span>
+        <span class="tag">Apache 2.0</span>
+        <span class="tag">Dolma Dataset</span>
+        <span class="tag">NVIDIA + AMD GPUs</span>
+        <span class="tag">SwiGLU</span>
+        <span class="tag">RoPE</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Architecture</div>
+      <h2>Model Design Choices</h2>
+      <p>OLMo uses a decoder-only transformer architecture with several modifications over the vanilla design, following trends established by models like LLaMA and PaLM.</p>
+      <ul class="arch-list">
+        <li>
+          <div class="icon">1</div>
+          <div class="content">
+            <strong>No Biases</strong>
+            <span>All bias terms are removed from the architecture to improve training stability.</span>
+          </div>
+        </li>
+        <li>
+          <div class="icon">2</div>
+          <div class="content">
+            <strong>Non-parametric Layer Norm</strong>
+            <span>No affine transformation (no adaptive gain or bias), chosen for both safety and speed.</span>
+          </div>
+        </li>
+        <li>
+          <div class="icon">3</div>
+          <div class="content">
+            <strong>SwiGLU Activation</strong>
+            <span>Replaces ReLU with SwiGLU. Hidden size ~8/3 d, rounded to nearest multiple of 128 (11,008 for 7B).</span>
+          </div>
+        </li>
+        <li>
+          <div class="icon">4</div>
+          <div class="content">
+            <strong>Rotary Positional Embeddings (RoPE)</strong>
+            <span>Replaces absolute positional embeddings for better length generalization.</span>
+          </div>
+        </li>
+        <li>
+          <div class="icon">5</div>
+          <div class="content">
+            <strong>Modified BPE Tokenizer</strong>
+            <span>Based on GPT-NeoX-20B with PII masking tokens. Vocabulary size: 50,280 (padded to 50,304).</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Data</div>
+      <h2>Dolma: The Pretraining Dataset</h2>
+      <p>One of OLMo's most significant contributions is releasing Dolma, the full pretraining dataset. This is rare in the field &mdash; most open models still keep their training data private. Dolma is a diverse, multi-source corpus containing roughly 3 trillion tokens from 6 major sources.</p>
+      <div class="table-wrapper">
+        <table>
+          <tr><th>Source</th><th>Type</th><th>Size (GB)</th><th>Tokens (B)</th></tr>
+          <tr><td>Common Crawl</td><td>Web pages</td><td>9,812</td><td>2,180</td></tr>
+          <tr><td>GitHub</td><td>Code</td><td>1,043</td><td>342</td></tr>
+          <tr><td>Reddit</td><td>Social media</td><td>339</td><td>80</td></tr>
+          <tr><td>Semantic Scholar</td><td>Papers</td><td>268</td><td>57</td></tr>
+          <tr><td>Project Gutenberg</td><td>Books</td><td>20.4</td><td>5.2</td></tr>
+          <tr><td>Wikipedia</td><td>Encyclopedic</td><td>16.2</td><td>3.7</td></tr>
+          <tr style="font-weight:600; background: var(--tag-bg);"><td>Total</td><td></td><td>11,519</td><td>2,668</td></tr>
+        </table>
+      </div>
+      <p>Dolma was built through a rigorous pipeline of language filtering, quality filtering, content filtering, deduplication, multi-source mixing, and tokenization.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Training</div>
+      <h2>Training Infrastructure</h2>
+      <p>OLMo was trained on two different GPU clusters to verify hardware portability. The LUMI supercomputer provided up to 256 nodes with AMD MI250X GPUs, while MosaicML (Databricks) provided 27 nodes with NVIDIA A100 GPUs. The team used PyTorch's FSDP framework with the ZeRO optimizer strategy, AdamW optimizer, and mixed-precision training with bfloat16.</p>
+      <p>A notable training trick: after the main training run, the learning rate was linearly decayed to 0 over a final 1,000 steps on the Dolma dataset, which provided a meaningful boost across both perplexity and end-task evaluations.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Results</div>
+      <h2>Performance Evaluation</h2>
+      <p>OLMo-7B was evaluated on 8 core downstream tasks using zero-shot evaluation. It achieves competitive performance against comparable 7B-scale models.</p>
+      <div class="table-wrapper">
+        <table>
+          <tr><th>Model</th><th>ARC-c</th><th>ARC-e</th><th>BoolQ</th><th>HellaSwag</th><th>PIQA</th><th>Avg.</th></tr>
+          <tr><td>LLaMA 7B</td><td>44.5</td><td>67.9</td><td>75.4</td><td>76.2</td><td>77.2</td><td>69.6</td></tr>
+          <tr><td>Llama 2 7B</td><td>48.5</td><td>69.5</td><td>80.2</td><td>76.8</td><td>76.7</td><td>69.4</td></tr>
+          <tr><td>MPT-7B</td><td>46.5</td><td>70.5</td><td>74.2</td><td>77.6</td><td>77.3</td><td>69.8</td></tr>
+          <tr><td>Falcon-7B</td><td>47.5</td><td>70.4</td><td>74.6</td><td>75.9</td><td>78.5</td><td>70.3</td></tr>
+          <tr class="highlight-row"><td>OLMo-7B</td><td>48.5</td><td>65.4</td><td>73.4</td><td>76.4</td><td>78.4</td><td>69.3</td></tr>
+        </table>
+      </div>
+      <p>After instruction fine-tuning (SFT) and DPO alignment, OLMo shows significant improvements &mdash; MMLU jumps from 28.3 to 46.2, and the model outperforms most other chat variants on aggregate. This demonstrates that OLMo serves as a strong base model for downstream adaptation.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-label">What Makes It Special</div>
+      <h2>The Full Open Release</h2>
+      <p>The most impactful aspect of this work isn't the model performance itself &mdash; it's the unprecedented level of openness. Here's everything they released:</p>
+      <div class="release-grid">
+        <div class="release-card">
+          <div class="title"><span class="check">&#10003;</span> Model Weights</div>
+          <div class="desc">7B, 7B-twin, 1B models plus 500+ intermediate checkpoints at 1000-step intervals.</div>
+        </div>
+        <div class="release-card">
+          <div class="title"><span class="check">&#10003;</span> Training Data (Dolma)</div>
+          <div class="desc">The complete 3T-token pretraining corpus with data curation tools and analysis tools.</div>
+        </div>
+        <div class="release-card">
+          <div class="title"><span class="check">&#10003;</span> Training Code</div>
+          <div class="desc">Full training and modeling code, training logs, and metrics logged to Weights & Biases.</div>
+        </div>
+        <div class="release-card">
+          <div class="title"><span class="check">&#10003;</span> Evaluation Framework</div>
+          <div class="desc">Catwalk for downstream evaluation, Paloma for perplexity, and the full adaptation pipeline.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Impact</div>
+      <h2>Why This Matters</h2>
+      <p>Most "open-source" LLMs only release weights and maybe inference code. This makes it impossible to study critical questions like how training data composition affects model behavior, what happens at different stages of training, and whether results are truly reproducible. OLMo's full release enables the research community to investigate these questions rigorously.</p>
+      <p>The paper also provides a transparent accounting of environmental impact: training consumed approximately 239 MWh of energy with estimated emissions of 69.78 tCO2eq, setting a precedent for responsible reporting in the field.</p>
+
+      <h3>Limitations Acknowledged</h3>
+      <p>The authors are candid about limitations: the training data is English-only, the adapted models still exhibit bias and toxicity issues, and the adaptation data mix (TULU, designed for Llama) may not be optimal for OLMo's unique characteristics. These are honest acknowledgements that further strengthen the paper's contribution to open science.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-label">Verdict</div>
+      <h2>Final Thoughts</h2>
+      <p>OLMo may not be the highest-performing 7B model, but that's not the point. Its value lies in being the most transparent and reproducible large language model ever released. For researchers studying how LLMs work, how training data shapes model behavior, or how to make these systems safer, OLMo provides an invaluable resource that no other model offers at this scale. This is a landmark paper for open science in AI.</p>
+    </div>
+
+  </div>
+
+  <!-- ======================== KOREAN ======================== -->
+  <div id="lang-ko" class="lang-section">
+
+    <div class="section">
+      <div class="section-label">요약</div>
+      <h2>OLMo란 무엇인가?</h2>
+      <p>OLMo(Open Language Model)는 Allen Institute for AI(AI2)가 발표한 진정한 의미의 오픈 언어 모델 프레임워크입니다. 모델 가중치만 공개하는 다른 "오픈" 모델들과 달리, OLMo는 학습 데이터, 학습 코드, 평가 코드, 중간 체크포인트, 학습 로그까지 모든 것을 Apache 2.0 라이선스로 공개합니다.</p>
+      <div class="insight-box">
+        <p>핵심 주장: 가장 강력한 언어 모델들이 독점적 인터페이스 뒤에 감춰지면서 과학적 연구가 거의 불가능해졌습니다. OLMo는 파이프라인의 모든 단계에서 완전한 투명성을 제공함으로써 이를 바꾸고자 합니다.</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">한눈에 보기</div>
+      <h2>주요 수치</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="number">7B</span>
+          <span class="label">파라미터 (최대 모델)</span>
+        </div>
+        <div class="stat-card">
+          <span class="number">2.46T</span>
+          <span class="label">학습 토큰 수</span>
+        </div>
+        <div class="stat-card">
+          <span class="number">500+</span>
+          <span class="label">중간 체크포인트</span>
+        </div>
+      </div>
+      <div class="tags">
+        <span class="tag">Decoder-only Transformer</span>
+        <span class="tag">Apache 2.0</span>
+        <span class="tag">Dolma 데이터셋</span>
+        <span class="tag">NVIDIA + AMD GPU</span>
+        <span class="tag">SwiGLU</span>
+        <span class="tag">RoPE</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">아키텍처</div>
+      <h2>모델 설계 선택</h2>
+      <p>OLMo는 디코더 전용 트랜스포머 아키텍처를 사용하며, LLaMA와 PaLM이 확립한 트렌드를 따라 바닐라 트랜스포머에서 여러 가지를 수정했습니다.</p>
+      <ul class="arch-list">
+        <li>
+          <div class="icon">1</div>
+          <div class="content">
+            <strong>바이어스 제거</strong>
+            <span>학습 안정성을 높이기 위해 아키텍처의 모든 바이어스 항을 제거했습니다.</span>
+          </div>
+        </li>
+        <li>
+          <div class="icon">2</div>
+          <div class="content">
+            <strong>비모수적 레이어 정규화</strong>
+            <span>아핀 변환(adaptive gain이나 bias)이 없는 방식으로, 안전성과 속도 면에서 최적의 선택입니다.</span>
+          </div>
+        </li>
+        <li>
+          <div class="icon">3</div>
+          <div class="content">
+            <strong>SwiGLU 활성화 함수</strong>
+            <span>ReLU를 SwiGLU로 대체했습니다. 히든 크기는 약 8/3 d이며, 128의 배수로 올림(7B 모델에서 11,008)합니다.</span>
+          </div>
+        </li>
+        <li>
+          <div class="icon">4</div>
+          <div class="content">
+            <strong>회전 위치 임베딩 (RoPE)</strong>
+            <span>절대 위치 임베딩을 대체하여 길이 일반화 성능을 향상시킵니다.</span>
+          </div>
+        </li>
+        <li>
+          <div class="icon">5</div>
+          <div class="content">
+            <strong>수정된 BPE 토크나이저</strong>
+            <span>GPT-NeoX-20B 기반이며 PII 마스킹 토큰을 추가했습니다. 어휘 크기: 50,280 (50,304로 패딩).</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <div class="section-label">데이터</div>
+      <h2>Dolma: 사전학습 데이터셋</h2>
+      <p>OLMo의 가장 중요한 기여 중 하나는 전체 사전학습 데이터셋인 Dolma를 공개한 것입니다. 대부분의 오픈 모델도 학습 데이터는 비공개로 유지하기 때문에 이는 매우 이례적입니다. Dolma는 6개 주요 소스에서 약 3조 개의 토큰을 포함하는 다양한 멀티소스 코퍼스입니다.</p>
+      <div class="table-wrapper">
+        <table>
+          <tr><th>소스</th><th>유형</th><th>크기 (GB)</th><th>토큰 (B)</th></tr>
+          <tr><td>Common Crawl</td><td>웹 페이지</td><td>9,812</td><td>2,180</td></tr>
+          <tr><td>GitHub</td><td>코드</td><td>1,043</td><td>342</td></tr>
+          <tr><td>Reddit</td><td>소셜 미디어</td><td>339</td><td>80</td></tr>
+          <tr><td>Semantic Scholar</td><td>학술 논문</td><td>268</td><td>57</td></tr>
+          <tr><td>Project Gutenberg</td><td>도서</td><td>20.4</td><td>5.2</td></tr>
+          <tr><td>Wikipedia</td><td>백과사전</td><td>16.2</td><td>3.7</td></tr>
+          <tr style="font-weight:600; background: var(--tag-bg);"><td>합계</td><td></td><td>11,519</td><td>2,668</td></tr>
+        </table>
+      </div>
+      <p>Dolma는 언어 필터링, 품질 필터링, 콘텐츠 필터링, 중복 제거, 멀티소스 혼합, 토크나이징의 체계적인 파이프라인을 통해 구축되었습니다.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-label">학습</div>
+      <h2>학습 인프라</h2>
+      <p>OLMo는 하드웨어 호환성을 검증하기 위해 두 가지 서로 다른 GPU 클러스터에서 학습되었습니다. LUMI 슈퍼컴퓨터는 AMD MI250X GPU가 장착된 최대 256개 노드를, MosaicML(Databricks)은 NVIDIA A100 GPU가 장착된 27개 노드를 제공했습니다. PyTorch의 FSDP 프레임워크와 ZeRO 옵티마이저 전략, AdamW 옵티마이저, bfloat16 혼합 정밀도 학습을 사용했습니다.</p>
+      <p>주목할 만한 학습 기법: 메인 학습 완료 후 Dolma 데이터셋에서 마지막 1,000 스텝 동안 학습률을 선형적으로 0까지 감소시켰는데, 이것이 퍼플렉시티와 엔드태스크 평가 모두에서 의미 있는 성능 향상을 가져왔습니다.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-label">결과</div>
+      <h2>성능 평가</h2>
+      <p>OLMo-7B는 8개 핵심 다운스트림 태스크에서 제로샷 평가를 수행했으며, 동급 7B 모델들과 경쟁력 있는 성능을 달성했습니다.</p>
+      <div class="table-wrapper">
+        <table>
+          <tr><th>모델</th><th>ARC-c</th><th>ARC-e</th><th>BoolQ</th><th>HellaSwag</th><th>PIQA</th><th>평균</th></tr>
+          <tr><td>LLaMA 7B</td><td>44.5</td><td>67.9</td><td>75.4</td><td>76.2</td><td>77.2</td><td>69.6</td></tr>
+          <tr><td>Llama 2 7B</td><td>48.5</td><td>69.5</td><td>80.2</td><td>76.8</td><td>76.7</td><td>69.4</td></tr>
+          <tr><td>MPT-7B</td><td>46.5</td><td>70.5</td><td>74.2</td><td>77.6</td><td>77.3</td><td>69.8</td></tr>
+          <tr><td>Falcon-7B</td><td>47.5</td><td>70.4</td><td>74.6</td><td>75.9</td><td>78.5</td><td>70.3</td></tr>
+          <tr class="highlight-row"><td>OLMo-7B</td><td>48.5</td><td>65.4</td><td>73.4</td><td>76.4</td><td>78.4</td><td>69.3</td></tr>
+        </table>
+      </div>
+      <p>Instruction fine-tuning(SFT)과 DPO 정렬 이후 OLMo는 크게 향상되었습니다. MMLU는 28.3에서 46.2로 상승했고, 대부분의 다른 챗 변형 모델들을 능가했습니다. 이는 OLMo가 다운스트림 적응을 위한 강력한 기반 모델임을 보여줍니다.</p>
+    </div>
+
+    <div class="section">
+      <div class="section-label">차별점</div>
+      <h2>완전한 오픈 릴리스</h2>
+      <p>이 연구의 가장 큰 임팩트는 모델 성능 자체가 아니라, 전례 없는 수준의 개방성에 있습니다. 공개된 모든 것을 정리하면 다음과 같습니다:</p>
+      <div class="release-grid">
+        <div class="release-card">
+          <div class="title"><span class="check">&#10003;</span> 모델 가중치</div>
+          <div class="desc">7B, 7B-twin, 1B 모델 및 1000스텝 간격의 500개 이상 중간 체크포인트.</div>
+        </div>
+        <div class="release-card">
+          <div class="title"><span class="check">&#10003;</span> 학습 데이터 (Dolma)</div>
+          <div class="desc">3T 토큰 규모의 완전한 사전학습 코퍼스와 데이터 큐레이션 및 분석 도구.</div>
+        </div>
+        <div class="release-card">
+          <div class="title"><span class="check">&#10003;</span> 학습 코드</div>
+          <div class="desc">전체 학습 및 모델링 코드, 학습 로그, Weights & Biases에 기록된 메트릭.</div>
+        </div>
+        <div class="release-card">
+          <div class="title"><span class="check">&#10003;</span> 평가 프레임워크</div>
+          <div class="desc">다운스트림 평가용 Catwalk, 퍼플렉시티용 Paloma, 전체 적응 파이프라인.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">의의</div>
+      <h2>왜 이 논문이 중요한가</h2>
+      <p>대부분의 "오픈소스" LLM은 가중치와 추론 코드만 공개합니다. 이로 인해 학습 데이터 구성이 모델 행동에 어떤 영향을 미치는지, 학습의 각 단계에서 무슨 일이 일어나는지, 결과가 실제로 재현 가능한지 등 핵심적인 질문을 연구하는 것이 불가능합니다. OLMo의 완전한 공개는 연구 커뮤니티가 이러한 질문을 엄밀하게 조사할 수 있게 해줍니다.</p>
+      <p>또한 이 논문은 환경적 영향에 대한 투명한 회계를 제공합니다. 학습에 약 239 MWh의 에너지가 소비되었고, 추정 탄소 배출량은 69.78 tCO2eq입니다. 이는 분야의 책임 있는 보고에 선례를 만들었습니다.</p>
+
+      <h3>인정된 한계점</h3>
+      <p>저자들은 한계점에 대해 솔직합니다. 학습 데이터가 영어 전용이고, 적응된 모델이 여전히 편향과 독성 문제를 보이며, 적응 데이터 혼합(Llama용으로 설계된 TULU)이 OLMo의 고유한 특성에 최적이 아닐 수 있다는 점입니다. 이러한 솔직한 인정은 오히려 오픈 사이언스에 대한 논문의 기여를 더욱 강화합니다.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section">
+      <div class="section-label">총평</div>
+      <h2>마무리</h2>
+      <p>OLMo가 가장 높은 성능의 7B 모델은 아닐 수 있지만, 그것이 핵심이 아닙니다. OLMo의 가치는 지금까지 공개된 대규모 언어 모델 중 가장 투명하고 재현 가능한 모델이라는 데 있습니다. LLM의 작동 원리, 학습 데이터가 모델 행동을 어떻게 형성하는지, 이러한 시스템을 더 안전하게 만드는 방법을 연구하는 연구자들에게 OLMo는 이 규모에서 다른 어떤 모델도 제공하지 못하는 귀중한 자원을 제공합니다. AI 오픈 사이언스의 이정표가 되는 논문입니다.</p>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>Paper: "OLMo: Accelerating the Science of Language Models" &middot; ACL 2024<br>
+    Groeneveld et al. &middot; Allen Institute for AI</p>
+  </div>
+
+</div>
+
+<script>
+function switchLang(lang) {
+  document.querySelectorAll('.lang-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('lang-' + lang).classList.add('active');
+  document.querySelector('.lang-btn' + (lang === 'en' ? ':first-child' : ':last-child')).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>
