@@ -217,18 +217,51 @@ P(s)를 계산하기 위해 각 시퀀스를 **5,000개 랜덤 프리픽스**로
 
 ### 6.2 Prefix 길이의 영향
 
+**실험 세팅:**
+
+Figure 3에서는 프롬프트 p의 길이가 PA memorization 탐지에 미치는 영향을 분석한다. 기본 prefix 길이는 50토큰이며, 최대 **400토큰**까지 확장하며 실험한다.
+
+- **Named Entity (4-토큰 suffix)**: 각 데이터셋에서 Named Entity를 포함하는 시퀀스 ~5,000-8,000개를 랜덤 샘플링 (Lukas et al., 2023). 각 시퀀스는 prefix 50토큰 + 4토큰 Named Entity suffix로 구성. prefix 길이를 100, 200, 300, 400 토큰까지 늘려가며 PA memorized 및 extractable memorized 시퀀스 수를 측정.
+- **Long Sequence (50-토큰 suffix)**: 각 데이터셋에서 5,000개를 랜덤 샘플링 (Biderman et al., 2024; Carlini et al., 2022). prefix 50토큰 + suffix 50토큰 구성. 마찬가지로 prefix 길이를 최대 400토큰까지 변화시킴.
+- P(s) 계산: 각 시퀀스당 **5,000개 랜덤 프리픽스**로 프롬프팅하여 s 생성 확률 측정, **5회 반복**.
+- 평가 모델: OPT (125M~13B), Llama (3B, 7B, 13B). 기본 결과는 OPT 6.7B와 Llama 7B 기준.
+
 ![Figure 3: Prefix 길이별 PA Memorized 및 Extractable 시퀀스 수](/images/pa-memorization/figure3_prefix_length.png)
 *Figure 3: 두 종류의 suffix에 대한 prefix 길이별 Extractable 및 PA Memorized 시퀀스 수.*
 
-- 더 긴 prefix는 더 많은 PA memorized 시퀀스를 발견 가능
-- 그러나 **4-토큰 Named Entity suffix**의 경우 긴 prefix의 효과가 제한적 → 많은 Named Entity가 웹 텍스트에서 흔하여 특정 프롬프트 없이도 생성 가능하기 때문
+**결과 분석:**
+
+- 더 긴 prefix는 더 많은 PA memorized 시퀀스를 발견 가능 — 길이가 길어질수록 모델에 더 구체적인 문맥을 제공하므로 당연한 결과
+- 그러나 **4-토큰 Named Entity suffix**의 경우 긴 prefix의 효과가 제한적. 이는 많은 Named Entity (예: "United States of America")가 웹 텍스트에서 흔하게 등장하여, 특정 프롬프트 없이도 생성 가능하기 때문
+- **50-토큰 suffix**는 prefix가 길어질수록 PA memorized 수가 뚜렷하게 증가 — 긴 suffix는 더 구체적이므로 특정 prefix에 의존하는 경향이 강함
 
 ### 6.3 SATML Challenge 결과
 
-![Figure 4: SATML Challenge 결과](/images/pa-memorization/figure4_satml.png)
-*Figure 4: (a) SATML challenge 데이터셋 1K 시퀀스에 대한 모델 크기별 memorization. (b) P(s|p)와 P(s)의 exact copy 수에 따른 변화.*
+**실험 세팅:**
 
-놀라운 발견: 전체 학습 데이터에서 **단 한 번만 등장**하는 SATML challenge 시퀀스 중에서도 약 **40%가 "common"**한 것으로 나타남. 이는 시퀀스의 빈도만으로는 암기를 판단할 수 없음을 보여준다.
+Yu et al. (2023)이 공개한 **2023 SATML Training Data Extraction Challenge** 데이터셋을 사용한다. 이 데이터셋의 특징:
+
+| 항목 | 세부 사항 |
+|------|----------|
+| **데이터 구성** | 1-eidetic 시퀀스 (각 p‖s가 전체 학습 데이터 The Pile에서 **정확히 1번**만 등장) |
+| **총 시퀀스 수** | 15,000개 |
+| **시퀀스 구성** | prefix 50토큰 + suffix 50토큰 |
+| **본 논문 평가** | 15,000개 중 **1,000개**에 대해 결과 보고 |
+| **평가 모델** | OPT (125M~13B), Llama (3B, 7B, 13B) |
+| **P(s) 추정** | 각 시퀀스당 5,000개 랜덤 프리픽스, 5회 반복 |
+
+이 데이터셋이 중요한 이유는 모든 시퀀스가 학습 데이터에 **단 1번만** 존재하기 때문에, 모델이 해당 시퀀스를 높은 확률로 생성하면 "진짜 암기"일 가능성이 높다는 점이다. 따라서 PA memorization이 "common"으로 분류한 시퀀스가 있다면, 그것은 실제로 통계적으로 일반적인 내용이라는 강력한 증거가 된다.
+
+Figure 4(b)는 Section 3.3의 counterfactual correlation 실험에서 exact copy 수가 P(s|p)와 P(s)에 미치는 영향을 보여준다.
+
+![Figure 4: SATML Challenge 결과](/images/pa-memorization/figure4_satml.png)
+*Figure 4: (a) SATML challenge 데이터셋 1K 시퀀스에 대한 모델 크기별 memorization. (b) P(s|p)와 P(s)의 exact copy 수에 따른 변화 (Section 3.3 실험).*
+
+**결과 분석:**
+
+- **놀라운 발견**: 전체 학습 데이터에서 **단 한 번만 등장**하는 SATML challenge 시퀀스 중에서도 약 **40%가 "common"**한 것으로 나타남
+- 이는 시퀀스의 빈도만으로는 암기를 판단할 수 없음을 강력하게 시사 — 1-eidetic이라도 통계적으로 흔한 내용이면 일반화로 생성 가능
+- Figure 4(b): exact copy가 추가되면 P(s|p)와 P(s) 모두 증가하지만, 비율 P(s|p)/P(s)는 매우 느리게 증가 → PA memorization의 한계점 (Section 7에서 논의)
 
 ### 6.4 정성적 분석
 

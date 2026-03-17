@@ -213,21 +213,53 @@ For 4-token Named Entity suffixes, **as few as 10% of extractable memorized samp
 
 As model size increases, the proportion of PA memorized sequences generally **decreases**. This suggests that larger models are increasingly able to reproduce verbatim text by **generalizing from common or near-duplicate data**, rather than through true memorization — consistent with Liu et al. (2025).
 
-### 6.2 Effect of Prefix Length
+### 6.2 Effect of Prefix Length on Discovering PA Memorization
+
+**Experimental Setup:**
+
+Figure 3 analyzes the effect of prompt length p on discovering PA memorized sequences. The default prefix length is 50 tokens, and experiments vary this up to **400 tokens**.
+
+- **Named Entity (4-token suffix)**: ~5,000-8,000 Named Entity sequences randomly sampled from each dataset (following Lukas et al., 2023). Each sequence consists of a 50-token prefix followed by a 4-token Named Entity suffix. Prefix lengths varied from 50 to 100, 200, 300, and 400 tokens.
+- **Long Sequence (50-token suffix)**: 5,000 sequences randomly sampled from each dataset (following Biderman et al., 2024; Carlini et al., 2022). Each consists of a 50-token prefix and 50-token suffix. Prefix lengths similarly varied up to 400 tokens.
+- P(s) estimation: For each sequence, **5,000 randomly sampled prefixes** are used to compute the likelihood of generating s, repeated for **5 trials**.
+- Evaluation models: OPT (125M–13B), Llama (3B, 7B, 13B). Default results reported for OPT 6.7B and Llama 7B.
 
 ![Figure 3: Effect of Prefix Length](/images/pa-memorization/figure3_prefix_length.png)
-*Figure 3: Number of Extractable and PA Memorized Sequences as a function of model prefix length for two types of suffixes.*
+*Figure 3: Number of a) Extractable, and b) PA Memorized Sequences as a function of model prefix length for two types of suffixes.*
 
-- Longer prefixes can discover more PA memorized sequences
-- However, PA memorized of **4-token Named Entity suffixes does not benefit as much** from longer prefixes as the 50-token suffixes
-- This is because many Named Entities are popular occurrences in web-text, and likely do not need specific prompts to be produced correctly
+**Results Analysis:**
+
+- Longer prefixes can discover more PA memorized sequences — unsurprisingly, as longer prompts provide more context to the model
+- However, the PA memorized count for **4-token Named Entity suffixes does not benefit as much** from longer prefixes as the 50-token suffixes. This is because many Named Entities (e.g., "United States of America") are popular occurrences in web-text, and likely do not need specific prompts to be produced correctly
+- **50-token suffixes** show a clear increase in PA memorized count with longer prefixes — longer suffixes are more specific and depend more heavily on the given prefix
 
 ### 6.3 SATML Challenge Dataset Results
 
-![Figure 4: SATML Challenge Results](/images/pa-memorization/figure4_satml.png)
-*Figure 4: (a) Memorization as a function of model size for 1K sequences from the SATML challenge dataset. (b) P(s | p) and P(s) as a function of the number of exact copies of p‖s in the training dataset.*
+**Experimental Setup:**
 
-Surprising finding: In the SATML challenge dataset, around **40% of sequences are "common"** in nature. This is despite the fact that each sequence in the challenge dataset occurs **only once in the entire training data**. This highlights the significance of looking beyond the low-frequency of exact copies in the training data when labeling a sequence as memorized.
+This experiment uses the **2023 SATML Training Data Extraction Challenge** dataset released by Yu et al. (2023). Key characteristics:
+
+| Item | Details |
+|------|---------|
+| **Data composition** | 1-eidetic sequences (each p‖s is known to occur **exactly once** in The Pile training data) |
+| **Total sequences** | 15,000 |
+| **Sequence structure** | prefix of 50 tokens + suffix of 50 tokens |
+| **Evaluation subset** | Results reported on **1,000** of the 15,000 sequences |
+| **Evaluation models** | OPT (125M–13B), Llama (3B, 7B, 13B) |
+| **P(s) estimation** | 5,000 random prefixes per sequence, 5 trials |
+
+This dataset is particularly important because every sequence occurs **only once** in the training data. Therefore, if a model generates the sequence with high probability, it is strong evidence of true memorization. Conversely, if PA memorization classifies a sequence as "common," this provides strong evidence that the content is indeed statistically generic — reproducible through generalization alone.
+
+Figure 4(b) shows results from the counterfactual correlation experiment (Section 3.3), illustrating how the number of exact copies of p‖s affects P(s | p) and P(s).
+
+![Figure 4: SATML Challenge Results](/images/pa-memorization/figure4_satml.png)
+*Figure 4: (a) Memorization as a function of model size for 1K sequences from the SATML challenge dataset. (b) P(s | p) and P(s) as a function of the number of exact copies of p‖s in the training dataset (from Section 3.3).*
+
+**Results Analysis:**
+
+- **Surprising finding**: In the SATML challenge dataset, around **40% of sequences are "common"** in nature, despite each sequence occurring **only once in the entire training data**
+- This strongly suggests that frequency alone is insufficient for determining memorization — even 1-eidetic sequences can be statistically generic and reproducible through generalization
+- Figure 4(b): As exact copies are added, both P(s | p) and P(s) increase, but the ratio P(s|p)/P(s) increases very slowly → a limitation of PA memorization (discussed in Section 7)
 
 ### 6.4 Qualitative Analysis
 
