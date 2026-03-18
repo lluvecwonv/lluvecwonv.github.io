@@ -90,7 +90,24 @@ The error of the estimator tends to 0 as the number of sampled prefixes c → �
 
 ## 4. Empirical Correlation with Counterfactual Memorization
 
-This is a controlled experiment to verify whether PA memorization captures similar information to counterfactual memorization. The core idea is to systematically vary the ratio of exact copies to near-duplicates in the training data, thereby controlling the degree to which the model relies on "memorization" versus "generalization," and then checking whether both metrics show consistent patterns.
+### 4.0 Why This Experiment Is Needed
+
+This is a controlled experiment to verify whether PA memorization captures similar information to counterfactual memorization.
+
+**Key Question: "Why should we trust PA memorization?"**
+
+PA memorization is an efficient metric computed using only the target model, without requiring a baseline model. But can we trust that it actually makes the same directional judgments as counterfactual memorization? To answer this, both metrics are computed on **small models (GPT-2 124M)** and compared directly.
+
+Why small models? Counterfactual memorization requires training **both** a target model M and a baseline model M', making it computationally very expensive. For large-scale models like Llama 13B or OPT 13B, this is practically infeasible. However, with GPT-2 124M, it is possible to train over 350 models and compute both metrics precisely.
+
+**Logical Structure of the Experiment:**
+
+1. On small models (GPT-2 124M), compute both counterfactual memorization and PA memorization **exactly**
+2. Verify whether the two metrics show a strong positive correlation
+3. If correlation is confirmed → establish evidence that "PA memorization captures similar information to counterfactual memorization"
+4. Based on this evidence, use **only PA memorization** (which is computationally feasible) on large-scale models (Llama, OPT)
+
+In short: **"Validate that both metrics agree on small models, then use only PA memorization on large models where counterfactual memorization is infeasible."**
 
 ### 4.1 Motivation
 
