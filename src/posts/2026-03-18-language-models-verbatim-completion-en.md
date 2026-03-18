@@ -47,15 +47,53 @@ The answer is affirmative: n-gram membership establishes a threshold dependent o
 
 ### 2.1 Definitions of Data Membership
 
-Most definitions fall into versions of n-gram or substring overlap. GPT-4 considers 50-character substring overlap; LLaMA-3 considers 8-gram token overlap. Training data deduplication methods also build on n-gram overlap through suffix arrays for exact matches and MinHash for approximate matches.
+Many language model tasks require a definition of data membership. In most cases, these definitions fall into versions of **n-gram or substring overlap** (Anil et al., 2023; Gemini Team et al., 2023; 2024; Gemma Team et al., 2024a;b; Touvron et al., 2023; Dubey et al., 2024; Zhang et al., 2024a; Duan et al., 2024; Carlini et al., 2021; Singh et al., 2024). n-gram based definitions capture near-duplicates by matching smaller text segments, offering flexibility, simplicity, and intuitiveness.
+
+**Membership definitions by major models:**
+
+- **GPT-4** (Achiam et al., 2023): 50-character substring overlap
+- **LLaMA-3** (Dubey et al., 2024): 8-gram token overlap
+- Much of the prior work on **data contamination** also uses n-gram based definitions (Sainz et al., 2023; Jiang et al., 2024; Dekoninck et al., 2024; Singh et al., 2024)
+
+For **training data deduplication** (Lee et al., 2021; Kandpal et al., 2022; Mou, 2023), duplicates are identified based on training data membership. Recent methods use **suffix arrays** for exact substring matches (Lee et al., 2021) and **MinHash or locality sensitive hashing** for approximate matches (Broder, 1997; Mou, 2023); both build on n-gram overlap.
+
+The prevalent use of n-gram based definitions reflects a practical balance between accuracy and simplicity. **A key focus of this work is to highlight the limitations of these n-gram based definitions.**
 
 ### 2.2 Tests for Data Membership
 
-**Membership Inference Attacks (MIA)** predict membership with only model access. However, membership can be inherently blurry for natural language, and existing MIA testbeds suffer from distribution shifts.
+Unlike membership definitions (which define the ground-truth), **membership tests** aim to detect whether a data sample was in a dataset. This paper focuses on **model-level membership tests** — those that predict membership with only access to a trained model and not the training dataset — because they are more relevant to downstream uses of membership in LLMs (e.g., privacy, copyright, and safety).
+
+**Membership Inference Attacks (MIA):** The most widely studied model-level membership test, originally proposed by Shokri et al. (2017).
+
+- **Computer vision:** Extensive work by Yeom et al. (2018), Salem et al. (2018), Sablayrolles et al. (2019), Choquette-Choo et al. (2021), Carlini et al. (2022a), and Jagielski et al. (2024).
+- **Example-level MIA for LLMs:** More recently studied by Zarifzadeh et al. (2023), Shi et al. (2023), Mattern et al. (2023), and Li et al. (2023).
+
+Despite these attempts, progress is hindered by **flawed evaluations** (Meeus et al., 2024; Zhang et al., 2024b):
+
+- **Duan et al. (2024):** Argue that membership can be inherently blurry for natural language
+- **Das et al. (2024):** Report that existing MIA testbeds suffer from distribution shifts
+- **Kong et al. (2023):** Refute MIAs using a gradient-space attack
+
+This work situates in this body of research by studying **systematic failure modes of operationalizing membership through definitions and tests**, and the consequences when these definitions and tests mismatch.
+
+**Dataset-level MIA:** Maini et al. (2021; 2024) and Kandpal et al. (2023) enhance membership signals by leveraging multiple correlated samples as inputs. These are closely related to contamination tests (Golchin & Surdeanu, 2023; Oren et al., 2023).
+
+This paper focuses on **sequence-level data membership tests based on data completion**, because these focus on scenarios where the LLM generates the text, presenting novel concerns for privacy, copyright, and safety.
 
 ### 2.3 Data Completion
 
-A model completing a long, high-entropy sequence from its prefix likely saw it during training. This paper uses such **completion tests** as a black-box membership test and studies non-member completions.
+There is a long body of work studying generation of training data in both **diffusion models** (Somepalli et al., 2023; Carlini et al., 2023) and **LLMs** (Carlini et al., 2019; Tirumala et al., 2022; Kudugunta et al., 2024; Biderman et al., 2024; Freeman et al., 2024). These works are often studied from the perspective of memorization, where the entity performing the model test has access to the training dataset.
+
+In this line of literature, two types of memorization definitions exist:
+
+- **Verbatim definitions:** Exact reproduction of training data (Carlini et al., 2022b)
+- **Approximate definitions:** Near-reproduction within some tolerance (Ippolito et al., 2022)
+
+When studied from a **black-box perspective** — without access to the training dataset — researchers typically match completions against known auxiliary databases as a surrogate confirmation of membership (Carlini et al., 2021; Nasr et al., 2023).
+
+**Key intuition:** If a model completes a long sequence x when prompted with its prefix, it likely saw x during training because x has high entropy due to its length and vocabulary size (Carlini et al., 2019; 2022b).
+
+This work focuses on these **completion tests as a black-box membership test**, specifically studying cases where completion succeeds for sequences that are non-members under n-gram based definitions.
 
 ---
 

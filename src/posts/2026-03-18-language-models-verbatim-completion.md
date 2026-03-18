@@ -45,17 +45,57 @@ LLM이 n-gram 기반 멤버십 정의상 학습 데이터의 '멤버'가 아닌 
 
 ## 2. 관련 연구 (Background & Related Work)
 
-### 2.1 데이터 멤버십 정의
+### 2.1 데이터 멤버십 정의 (Definitions of Data Membership)
 
-대부분의 경우 n-gram 또는 substring overlap 기반이다. GPT-4는 50-character substring overlap을, LLaMA-3은 8-gram token overlap을 사용한다. 학습 데이터 중복 제거(deduplication)에서도 suffix array를 이용한 정확한 substring 매칭이나 MinHash를 이용한 근사 매칭이 모두 n-gram overlap에 기반한다.
+많은 언어 모델 과제에서 데이터 멤버십에 대한 정의가 필요하다. 대부분의 경우 **n-gram 또는 substring overlap** 기반의 정의가 사용된다. n-gram 기반 정의는 텍스트를 작은 세그먼트로 분할하여 near-duplicate를 포착하는 방식으로, 유연하고 단순하며 직관적이라는 장점이 있다.
 
-### 2.2 데이터 멤버십 테스트
+**주요 모델별 멤버십 정의:**
 
-**Membership Inference Attack (MIA)** 는 학습 데이터 접근 없이 모델만으로 멤버십을 예측하는 방법이다. 그러나 자연어에서 멤버십이 본질적으로 모호하다는 연구도 있으며, 기존 MIA 테스트베드가 분포 이동(distribution shift) 문제를 겪는다는 지적도 있다.
+- **GPT-4** (Achiam et al., 2023): 50-character substring overlap 기준
+- **LLaMA-3** (Dubey et al., 2024): 8-gram token overlap 기준
+- 이 외에도 Anil et al. (2023), Gemini Team et al. (2023; 2024), Gemma Team et al. (2024a;b), Touvron et al. (2023) 등 주요 LLM 개발팀들이 n-gram 기반 멤버십 정의를 채택
+
+**데이터 오염(data contamination) 연구**에서도 대부분 n-gram 기반 정의를 사용한다 (Sainz et al., 2023; Jiang et al., 2024; Dekoninck et al., 2024; Singh et al., 2024).
+
+**학습 데이터 중복 제거(deduplication)** 에서도 멤버십 정의가 핵심이다. Lee et al. (2021)은 **suffix array**를 이용한 정확한 substring 매칭을, Broder (1997)와 Mou (2023)는 **MinHash 또는 locality sensitive hashing**을 이용한 근사 매칭을 제안했으며, 이 모두 n-gram overlap에 기반한다 (Kandpal et al., 2022).
+
+n-gram 기반 정의의 광범위한 사용은 정확성과 단순성 사이의 실용적 균형을 반영하지만, **본 논문의 핵심 초점은 바로 이 n-gram 기반 정의의 한계를 드러내는 것**이다.
+
+### 2.2 데이터 멤버십 테스트 (Tests for Data Membership)
+
+멤버십 정의(definition)가 ground-truth를 규정하는 것이라면, **멤버십 테스트(test)** 는 데이터 샘플이 데이터셋에 포함되어 있는지를 탐지하는 것이다. 본 논문은 학습 데이터에 직접 접근하지 않고 학습된 모델만을 이용하는 **model-level 멤버십 테스트**에 초점을 맞추는데, 이는 프라이버시, 저작권, 안전성 등 LLM의 downstream 활용과 더 직접적으로 관련되기 때문이다.
+
+**Membership Inference Attack (MIA):** 가장 널리 연구된 model-level 멤버십 테스트이다.
+
+- **컴퓨터 비전 분야:** Shokri et al. (2017)이 최초로 제안한 이후, Yeom et al. (2018), Salem et al. (2018), Sablayrolles et al. (2019), Choquette-Choo et al. (2021), Carlini et al. (2022a), Jagielski et al. (2024) 등이 발전시켜 왔다.
+- **LLM에 대한 example-level MIA:** Zarifzadeh et al. (2023), Shi et al. (2023), Mattern et al. (2023), Li et al. (2023) 등이 최근 연구를 수행하였다.
+
+그러나 기존 MIA 연구에는 여러 **평가상의 결함(flawed evaluations)** 이 지적되고 있다 (Meeus et al., 2024; Zhang et al., 2024b):
+
+- **Duan et al. (2024):** 자연어에서 멤버십이 본질적으로 모호(inherently blurry)할 수 있다고 주장
+- **Das et al. (2024):** 기존 MIA 테스트베드가 분포 이동(distribution shift) 문제를 겪는다고 보고
+- **Kong et al. (2023):** gradient-space attack을 이용하여 MIA를 반박
+
+본 논문은 이러한 연구들의 맥락에서 멤버십의 **정의(definition)와 테스트(test)를 운용화(operationalize)할 때의 체계적 실패 모드**, 그리고 정의와 테스트가 불일치(mismatch)할 때의 결과를 연구한다.
+
+**Dataset-level MIA:** Maini et al. (2021; 2024), Kandpal et al. (2023) 등은 여러 상관된 샘플을 입력으로 활용하여 멤버십 신호를 강화하는 dataset-level MIA를 제안했다. 이는 오염 테스트(contamination tests, Golchin & Surdeanu, 2023; Oren et al., 2023)와도 밀접한 관련이 있다.
+
+본 논문이 특히 주목하는 것은 **시퀀스 수준의 데이터 완성(data completion) 기반 멤버십 테스트**인데, 이는 LLM이 텍스트를 직접 생성하는 시나리오에 초점을 맞추어 프라이버시, 저작권, 안전성에 대한 새로운 우려를 제기하기 때문이다.
 
 ### 2.3 데이터 완성 (Data Completion)
 
-모델이 prefix를 받아 suffix를 생성하여 학습 데이터를 재현하는지 확인하는 방법이다. 직관적으로, 긴 시퀀스의 prefix만으로 suffix를 정확히 완성하면 해당 시퀀스가 학습 데이터에 있었을 가능성이 높다. 본 논문은 이 completion test를 블랙박스 멤버십 테스트로 사용한다.
+학습 데이터의 생성(generation of training data)에 관한 연구는 **확산 모델(diffusion models)** (Somepalli et al., 2023; Carlini et al., 2023)과 **LLM** (Carlini et al., 2019; Tirumala et al., 2022; Kudugunta et al., 2024; Biderman et al., 2024; Freeman et al., 2024) 양쪽에서 활발히 이루어져 왔다.
+
+이러한 연구들은 주로 **메모리제이션(memorization)** 관점에서 수행되며, 모델 테스트를 수행하는 주체가 학습 데이터에 접근할 수 있는 상황을 가정한다. 이 맥락에서 메모리제이션의 정의는 두 가지로 나뉜다:
+
+- **Verbatim 정의:** Carlini et al. (2022b)이 제안한 정확한 재현 기반 정의
+- **Approximate 정의:** Ippolito et al. (2022)이 제안한 근사적 재현 기반 정의
+
+**블랙박스 관점** — 학습 데이터에 접근할 수 없는 경우 — 에서는, 모델의 completion 결과를 알려진 보조 데이터베이스(auxiliary database)와 대조하여 멤버십을 간접적으로 확인하는 방법이 일반적이다 (Carlini et al., 2021; Nasr et al., 2023).
+
+**핵심 직관:** 모델이 긴 시퀀스 x의 prefix만으로 x를 완성할 수 있다면, x가 학습 데이터에 포함되었을 가능성이 높다. 이는 긴 시퀀스가 그 길이와 어휘 크기(vocabulary size) 때문에 높은 엔트로피를 가지기 때문이다 (Carlini et al., 2019; 2022b).
+
+본 논문은 이 **completion test를 블랙박스 멤버십 테스트로 사용**하며, 특히 completion이 성공하지만 멤버십 정의상 비멤버인 경우를 집중 연구한다.
 
 ---
 
