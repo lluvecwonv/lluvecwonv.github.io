@@ -90,55 +90,87 @@ The error of the estimator tends to 0 as the number of sampled prefixes c → �
 
 ## 4. Empirical Correlation with Counterfactual Memorization
 
-### 4.1 Experimental Setup
+This is a controlled experiment to verify whether PA memorization captures similar information to counterfactual memorization. The core idea is to systematically vary the ratio of exact copies to near-duplicates in the training data, thereby controlling the degree to which the model relies on "memorization" versus "generalization," and then checking whether both metrics show consistent patterns.
+
+### 4.1 Model Training
 
 | Component | Details |
 |-----------|---------|
-| **Model** | 124M parameter GPT-2 |
+| **Model Architecture** | 124M parameter GPT-2 |
 | **Training Data** | 1,000 Wikitext documents |
-| **Number of Models Trained** | Over 350 |
+| **Total Models Trained** | Over 350 (across different seeds and target sequences) |
 | **Target Sequences** | 25 |
-| **Near-duplicate Definition** | 20% token overlap (more conservative than prior work) |
+| **Dataset Variations** | 7 (varying exact copy vs near-duplicate ratio) |
 
-**Near-duplicate Injection Strategy:**
+#### Near-duplicate Definition
 
-The ratio of exact copies to near-duplicates of a target sequence is varied across 7 distinct dataset compositions:
+While prior work (Liu et al., 2025; Zhang et al., 2023) commonly used duplicates with high overlap (e.g., 50%+), this paper intentionally adopts a **conservative 20% token overlap** threshold. The rationale:
 
-| Setting | (Exact Copies, Near-Duplicates) |
-|---------|-------------------------------|
-| 1 | (0, 180) |
-| 2 | (10, 150) |
-| 3 | (20, 120) |
-| 4 | (30, 90) |
-| 5 | (40, 60) |
-| 6 | (50, 30) |
-| 7 | (60, 0) |
-
-The total training set size remains fixed at 1,000 sequences in every case, with only the composition of exact versus near-duplicate instances varying.
-
-25 target sequences × 7 settings = **175 models** trained.
+- Lee et al. (2022) showed that removing high-overlap sequences improves model performance
+- Modern training pipelines (Touvron et al., 2023; Zhang et al., 2022) typically remove highly overlapping examples during preprocessing
+- Demonstrating that generalization occurs even with only 20% overlap is therefore more realistic and relevant to current practice
 
 ![Table 1: Near-duplicate example](/images/pa-memorization/table1_near_duplicate.png)
-*Table 1: A sequence and one possible 20% near-duplicate. Matching tokens are highlighted.*
+*Table 1: A sequence and one possible 20% near-duplicate. Matching tokens are highlighted. For example, the exact copy "Quantum doughnuts might not exist, but theoretical bakers remain hopeful." has a near-duplicate "majesticum Nantonuts might Conradavery 258 texted theoretical imperialistmlicks Shim." where only ~20% of tokens match.*
 
-**Baseline Model:** For counterfactual memorization, the baseline model removes only the exact copies of the target sequence but keeps the near duplicates in the training data.
+#### Target Model Training Strategy
+
+The training data is constructed by **systematically varying the ratio of exact copies to near-duplicates** of a target sequence, creating 7 distinct dataset compositions:
+
+| Setting | (Exact Copies, Near-Duplicates) | Interpretation |
+|---------|-------------------------------|----------------|
+| 1 | (0, 180) | Pure generalization — only near-duplicates, no exact copies |
+| 2 | (10, 150) | Weak memorization signal |
+| 3 | (20, 120) | |
+| 4 | (30, 90) | Balanced |
+| 5 | (40, 60) | |
+| 6 | (50, 30) | Strong memorization signal |
+| 7 | (60, 0) | Pure memorization — only exact copies, no near-duplicates |
+
+**Key Design Principles:**
+
+- **Total training set size is always fixed at 1,000 sequences** — only the exact vs near-duplicate composition changes, controlling for other variables
+- Example: In setting 2, 30 of the original 180 near-duplicates are replaced with 10 exact copies → 150 near-dup + 10 exact
+- As more exact copies are included, the model is expected to exhibit greater **counterfactual memorization** (having seen the target verbatim during training)
+- Conversely, when the dataset consists mostly of near-duplicates, the model must rely on **generalization** from many similar-but-not-identical examples, simulating the case where a sequence is generated with high probability simply because there is a lot of similar data in the training set
+
+25 target sequences × 7 settings = **175 target models** trained. Experiments in each setting are repeated several times with different seeds, resulting in over 350 total models.
+
+#### Baseline Model Training Strategy
+
+Computing counterfactual memorization requires comparing a target model with a baseline model:
+
+- **Target model**: Trained on data containing both exact copies and near-duplicates
+- **Baseline model**: Only the exact copies of the target sequence are removed; near-duplicates are **kept** in the training data
+- Example: If the target model was trained with (10 exact, 150 near-dup), the baseline model is trained with (0 exact, 150 near-dup)
+
+This design simulates a realistic scenario where the exact target data might be removed, but other data that can generalize to the target sequence remains present in the training dataset.
 
 ### 4.2 Metric Measurements
 
-**Counterfactual Memorization:**
+The setup interprets x in the counterfactual memorization definition as p‖s, using M and M' to refer to the target and baseline models respectively. Model accuracy is measured as log(P(s | p; M)), following the definition of extractable memorization from Carlini et al. (2022).
+
+**Counterfactual Memorization (Equation 6):**
 > E_M[log(P(s | p; M))] − E_{M'}[log(P(s | p; M'))]
 
-**PA Memorization:**
+The expectation is taken over all models trained with the same ratio of near-duplicates to exact copies. Assuming these models are uniformly distributed, the expectation reduces to the average of log(P(s | p)) across multiple trained models.
+
+**PA Memorization (Equation 7):**
 > E_M[log(P(s | p; M) / v̂_s)] = E_M[log(P(s | p; M))] − E_M[log(v̂_{s;M})]
 
-Note that PA memorization only relies on M, thus **obviating the need for training baseline models M'** like with counterfactual memorization.
+Note that PA memorization **only relies on the target model M**, thus obviating the need for training baseline models M'. This is the key advantage of PA memorization.
 
 ### 4.3 Results
 
 ![Figure 1: Counterfactual Memorization vs PA Memorization](/images/pa-memorization/figure1_counterfactual_vs_pa.png)
-*Figure 1: Counterfactual Memorization (x-axis) vs PA Memorization (y-axis). Both metrics are positively correlated across different training settings. Each data point label indicates (exact copies, near-duplicates) count.*
+*Figure 1: Counterfactual Memorization (x-axis) vs PA Memorization (y-axis). Both metrics are positively correlated across different training settings. Each data point represents the average over 25 different models trained. Labels indicate (exact copies, near-duplicates) count.*
 
-As the target sequence becomes less generic due to fewer near-duplicates, both the counterfactual memorization metric and PA memorization increase correspondingly. A **strong positive correlation** is observed, suggesting that the metric indeed measures generalization from similar data.
+**Results Interpretation:**
+
+- Moving from (0, 180) → (60, 0), both x-axis (counterfactual memorization) and y-axis (PA memorization) increase → **strong positive correlation** confirmed
+- As near-duplicates decrease and the sequence becomes less generic, both metrics strengthen their verdict of "this is memorization"
+- This demonstrates that PA memorization can capture similar information to counterfactual memorization **without requiring any additional model training**
+- However, a **difference in scale** between the two metrics is observed — this is discussed in detail in Section 7 (Limitations)
 
 ---
 
