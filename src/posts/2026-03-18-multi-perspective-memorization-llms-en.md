@@ -57,18 +57,18 @@ For LLMs, memorization is directly observable as they generate their pre-train c
 
 ### 3.1 Memorization Criteria: K-extractability
 
-![Figure 1: Memorization and Research Scope in this study](/images/papers/multi-perspective-memorization/general.pdf)
+![Figure 1: Memorization and Research Scope in this study](/images/papers/multi-perspective-memorization/general.png)
 
 The study uses K-extractability (Carlini et al., 2021) to define memorization and calculate memorization scores.
 
-**Method:** The LLM is prompted with a sequence of context tokens $C = \{c_0 \cdots c_n\}$, and greedy decoding generates continuation tokens. The predicted continuations are compared with actual continuations:
+**Method:** The LLM is prompted with a sequence of context tokens C = {c0 ... cn}, and greedy decoding generates continuation tokens. The predicted continuations are compared with actual continuations:
 
-$$M(X, Y) = \frac{\sum_{i=0}^{n} x_i == y_i}{L(Y)}$$
+M(X, Y) = (sum of matched tokens from i=0 to n) / L(Y)
 
-- $X = \{x_0 \cdots x_n\}$: predicted continuation token sequence
-- $Y = \{y_0 \cdots y_n\}$: true continuation tokens
-- $M(X, Y) = 1$: fully memorized (**K-extractable**)
-- $M(X, Y) = 0$: **unmemorized**
+- X = {x0 ... xn}: predicted continuation token sequence
+- Y = {y0 ... yn}: true continuation tokens
+- M(X, Y) = 1: fully memorized (**K-extractable**)
+- M(X, Y) = 0: **unmemorized**
 
 ### 3.2 Prediction Criteria
 
