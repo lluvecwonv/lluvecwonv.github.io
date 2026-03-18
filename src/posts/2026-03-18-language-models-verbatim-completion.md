@@ -101,21 +101,49 @@ n-gram 기반 정의의 광범위한 사용은 정확성과 단순성 사이의 
 
 ## 3. 사전 정의 (Preliminaries)
 
-### 3.1 n-gram 데이터 멤버십
+이 섹션에서는 논문의 실험을 뒷받침하는 핵심 정의들을 형식화한다. 시퀀스가 언어 모델의 학습 데이터 "멤버"라는 것이 무엇을 의미하는지, 그리고 멤버십 테스트로서 시퀀스를 "완성(complete)"한다는 것이 무엇인지를 정의한다. 이 정확한 정의들이 정의와 테스트 간의 불일치(mismatch)를 연구하는 기반이 된다.
 
-> **정의 1 (n-gram data membership):** 시퀀스 x가 데이터셋 D의 멤버란, x의 n-gram 중 적어도 하나가 D의 어떤 시퀀스의 n-gram과 일치하는 것이다.
+현대 언어 모델은 **BPE(byte-pair encoding) 토크나이저** (Sennrich, 2015)를 통해 텍스트 문자열을 정수로 인코딩한 **토큰 시퀀스** 위에서 동작한다. x는 토큰 시퀀스(텍스트 형태가 아닌)를 나타내며, |x|는 그 길이이다. n-grams(x) = {x_{i:i+n}}는 x에서 도출된 n-gram 집합을 의미한다.
 
-이 정의는 stringent하여 멤버를 과대추정하고 비멤버를 과소추정한다. n을 시퀀스 길이와 같게 설정하면 Carlini et al. (2022)의 verbatim 멤버십이 되고, 작은 n은 MinHash, edit distance 기반 등 다양한 approximate 멤버십 정의를 포괄한다.
+### 3.1 n-gram 데이터 멤버십 정의
 
-### 3.2 데이터 완성 정의
+> **정의 3.1 (n-gram data membership):** 시퀀스 x가 데이터셋 D = {x^(i)}의 멤버란, x의 n-gram 중 적어도 하나가 D의 어떤 x^(i)의 n-gram과 일치하는 것이다. 즉, g ∈ n-grams(x)이면서 g ∈ ∪_i n-grams(x^(i))인 g가 존재하면 x는 멤버이다.
+
+이 정의의 핵심 속성:
+
+- **Stringent (엄격함):** 일반적인 approximate 멤버십은 많은 n-gram이 일치해야 하지만, 이 정의는 단 하나만 일치해도 멤버로 판정한다. 따라서 **멤버를 과대추정하고 비멤버를 과소추정**한다. 이는 의도적인 설계로, 비멤버라고 판정된 시퀀스가 정말로 비멤버일 가능성을 높인다.
+- **포괄성 (Inclusiveness):** n의 값을 조절하면 문헌의 다양한 멤버십 정의를 포괄할 수 있다:
+  - **n = |x| (시퀀스 전체 길이):** Carlini et al. (2022b)의 **verbatim 멤버십** — 완전히 동일한 시퀀스만 멤버
+  - **작은 n:** **MinHash** (Broder, 1997; Lee et al., 2021), **edit distance 기반 멤버십** (Ippolito et al., 2022), 그리고 Section 2에서 인용된 다양한 n-gram 변형을 포괄
+
+논문의 나머지 부분에서, 시퀀스 x가 정의 3.1을 만족하면 **"n-gram 멤버"**, 그렇지 않으면 **"n-gram 비멤버"**라 부른다.
+
+### 3.2 데이터 완성 정의 (Definition of Data Completion)
+
+비공식적으로 completion이란, 토큰 시퀀스가 사전에 알려져 있고(known a priori), 언어 모델이 prefix를 prompt로 받았을 때 그 suffix를 생성하는 것이다. 형식적으로, x = [p∥s]일 때, 모델이 prefix p를 입력받아 기대되는 suffix s를 생성하는 것이다. 실험에서는 단순성을 위해 **|p| = |s| = |x|/2**로 설정한다 (prefix 길이와 suffix 길이의 선택이 memorization에 미치는 영향은 Carlini et al. (2022b)에서 연구된 바 있다).
+
+원래 suffix와 의미적으로 무의미한 차이(semantically insignificant deviations)만 있는 완성을 포착하기 위해, 여러 변형 정의를 도입한다:
+
+> **정의 3.2 (Exact completion):** 토큰 시퀀스 x = [p∥s]와 모델 M에 대해, greedy decoding으로 M(p) = s이면 x는 exact completion된다.
+
+이는 verbatim memorization 및 verbatim training data extraction (Section 2 참조)과 밀접한 관련이 있다.
+
+인간이 원본과 구분하기 어려운 의미적으로 동등한(semantically equivalent) 시퀀스도 존재한다. 따라서 Section 5 실험에 관련된 두 가지 근사적 완성 개념을 추가로 정의한다:
+
+> **정의 3.3 (r-similar completion):** x = [p∥s]와 M에 대해, greedy decoding으로 M(p)와 s 사이의 **정규화된 Levenshtein edit distance**가 (1−r) 이하이면 r-similar completion이다. 즉, lev(M(p), s) / max(|M(p)|, |s|) ≤ 1−r.
+
+> **정의 3.4 (Case-insensitive completion):** x = [p∥s]와 M에 대해, greedy decoding으로 **lower(M(p)) = lower(s)** 이면 case-insensitive completion이다. lower(·)는 문자별 소문자 변환을 적용한다.
+
+### 3.3 Data Completion vs. Data Extraction
 
 ![Figure 2: Completion과 Extraction의 관계를 보여주는 벤 다이어그램. 시퀀스가 extractable하려면 completion이 성공하고 학습 데이터의 멤버임이 확인되어야 한다.](/images/papers/verbatim-completion/venn-complete.png)
 
-- **Exact completion:** 모델이 prompt를 받아 greedy decoding으로 생성한 결과가 suffix와 정확히 일치
-- **r-similar completion:** normalized Levenshtein edit distance가 (1-r) 이내
-- **Case-insensitive completion:** 대소문자 무시 시 일치
+최근 연구 (Carlini et al., 2021; Nasr et al., 2023)에서 다루는 **Data extraction**은 모델로부터 학습 데이터를 복원하는 것으로, 두 가지 조건이 모두 필요하다:
 
-**Data Extraction = Data Completion + Data Membership.** 즉, extraction은 completion이 성공하고 그 결과가 학습 데이터의 멤버임이 확인될 때 성립한다. 본 논문은 **비멤버의 completion**을 연구한다.
+1. **Data completion** (예: 정의 3.2에 따른 완성 성공)
+2. **Membership verification** (완성된 결과가 학습 데이터의 멤버임을 확인, 예: 학습 데이터 직접 검사)
+
+즉, **extraction은 구체적으로 memorization을 측정**하는 반면, **completion은 더 일반적인 개념**이다. 본 논문이 연구하는 것은 바로 **비멤버의 completion** — completion은 성공하지만 멤버십 정의상 비멤버인 경우 — 이며, Figure 2의 벤 다이어그램이 이 구분을 잘 보여준다.
 
 ---
 

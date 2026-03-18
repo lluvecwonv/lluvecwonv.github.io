@@ -99,21 +99,47 @@ This work focuses on these **completion tests as a black-box membership test**, 
 
 ## 3. Preliminaries
 
-### 3.1 n-gram Data Membership
+This section formalizes the key definitions that underlie the experiments. The focus is on defining what it means for a sequence to be a "member" of a language model's training set, and what constitutes "completing" a sequence as a means of testing its membership. Precise definitions of these notions anchor the study of the mismatch between them.
 
-> **Definition 1:** A sequence x is a member of dataset D if x shares at least one n-gram with any x^(i) in D.
+Modern language models operate on **token sequences**, which are integer encodings of text strings via a **byte-pair encoding (BPE) tokenizer** (Sennrich, 2015). We use x to denote a token sequence (rather than its text form) with length |x|, and n-grams(x) = {x_{i:i+n}} to denote the set of n-grams derived from x.
 
-This definition is stringent (overestimates members, underestimates non-members). Setting n = |x| gives verbatim membership; smaller n captures approximate membership definitions including MinHash and edit distance based methods.
+### 3.1 Definition of Data Membership
 
-### 3.2 Definitions of Data Completion
+> **Definition 3.1 (n-gram data membership):** A sequence x is a member of a dataset D = {x^(i)} if x shares at least one n-gram with any x^(i) ∈ D. That is, x is a member if there exists a g ∈ n-grams(x) such that g ∈ ∪_i n-grams(x^(i)).
 
-![Figure 2: Completion vs. Extraction](/images/papers/verbatim-completion/venn-complete.png)
+Key properties of this definition:
 
-- **Exact completion:** M(prompt) = suffix using greedy decoding
-- **r-similar completion:** normalized Levenshtein edit distance within 1-r
-- **Case-insensitive completion:** matching after lowercasing both sides
+- **Stringent:** Approximate membership typically requires many n-grams to match, but this definition requires only one. This ensures we **overestimate members and underestimate non-members** — a deliberate design choice that increases confidence that sequences classified as non-members are truly non-members.
+- **Inclusive:** Varying n captures a spectrum of membership definitions from the literature:
+  - **n = |x| (full sequence length):** This gives **verbatim membership** as in Carlini et al. (2022b) — only identical sequences are members
+  - **Smaller n:** Captures many approximate membership definitions, including **MinHash** (Broder, 1997; Lee et al., 2021), **edit distance based membership** (Ippolito et al., 2022), and various other n-gram variants cited in Section 2
 
-**Data Extraction = Data Completion + Data Membership.** This paper specifically studies **non-member completions**.
+Throughout the remainder of the paper, a sequence x satisfying Definition 3.1 is called an **"n-gram member"**, and otherwise an **"n-gram non-member"**.
+
+### 3.2 Definition of Data Completion
+
+Informally, a completion occurs when a token sequence is known a priori and a language model generates its suffix when prompted with its prefix. Formally, if x = [p∥s], then a model generates the expected suffix s of x based on the provided prefix p (prompt). For simplicity, the experiments focus on **|p| = |s| = |x|/2** (the impact of prefix and suffix length choices on memorization has been studied in Carlini et al. (2022b)).
+
+To capture highly similar but not verbatim completions, the paper introduces variants that allow for semantically insignificant deviations from the original suffix:
+
+> **Definition 3.2 (Exact completion):** Given tokens x = [p∥s] and a model M, x is exactly completed if **M(p) = s** using greedy decoding. This is closely related to verbatim memorization and verbatim training data extraction (see Section 2).
+
+There are also semantically equivalent sequences that humans would be unlikely to distinguish from the original. Two approximate notions of completion are thus defined, relevant to the experiments in Section 5:
+
+> **Definition 3.3 (r-similar completion):** Given x = [p∥s] and M, x is an r-similar completion if M(p) is within a **normalized Levenshtein edit distance** of 1−r using greedy decoding, i.e., lev(M(p), s) / max(|M(p)|, |s|) ≤ 1−r.
+
+> **Definition 3.4 (Case-insensitive completion):** Given x = [p∥s] and M, x is a case-insensitive completion if **lower(M(p)) = lower(s)** with greedy decoding, where lower(·) applies character-wise lower casing.
+
+### 3.3 Data Completion vs. Data Extraction
+
+![Figure 2: Completion vs. Extraction — A sequence is extractable if it can be completed AND can be proved a member of the training set.](/images/papers/verbatim-completion/venn-complete.png)
+
+**Data extraction**, as considered in recent work (Carlini et al., 2021; Nasr et al., 2023), concerns recovering training data from the model. This involves both:
+
+1. **Data completion** (e.g., as in Definition 3.2)
+2. **Membership verification** — verifying that the completion is a training member, e.g., by inspecting the training data
+
+In this sense, **extraction specifically measures memorization**, while **completion is more generic**. This paper studies **non-member completions** — cases where completion succeeds but the sequence is a non-member under n-gram definitions. Figure 2 illustrates this distinction with a Venn diagram.
 
 ---
 
