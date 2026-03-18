@@ -179,14 +179,33 @@ The crucial difference: PA memorization **only relies on the target model M**, t
 ### 4.4 Results
 
 ![Figure 1: Counterfactual Memorization vs PA Memorization](/images/pa-memorization/figure1_counterfactual_vs_pa.png)
-*Figure 1: Counterfactual Memorization (x-axis) vs PA Memorization (y-axis). Both metrics are positively correlated across different training settings. Each data point represents the average over 25 different models trained. Labels indicate (exact copies, near-duplicates) count.*
+*Figure 1: Counterfactual Memorization (x-axis, Equation 6) vs PA Memorization commonality component (y-axis, Equation 7). Each data point represents the average over 25 different models trained. Labels indicate (exact copies, near-duplicates) count.*
 
-**Results Interpretation:**
+**Interpreting Figure 1:**
 
-- Moving from (0, 180) → (60, 0), both x-axis (counterfactual memorization) and y-axis (PA memorization) increase → **strong positive correlation** confirmed
-- As near-duplicates decrease and the sequence becomes less generic, both metrics strengthen their verdict of "this is memorization." As hypothesized, higher exact copy ratios produce higher values for both metrics
-- This demonstrates that PA memorization can capture similar information to counterfactual memorization **without requiring any additional model training** — supporting the hypothesis that PA memorization indeed measures generalization from similar data
-- However, a **difference in scale** between the two metrics is observed — this is discussed in detail in Section 7 (Limitations)
+The x-axis shows the counterfactual memorization metric (Equation 6), and the y-axis shows the component of PA memorization that measures the commonality of suffix s (Equation 7).
+
+**Positive Correlation:** As we move from (0, 180) → (60, 0), i.e., as near-duplicates decrease and exact copies increase, both x-axis (counterfactual memorization) and y-axis (PA memorization) increase correspondingly. This demonstrates a **strong positive correlation** between the two metrics.
+
+**Why does this prove PA memorization can substitute for counterfactual memorization?**
+
+The key logic is as follows:
+
+1. **Many near-duplicates, few exact copies (0, 180)**: The target sequence is "generic" in the training data — abundant similar data enables generation through generalization. In this case, counterfactual memorization should be low (the baseline model can also generate it), and PA memorization should also be low (v̂_s is high). **Both metrics indeed show low values.**
+
+2. **Many exact copies, few near-duplicates (60, 0)**: The model has seen the target sequence verbatim, so this represents true memorization. Counterfactual memorization should be high (the baseline model cannot generate it), and PA memorization should also be high (v̂_s is low). **Both metrics indeed show high values.**
+
+3. Intermediate settings (10,150) → (50,30) show **both metrics increasing monotonically together**, demonstrating that PA memorization captures the same directional information as counterfactual memorization.
+
+**Why PA memorization can serve as an efficient alternative to counterfactual memorization:**
+
+- Counterfactual memorization requires training **both** a target model M and a baseline model M', making it computationally expensive
+- PA memorization achieves the same directional judgment using **only the target model M**
+- The strong positive correlation observed in this experiment empirically demonstrates that PA memorization can distinguish "generalization vs. memorization" **without training baseline models** — capturing essentially the same signal that counterfactual memorization captures, but at a fraction of the computational cost
+
+**Observation on Scale Difference:**
+
+One interesting observation is the **difference in scale** between the two metrics. Counterfactual memorization (x-axis) ranges from 0 to ~50, while PA memorization (y-axis) ranges from ~1 to ~4. This indicates that while both metrics capture the same phenomenon, they measure it from different perspectives. This scale difference is a limitation discussed in detail in Section 7.
 
 ---
 

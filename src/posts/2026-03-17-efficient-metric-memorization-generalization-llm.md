@@ -179,14 +179,33 @@ Counterfactual memorization과의 비교를 위해, PA memorization도 원래의
 ### 4.4 결과
 
 ![Figure 1: Counterfactual Memorization vs PA Memorization](/images/pa-memorization/figure1_counterfactual_vs_pa.png)
-*Figure 1: Counterfactual Memorization (x축) vs PA Memorization (y축). 두 메트릭이 다양한 학습 설정에서 양의 상관관계를 보인다. 각 데이터 포인트는 25개 모델의 평균이며, 라벨은 (exact copies, near-duplicates) 수를 나타낸다.*
+*Figure 1: Counterfactual Memorization (x축, Equation 6) vs PA Memorization의 commonality 성분 (y축, Equation 7). 각 데이터 포인트는 25개 모델의 평균이며, 라벨은 (exact copies, near-duplicates) 수를 나타낸다.*
 
-**결과 해석:**
+**Figure 1 해석:**
 
-- (0, 180) → (60, 0)으로 갈수록 x축(counterfactual memorization)과 y축(PA memorization) 모두 증가 → **강한 양의 상관관계** 확인
-- Near-duplicate이 줄어들면서 시퀀스가 덜 generic해질수록, 두 메트릭 모두 "이것은 암기다"라는 판단을 강화. 가설대로 exact copy 비율이 높을수록 두 메트릭 모두 높은 값을 보임
-- 이는 PA memorization이 추가 모델 학습 없이도 counterfactual memorization과 유사한 정보를 포착할 수 있음을 시사 — PA memorization이 실제로 generalization from similar data를 측정한다는 가설을 지지
-- 단, 두 메트릭의 **스케일 차이**가 관찰됨 — 이는 Section 7 (한계점)에서 상세히 논의
+Figure 1의 x축은 counterfactual memorization metric (Equation 6)이고, y축은 PA memorization에서 suffix s의 commonality를 측정하는 성분 (Equation 7)이다.
+
+**양의 상관관계 (Positive Correlation):** 그래프에서 (0, 180) → (60, 0)으로 이동할수록, 즉 near-duplicate이 줄어들고 exact copy가 많아질수록 x축(counterfactual memorization)과 y축(PA memorization) 모두 증가한다. 이는 두 메트릭이 **양의 상관관계**를 보인다는 것을 의미한다.
+
+**왜 이것이 PA memorization이 counterfactual memorization과 유사하다는 근거인가?**
+
+핵심 논리는 다음과 같다:
+
+1. **Near-duplicate이 많고 exact copy가 적은 경우 (0, 180)**: 타겟 시퀀스가 학습 데이터에서 "generic"하다 — 비슷한 데이터가 많으므로 일반화로 생성 가능. 이 경우 counterfactual memorization은 낮아야 하고 (baseline model도 비슷하게 생성 가능하므로), PA memorization도 낮아야 한다 (v̂_s가 높으므로). **실제로 두 메트릭 모두 낮은 값**을 보인다.
+
+2. **Exact copy가 많고 near-duplicate이 적은 경우 (60, 0)**: 타겟 시퀀스를 verbatim으로 학습했으므로, 이는 진정한 암기이다. counterfactual memorization은 높아야 하고 (baseline model은 생성 못 하므로), PA memorization도 높아야 한다 (v̂_s가 낮으므로). **실제로 두 메트릭 모두 높은 값**을 보인다.
+
+3. 중간 설정들 (10,150) → (50,30)에서도 **두 메트릭이 함께 단조 증가**하며, 이는 PA memorization이 counterfactual memorization과 동일한 방향의 정보를 포착함을 보여준다.
+
+**PA memorization이 counterfactual memorization의 대안이 될 수 있는 이유:**
+
+- Counterfactual memorization은 target model M과 baseline model M'를 **모두** 학습해야 하므로 계산 비용이 매우 높다
+- PA memorization은 **target model M만으로** 동일한 방향의 판단이 가능하다
+- 이 실험에서 두 메트릭이 강한 양의 상관관계를 보인다는 것은, PA memorization이 baseline model 학습 없이도 "이 시퀀스가 일반화에 의한 것인지 암기에 의한 것인지"를 구분할 수 있음을 경험적으로 보여준다
+
+**스케일 차이에 대한 관찰:**
+
+한 가지 흥미로운 관찰은 두 메트릭 간의 **스케일 차이**이다. Counterfactual memorization (x축)은 0~50 범위, PA memorization (y축)은 1~4 범위로, 스케일이 상당히 다르다. 이는 두 메트릭이 동일한 현상을 포착하지만 다른 관점에서 측정하기 때문이며, PA memorization의 한계점으로 Section 7에서 상세히 논의한다.
 
 ---
 
