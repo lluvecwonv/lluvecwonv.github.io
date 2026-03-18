@@ -86,14 +86,90 @@ Computing this directly would require retraining a model for every possible trai
 
 ### 3.3 Implementation Details
 
-- **Architecture**: T5-base decoder-only, ~112M parameters
-- **Number of models**: m = 400
-- **Subset size**: ~25% of training set per model (random sampling)
-- **Training epochs**: 60
-- **Metric**: Per-token accuracy M(model, x)
-- **Datasets**: RealNews, C4, Wiki40B:en (diverse sources)
+**Datasets and Preprocessing:**
+
+| Dataset | Source | Characteristics |
+|---------|--------|----------------|
+| **RealNews** (Zellers et al., 2019) | News articles | Journalistic text, domain diversity |
+| **C4** (Raffel et al., 2020a) | Web crawl | General web text, most diverse distribution |
+| **Wiki40B:en** (Guo et al., 2020) | Wikipedia | Encyclopedic text, relatively clean distribution |
+
+To save computation and enable more direct comparisons across datasets, the training set for each dataset is **truncated by taking the first 2^21 documents**.
+
+**Model Training Configuration:**
+
+| Item | Details |
+|------|---------|
+| **Architecture** | Transformer-based, equivalent to T5-base (decoder-only) |
+| **Parameters** | ~112M |
+| **Number of models (m)** | 400 (per dataset) |
+| **Subset size** | ~25% of training set per model (random sampling) |
+| **Optimizer** | Adam (Kingma and Ba, 2015) |
+| **Learning rate** | 0.1 |
+| **Weight decay** | 10^-5 |
+| **Training epochs** | 60 |
+| **Metric** | Per-token accuracy |
+
+**Convergence Performance:**
+
+| Dataset | Training set avg. accuracy | Validation set avg. accuracy |
+|---------|---------------------------|------------------------------|
+| **C4** | 44.21% | 27.90% |
+| **RealNews** | 47.59% | 31.09% |
+| **Wiki40B:en** | 66.35% | 49.55% |
+
+On average, **models start to overfit at around epoch 5**, as indicated by the validation accuracy starting to decrease.
 
 This design is elegant: the 400 models give a distribution of possible model instances, and each example x naturally appears in ~100 IN models and ~300 OUT models, providing stable estimates.
+
+### 3.4 Hash-Based Subsampling Procedure
+
+Each of the 400 models must be trained on an independent random subset of training examples. However, the data loading APIs for large text corpora (Tensorflow Datasets, TFDS) generally support only sequential visits to examples with limited shuffling and subsampling capability within a window. TFDS does not support subset loading from a list of indices. A naive implementation — checking whether the current example's index is in a given list of subset indices — is very slow and scales poorly with subset size.
+
+To mitigate this issue, the paper implements a **hash-based subset sampling predicate** that can be evaluated efficiently for each example.
+
+**Core Idea:**
+
+Let N be the total number of training examples, n < N be the expected subset size:
+
+1. Map the index i of each example to **N/n hash buckets**
+2. Select all examples that fall into **one particular bucket**
+3. Use **different hash functions** (based on model index as seed) for each model to ensure independent subset sampling
+
+Specifically, a known hash function for `uint64` types is composed with a simple pseudo-random number based on the model index:
+
+```python
+def hash_sampler(mod, seed, system):
+    """Get hash based subset sampler.
+    Args:
+        mod: total_n_egs // subset_size
+        seed: different seed leads to different subset sample
+        system: 'np' or 'tf'
+    """
+    np_hash = hash_uint64_builder('np')
+    mul, offset, remainder = np_hash(seed + 1234 + np.arange(3))
+    remainder = remainder % mod
+    # ...returns tf_filter or np_sampler
+```
+
+The hash function itself uses a [well-known uint64 hash](https://stackoverflow.com/questions/664014/):
+
+```python
+def hash_uint64(x):
+    x = uint64_cast(x)
+    x = op_xor(x, op_rshift(x, 30)) * uint64_cast(0xbf58476d1ce4e5b9)
+    x = op_xor(x, op_rshift(x, 27)) * uint64_cast(0x94d049bb133111eb)
+    x = op_xor(x, op_rshift(x, 31))
+    return x
+```
+
+**Validation Results (Paper Figure 11):**
+
+1. **Sample size consistency:** The hash-based sampler always samples close to n points with small variance
+2. **Selection probability distribution:** With r = 0.25, the empirical fraction of total models containing each point should average 0.25. The hash-based sampler's probability distribution is highly consistent with `numpy.random.choice`
+3. **Pairwise independence:** The probability that two different training points x1, x2 both appear IN or both OUT of a model's training set should be 0.625 (= r² + (1−r)²). The hash-based sampler's independence is very similar to `numpy.random.choice`
+
+**Advantages** of this hash-based approach: each example can be evaluated individually and efficiently, enabling fast subset determination even for large-scale datasets. The subset size sampled is close to n but not guaranteed to be exactly n, which is acceptable in this setting.
 
 ---
 
