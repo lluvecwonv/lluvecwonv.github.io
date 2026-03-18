@@ -65,26 +65,26 @@ For tunable thresholds m, n ≥ 0, a sequence p‖s ∈ D is **Prior-Aware memor
 
 ### 3.2 Computing P(s | p; M): Verbatim Generation
 
-The probability of producing k tokens s = t_{j+1:j+k} (suffix) when prompted with j-token prefix p = t_{1:j}:
+The probability of producing k-token suffix s given prefix p is the product of each token's conditional probability given all preceding tokens:
 
-> P(s | p) = ∏_{i=j+1}^{j+k} P(t_i | t_{1:i-1})
+> P(s | p) = P(token₁ | context) × P(token₂ | context) × ... × P(tokenₖ | context)
 
-This is a closed form computable from a **single forward-pass** per token.
+This is computable from a **single forward-pass** through the model.
 
 ### 3.3 Computing P(s; M): Monte-Carlo Estimation
 
-Computing the total probability over all possible prefixes is computationally prohibitive. Instead, an **unbiased estimator** inspired by Monte-Carlo Integration is used:
+Computing the total probability P(s) over all possible prefixes is computationally prohibitive. Instead, an **unbiased estimator** inspired by Monte-Carlo Integration is used:
 
-> v̂_s = (1/c) Σ_{i=0}^{c} P(s | q_i)
+> v̂(s) = (1/c) × [P(s | q₁) + P(s | q₂) + ... + P(s | qc)]
 
-where samples q_i are chosen independently and identically according to the distribution of prefixes p_i ~ V*.
+That is, sample c random prefixes, compute P(s | prefix) for each, and take the average.
 
 **Theoretical guarantees:**
 
-- **Theorem 1**: E[v̂_s] = v_s (unbiasedness)
-- **Theorem 2**: Var[v̂_s] = (1/c) · Var[P(s | p_i)] ≤ 1/(4c) (variance bound)
+- **Theorem 1** : The expected value of this estimator equals the true value (unbiased)
+- **Theorem 2** : The variance of the estimator is at most 1/(4c) (variance bound)
 
-The error of the estimator tends to 0 as the number of sampled prefixes c → ∞.
+The estimation error converges to 0 as the number of sampled prefixes c increases.
 
 ---
 
@@ -177,19 +177,19 @@ This section describes how Equations (5) and (2) are concretely measured in the 
 
 The setup interprets x as p‖s, where p and s are of equal length. To simplify notation, A(S) and A(S') are written as M (target model) and M' (baseline model) respectively. Model accuracy L(f, x) is measured as **log(P(s | p; M))**, following the definition of extractable memorization from Carlini et al. (2022).
 
-**Counterfactual Memorization (Equation 6):**
+**Counterfactual Memorization measurement:**
 
-> E_M[log(P(s | p; M))] − E_{M'}[log(P(s | p; M'))]
+> [Average of log P(s|p) across target models] − [Average of log P(s|p) across baseline models]
 
-The expectation is taken over all models trained with the same ratio of near-duplicates to exact copies. Following Zhang et al. (2023), these models are assumed to be uniformly distributed, so the expectation reduces to the **simple average of log(P(s | p)) across multiple trained models**.
+The expectation is taken over all models trained with the same ratio of near-duplicates to exact copies. Following Zhang et al. (2023), these models are assumed to be uniformly distributed, so the expectation reduces to the **simple average of log P(s|p) across multiple trained models**.
 
-**PA Memorization (Equation 7):**
+**PA Memorization measurement:**
 
-To keep PA memorization comparable with counterfactual memorization, instead of measuring E_M[P(s|p;M)/v̂_s] directly, its **log** is measured:
+To keep PA memorization comparable with counterfactual memorization, the **log form** is used:
 
-> E_M[log(P(s | p; M) / v̂_s)] = E_M[log(P(s | p; M))] − E_M[log(v̂_{s;M})]
+> PA mem = [Average of log P(s|p) from target model] − [Average of log v̂(s) from target model]
 
-This decomposition is key: PA memorization is expressed as the difference between the **conditional probability from the target model (first term)** and the **statistical commonality of the suffix (second term)**. Even if P(s|p) is high, if v̂_s (≈ P(s)) is also high, the PA memorization value will be low — this is the mechanism that distinguishes generalization from memorization.
+This decomposition is key: PA memorization is the difference between **"how likely the suffix is generated from a specific prefix" (first term)** and **"how commonly the suffix is generated from any prefix" (second term)**. Even if P(s|p) is high, if v̂(s) (≈ P(s)) is also high, the PA memorization value will be low — this is the mechanism that distinguishes generalization from memorization.
 
 The crucial difference: PA memorization **only relies on the target model M**, thus obviating the need for training baseline models M'. This is the key reason PA memorization is computationally more efficient than counterfactual memorization.
 
