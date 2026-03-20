@@ -3,6 +3,9 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import remarkMath from 'remark-math'
+import rehypeKatex from 'rehype-katex'
+import 'katex/dist/katex.min.css'
 import InteractiveBackground from '../components/InteractiveBackground'
 import LocaleToggle from '../components/LocaleToggle'
 import { useBlogTheme } from '../context/BlogThemeContext'
@@ -108,7 +111,8 @@ export default function BlogPost() {
 
           <div className={styles.content}>
             <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
+              remarkPlugins={[remarkGfm, remarkMath]}
+              rehypePlugins={[rehypeKatex]}
               components={{
                 img: ({ node, ...props }) => (
                   <img {...props} loading="lazy" decoding="async" />
