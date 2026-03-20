@@ -77,12 +77,18 @@ M(X, Y) = (sum of matched tokens from i=0 to n) / L(Y)
 
 ### 3.3 Model Setting
 
-The study uses the **Pythia model** (Biderman et al., 2023), which provides LLMs trained across various sizes with the same training order using the open-sourced **Pile** corpus.
+The study uses the **Pythia model** (Biderman et al., 2023b) to analyze memorization, as it provides LLMs trained across various sizes with the **same training order** using the open-sourced **Pile** (Gao et al., 2020) corpora, ensuring experimental stability.
 
-- **Model sizes:** 70M, 160M, 410M, 1B, 2.8B, 6.9B, 12B
-- **Data:** Deduplicated pre-train data version (as the chance of memorization grows exponentially with the number of duplicates)
+- **Model sizes:** 70M, 160M, 410M, 1B, 2.8B, 6.9B, 12B (where m and b stand for million and billion)
+- **Data:** The deduplicated Pile corpora version is used to avoid the effect of duplicated sentences, as previous research (Kandpal et al., 2022) reported that the chance to be memorized grows **exponentially with the number of duplicates**.
 
-### 3.4 Experiment Environment
+### 3.4 Corpora Setting
+
+The open-sourced **Pile** (Gao et al., 2020) corpora are publicly available data. The data contains **146,432,000 rows** with a chunk length of **2,048** tokens, reaching a data size of approximately **800GB**.
+
+The experiment is iterated through the **whole training data matrix**, meaning that sampling over the rows was not conducted. Instead, the whole Pile matrices were iterated. For example, if the context size is 32 and the continuation size is 96, the first 32 tokens at each row are prompted into the model. The Pythia model generates 96 tokens equal to the continuation size. Then, the generated token IDs are compared with the gold token IDs in the data to calculate the memorization score at each row. This process is repeated for the **entire Pile matrix**, distributed over different CUDA devices.
+
+### 3.5 Experiment Environment
 
 - **GPU:** 64 A100 40GB GPUs with PyTorch's parallel running packages
 - **Precision:** half-precision for speed and memory efficiency
