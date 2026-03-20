@@ -9,8 +9,8 @@ language: en
 
 # Efficient Metric for Distinguishing Memorization from Generalization in Large Language Models
 
-**Venue:** Under review as a conference paper at ICLR 2026
-**Authors:** Anonymous authors (Paper under double-blind review)
+**Venue:** ICLR 2025 (Accepted)
+**Authors:** Trishita Tiwari (Cornell University), Ari Trachtenberg (Boston University), G. Edward Suh (NVIDIA, Cornell University)
 **Paper Link:** [OpenReview](https://openreview.net/forum?id=lduxR2cLsS)
 
 ---
@@ -193,16 +193,35 @@ This decomposition is key: PA memorization is the difference between **"how like
 
 The crucial difference: PA memorization **only relies on the target model M**, thus obviating the need for training baseline models M'. This is the key reason PA memorization is computationally more efficient than counterfactual memorization.
 
-### 4.4 Results
+### 4.4 Real Data Experiment
 
-![Figure 1: Counterfactual Memorization vs PA Memorization](/images/pa-memorization/figure1_counterfactual_vs_pa.png)
-*Figure 1: Counterfactual Memorization (x-axis, Equation 6) vs PA Memorization commonality component (y-axis, Equation 7). Each data point represents the average over 25 different models trained. Labels indicate (exact copies, near-duplicates) count.*
+In addition to synthetic data, the authors also perform a correlation experiment using **naturally occurring Named Entities** from Wikitext.
 
-**Interpreting Figure 1:**
+- **Model**: 124M parameter GPT-2
+- **Data**: Wikitext
+- Named Entities as suffixes, 50 $p \| s$ pairs total
+- Sampled uniformly across the frequency distribution (e.g., "United States of America" ≈ 500 occurrences, "Starlicide" = 1 occurrence)
 
-The x-axis shows the counterfactual memorization metric (Equation 6), and the y-axis shows the component of PA memorization that measures the commonality of suffix s (Equation 7).
+![Named Entity frequency distribution](/images/pa-memorization/ne_distribution.png)
+*Distribution of Named Entities across Wikitext. x-axis: frequency of each NE; y-axis: number of NEs in each frequency bucket.*
+
+**Baseline Model**: Remove only the specific $p \| s$ pair; retain other occurrences of suffix $s$ with different prefixes. For example, if $p \| s$ = "I live in the | United States of America," only this exact prefix-suffix pair is removed while other appearances of "United States of America" are retained.
+
+### 4.5 Results
+
+#### Synthetic Data Results
+
+![Figure 1a: Counterfactual Memorization vs PA Memorization (Synthetic)](/images/pa-memorization/figure1_counterfactual_vs_pa.png)
+*Figure 1a: Counterfactual Memorization (x-axis) vs PA Memorization (y-axis). Each data point is averaged over models with the same frequency of exact matches and near-duplicates.*
 
 **Positive Correlation:** As we move from (0, 180) → (60, 0), i.e., as near-duplicates decrease and exact copies increase, both x-axis (counterfactual memorization) and y-axis (PA memorization) increase correspondingly. This demonstrates a **strong positive correlation** between the two metrics.
+
+#### Real Data Results
+
+![Figure 1b: Counterfactual Memorization vs PA Memorization (Real Data)](/images/pa-memorization/figure1b_wikitext_correlation.png)
+*Figure 1b: Counterfactual Memorization (x-axis) vs PA Memorization (y-axis) on real Wikitext data. Each data point represents a single $p \| s$ pair.*
+
+**A positive correlation is also observed in real data.** Even without artificially injecting near-duplicates, the two metrics capture the same directional information using naturally occurring Named Entities.
 
 **Why does this prove PA memorization can substitute for counterfactual memorization?**
 
@@ -336,8 +355,11 @@ This dataset is particularly important because every sequence occurs **only once
 
 Figure 4(b) shows results from the counterfactual correlation experiment (Section 3.3), illustrating how the number of exact copies of p‖s affects P(s | p) and P(s).
 
-![Figure 4: SATML Challenge Results](/images/pa-memorization/figure4_satml.png)
-*Figure 4: (a) Memorization as a function of model size for 1K sequences from the SATML challenge dataset. (b) P(s | p) and P(s) as a function of the number of exact copies of p‖s in the training dataset (from Section 3.3).*
+![Figure 4a: SATML Challenge Results](/images/pa-memorization/figure4_satml_a.png)
+*Figure 4a: Memorization as a function of model size for 1K sequences from the SATML challenge dataset.*
+
+![Figure 4b: P(s|p) and P(s) breakdown](/images/pa-memorization/figure4_satml_b.png)
+*Figure 4b: P(s|p) and P(s) as a function of the number of exact copies of p‖s in the training dataset. Both quantities are positively correlated, limiting the sensitivity of the ratio.*
 
 **Results Analysis:**
 
@@ -380,9 +402,9 @@ This work highlights how traditional metrics may overstate memorization in LLMs 
 
 ---
 
-## 9. ICLR 2026 Review Outcome: Reject
+## 9. ICLR 2026 Review Outcome (Initial Submission: Reject → Later Accepted at ICLR 2025)
 
-This paper was submitted to ICLR 2026 but received a **Reject** decision. Below is a summary of all 5 reviewer evaluations and the Area Chair's Meta Review.
+This paper was initially submitted to ICLR 2026 and received a **Reject** decision. However, after revisions, it was ultimately **accepted at ICLR 2025** (Authors: Trishita Tiwari, Ari Trachtenberg, G. Edward Suh). Below is a summary of the initial submission's 5 reviewer evaluations and the Area Chair's Meta Review.
 
 ### 9.1 Score Summary
 
