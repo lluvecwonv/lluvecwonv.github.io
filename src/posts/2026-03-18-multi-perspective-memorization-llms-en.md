@@ -84,9 +84,15 @@ The study uses the **Pythia model** (Biderman et al., 2023b) to analyze memoriza
 
 ### 3.4 Corpora Setting
 
-The open-sourced **Pile** (Gao et al., 2020) corpora are publicly available data. The data contains **146,432,000 rows** with a chunk length of **2,048** tokens, reaching a data size of approximately **800GB**.
+The training data is the open-sourced **Pile** (Gao et al., 2020) corpora, a publicly available dataset consisting of **146,432,000 rows**, each with a chunk length of **2,048** tokens, totaling approximately **800GB** in size.
 
-The experiment is iterated through the **whole training data matrix**, meaning that sampling over the rows was not conducted. Instead, the whole Pile matrices were iterated. For example, if the context size is 32 and the continuation size is 96, the first 32 tokens at each row are prompted into the model. The Pythia model generates 96 tokens equal to the continuation size. Then, the generated token IDs are compared with the gold token IDs in the data to calculate the memorization score at each row. This process is repeated for the **entire Pile matrix**, distributed over different CUDA devices.
+The memorization measurement is conducted by iterating through the **entire Pile dataset without sampling**. Specifically, taking context size 32 and continuation size 96 as an example:
+
+1. The **first 32 tokens (context)** of each row are fed into the model as input.
+2. The Pythia model generates the following **96 tokens (continuation)** via greedy decoding.
+3. The generated token IDs are compared with the gold token IDs in the data to compute the **memorization score** for that row.
+
+This process is repeated for all **146M rows in the Pile**, distributed across multiple CUDA devices for parallel processing.
 
 ### 3.5 Experiment Environment
 
