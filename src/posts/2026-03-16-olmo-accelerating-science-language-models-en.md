@@ -55,7 +55,9 @@ OLMo adopts a decoder-only transformer architecture, delivering models at both 1
 
 ### 2.2 Pretraining Data: Dolma
 
-One of OLMo's most significant contributions is the release of the full pretraining dataset, Dolma. This is rare in the field — most open models still keep their training data private.
+Despite progress in access to model parameters, pretraining datasets are still not as open. Pretraining data are often not released alongside open models (let alone closed models) and documentation about such data is often lacking in detail that would be needed to reproduce or fully understand the work. This has made it difficult to support certain threads of language model research, such as understanding how training data impacts model capabilities and limitations.
+
+To facilitate open research on language model pretraining, the authors built and released their pretraining dataset, **Dolma** — a diverse, multi-source corpus containing trillions of tokens across billions of documents acquired from different data sources that are (1) commonly seen in large-scale language model pretraining and (2) accessible to the general public (Soldaini et al., 2024).
 
 **Dolma composition (Table 2):**
 
@@ -69,7 +71,11 @@ One of OLMo's most significant contributions is the release of the full pretrain
 | Wikipedia | encyclopedic | 16.2 | 6.2 | 3.7 |
 | **Total** | | **11,519** | **4,367** | **2,668** |
 
-Dolma was built through a pipeline of (1) language filtering, (2) quality filtering, (3) content filtering, (4) deduplication, (5) multi-source mixing, and (6) tokenization.
+*Token counts are based on the GPT-NeoX tokenizer.*
+
+Dolma was built using a pipeline of (1) language filtering, (2) quality filtering, (3) content filtering, (4) deduplication, (5) multi-source mixing, and (6) tokenization. Documents from each source are kept separate, both during curation as well as in the final release.
+
+The Dolma report (Soldaini et al., 2024) provides additional analyses and experimental results from training language models on intermediate states of Dolma to share what they learned about important data curation practices, including the role of content or quality filters, deduplication, and mixing data from multiple sources. The authors open-sourced their high-performance data curation tools; this toolkit can be used to further experiment on Dolma, reproduce their work, and enable fast and easy curation of pretraining corpora. They also open-sourced the **WIMBD** tool (Elazar et al., 2024) to help with dataset analysis.
 
 ### 2.3 Adaptation
 
