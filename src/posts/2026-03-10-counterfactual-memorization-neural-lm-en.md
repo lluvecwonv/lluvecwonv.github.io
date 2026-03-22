@@ -247,41 +247,87 @@ The authors emphasize: *counterfactual memorization measures a fundamentally dif
 
 ---
 
-## 6. Counterfactual Influence: Tracing Information Flow
+## 6. From Memorization to Influence
 
-Beyond "Does this example affect itself?", the paper extends to: "Does this training example affect prediction on *other* examples?"
+Counterfactual memorization identifies training examples that contain rare information not conveyed by other examples. A natural question is whether a model would leak the information in a memorized example during inference. Previous work studies **membership inference attacks** (Shokri et al., 2017; Sablayrolles et al., 2019; Long et al., 2020) where an attacker tries to figure out if a particular example exists in the training set. In this paper, the authors consider standard model evaluation without adversarial attackers, and quantify **"does seeing a particular training example strongly influence the prediction on a validation example?"** Another way of asking this is whether a single example in the training set has a large and over-representative impact on the prediction of a validation example.
 
 ### 6.1 Definition
 
+**Definition 6.1 (Counterfactual Influence).** Given a training algorithm A that maps a training set D to a trained model, and a performance measure M, the counterfactual influence of a training example x ∈ D on another example x' is:
+
 ```
-infl(x → x') = E[M(A(S), x') | x ∈ S] - E[M(A(S), x') | x ∉ S]
+infl(x ⇒ x') ≜ E_{S⊂D, x∈S}[M(A(S), x')] - E_{S⊂D, x∉S}[M(A(S), x')]    (3)
 ```
 
-Note: `mem(x) = infl(x → x)` (self-influence is memorization).
+where S is a subset of training examples sampled from D. The expectation is taken with respect to the random sampling of S, as well as the randomness in the training algorithm A. Here x' can be an example from the validation set, test set, a generated example, or a training example.
 
-![Figure 5: (Left) Histogram of influence from all training examples on specific test examples — most influences are near-zero, but outliers indicate strong training-test connections. (Right) Joint distribution of memorization score and maximum influence on any validation example for RealNews.](/images/papers/counterfactual-memorization/fig5_mem_infl_main.png)
+An empirical estimation of the influence can be computed similarly to counterfactual memorization by uniformly sampling m subsets S₁, ..., Sₘ from D, where |Sᵢ| = r|D|, and calculating:
 
-![Figure 5 (extended): Joint distribution of memorization and max-influence across all three datasets — RealNews, C4, and Wiki40B:en.](/images/papers/counterfactual-memorization/fig5_mem_infl_all.png)
+```
+inflc(x ⇒ x') ≜ mean_{i: x∈Sᵢ}[M(A(Sᵢ), x')] - mean_{i: x∉Sᵢ}[M(A(Sᵢ), x')]    (4)
+```
 
-### 6.2 Empirical Findings
+This measures how much a training sample x's presence influences the prediction of a different example x'. Note: **`mem(x) = infl(x ⇒ x)`** — i.e., counterfactual memorization is self-influence.
 
-1. **Sparsity**: Most training examples have negligible influence on validation examples (distribution heavily skewed toward near-zero).
+### 6.2 Influence on Examples of the Validation Set
 
-2. **High-influence pairs** include:
-   - **Near-identical texts** from different URLs (same content, different publication)
-   - **Reports on the same event** from different sources (temporal/semantic proximity)
-   - **Paraphrases and variants** (information is similar, phrasing differs)
+With the same models trained for estimating memorization, the authors can estimate the counterfactual influence on the validation set according to Equation (4). For each example in the validation set, they estimate the influence on it from each training example.
 
-3. **Asymmetry**: A → B influence differs from B → A influence (one direction might matter more if B is "earlier" in training or more distinctive).
+![Figure 4: (a) Histogram of the influence of all training examples on a specific test example for three different test examples on RealNews. The blue and orange examples have high and intermediate influence from some training examples, as indicated by the outlier values to the right. The green one is a random example, where the influence from all individual training examples are close to zero. (b) The joint distribution of the memorization score of each training example and its maximum influence on any validation set example. The histograms are in log scale to better visualize the tail of the distributions.](/images/papers/counterfactual-memorization/fig5_mem_infl_main.png)
+
+![Figure 4 (extended): Joint distribution of memorization and max-influence across all three datasets — RealNews, C4, and Wiki40B:en.](/images/papers/counterfactual-memorization/fig5_mem_infl_all.png)
+
+Figure 4(a) shows the distribution of influence from all training examples on three different validation set examples:
+
+- **Green example** (randomly chosen): Represents the behavior for most validation examples — it receives close-to-zero influence from all the (individual) training examples.
+- **Blue and orange examples** (sampled to have high and intermediate maximum influence): Each has one (or a few) strong influencers from the training set, as indicated by the bars to the right of the histogram. They also only receive tiny influence from all the rest of the training examples, though the variance of influence is larger than for the green example.
+
+Intuitively, most training examples will have small influence on validation set examples because the models learn distributional patterns shared across many training examples, and individual training examples tend to have insignificant influence. However, **a training example x with high counterfactual memorization contains rare information that is not shared with other examples**. Therefore, if a validation set example x' contains similar information, infl(x ⇒ x') could be large.
+
+**Relationship between Memorization and Influence (Figure 4b):**
+
+Figure 4(b) plots mem(x) of each training example x against its maximum influence max_{x'} infl(x ⇒ x') across the validation set. Consistent with our intuition:
+
+- **Examples with small memorization scores** have small max-influence scores.
+- **Larger influence scores** on the validation set generally require larger memorization scores — not exceeding the memorization score of the training example itself.
+- However, **not all training examples with large memorization scores lead to large influence scores**. In particular, the max-influences drop significantly for examples with memorization larger than 0.4. Two potential reasons:
+  1. Many examples with very high memorization are simply low quality text, so memorization is required to learn them, but they do not encode anything interesting that could influence a validation example.
+  2. Even if a memorized example encodes some rare and useful information, the max-influence could still be low because the validation set does not contain a relevant document — especially true given that all datasets have considerably smaller validation sets than training sets.
+
+**Table 2: Train-Validation Example Pairs at Different Influence Levels (RealNews)**
+
+![Table 2: Train-validation example pairs of RealNews sampled at a variety of influence levels. [...] indicate text omitted for brevity. Differences in each document pair are highlighted yellow.](/images/papers/counterfactual-memorization/table2_influence_pairs.png)
+
+Table 2 shows train-validation example pairs from RealNews sampled at different influence value ranges. Analysis by influence level:
+
+| Influence Level | Estimated Influence | Observed Pattern |
+|----------------|-------------------|-----------------|
+| **Highest** (infl ≈ 0.378) | Train-validation pairs with nearly identical text | Only URL protocol difference (http:// vs. https://); text content is identical |
+| **High** (infl ≈ 0.121) | (Almost) identical reports from different websites | Same AP/Reuters article published on different outlets — one may cite the other or both cite a third party |
+| **Intermediate** (infl ≈ 0.067) | Same event with slightly different wordings | Covering the same sports game but with different phrasings (e.g., "might have been lost without their programs" vs. "needed programs to identify the players") |
+| **Low** (infl ≈ 0.036) | Same event reporting with differing detail levels | Same food recall event, but one embedded significantly more product detail information |
+
+At influence scores below 0.02, no noticeable relationships in the document pairs were observed due to high signal-to-noise ratio.
+
+At low influence ranges, two types of correlations are commonly observed:
+1. **Templated texts with high similarity** — the reason for low influence is that there are many similar training examples that split the influence
+2. **Superficially related documents** — due to a shared prefix such as "ST. CLOUD – This week in our 'Behind the Scenes' series on WJON" or a shared substring of common knowledge like "FSIS, the Centers for Disease Control and Prevention"
+
+**Key Takeaway:** Influence turns out to be an effective tool for analyzing and attributing model predictions at test time. For predictions that rely on information obtained by (counterfactual) memorization, we can identify exactly which training example provided such information. The observation of near-duplicated training-validation document pairs is consistent with recent studies that identify data contamination in large Internet-crawled text corpora (Lee et al., 2021; Dodge et al., 2021).
 
 ### 6.3 Influence on Generated Texts
 
-![Figure 8: Histogram of max-influence on Grover-Mega generated examples from RealNews training data. Generative tasks show different sensitivity patterns compared to discriminative evaluation.](/images/papers/counterfactual-memorization/fig8_grover_influence.png)
+The influence estimation is not restricted to the validation set. We can also estimate influence on generated examples. In this section, the authors evaluate on the publicly released generations from the **Grover models** (Zellers et al., 2019) trained on RealNews. Specifically, they take the generations from **Grover-Mega (p=0.96)**, a 1.5-billion-parameter model trained on the RealNews dataset.
 
-Testing on Grover-Mega (a generative model), influence patterns shift:
-- Generative tasks show different sensitivity to training examples
-- Some training documents have higher influence on generation than on next-token prediction
-- This suggests different mechanisms govern discriminative vs. generative memorization
+![Figure 8: Histogram of max-influence on Grover-Mega generated examples from RealNews training data. Compared with the train-validation influence in Figure 4b, the histogram decays faster as max-influence grows. Moreover, the value range of max-influence is also twice smaller.](/images/papers/counterfactual-memorization/fig8_grover_influence.png)
+
+Compared with the train-validation influence in Figure 4(b), the histogram for generated text **decays faster** as max-influence grows. Moreover, the value range of max-influence is also **twice smaller**.
+
+The reasons for not finding many highly influenced generated examples are two-fold:
+
+1. **Limited number of generations**: There are only 24,576 generations in the public release, which is much fewer than the validation examples. As a result, the corresponding examples of many memorized training examples do not get sampled in the generations. For comparison, previous work (Carlini et al., 2020; Lee et al., 2021) generated 100,000+ examples to identify memorization in generation. These approaches also count duplicates in the training set, which counterfactual memorization filters out.
+
+2. **Training set scope mismatch**: The Grover model was trained on the full RealNews training set, while this analysis is restricted to the first 2M training examples. There could potentially be more high-influence training examples that are missed in the calculation.
 
 ---
 
