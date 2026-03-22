@@ -1,8 +1,8 @@
 import { supabase } from '../lib/supabase'
 
-export type Category = '전체' | 'AI/개발' | '연구노트' | '인사이트' | '여행' | '일상'
+export type Category = '전체' | 'AI/개발' | '연구노트' | '알고리즘' | '인사이트' | '여행' | '일상'
 
-export const categories: Category[] = ['전체', 'AI/개발', '연구노트', '인사이트', '여행', '일상']
+export const categories: Category[] = ['전체', 'AI/개발', '연구노트', '알고리즘', '인사이트', '여행', '일상']
 
 export type PostLanguage = 'ko' | 'en'
 
