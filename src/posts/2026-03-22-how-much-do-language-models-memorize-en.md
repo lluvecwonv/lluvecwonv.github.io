@@ -40,29 +40,29 @@ This paper proposes a definition of memorization that quantifies the extent to w
 
 ### 2.1 Statistical View (Shannon Information)
 
-Given a learning algorithm L that maps dataset X to trained model Θ̂, the total information about X stored in Θ̂ is captured by mutual information:
+Given a learning algorithm $L$ that maps dataset $X$ to trained model $\hat{\Theta}$, the total information about $X$ stored in $\hat{\Theta}$ is captured by mutual information:
 
-```
-mem(X, Θ̂) = I(X, Θ̂) = H(X) - H(X|Θ̂)
-```
+$$
+\text{mem}(X, \hat{\Theta}) = I(X; \hat{\Theta}) = H(X) - H(X|\hat{\Theta})
+$$
 
-To separate generalization, the authors condition on a prior model Θ to define **unintended memorization**:
+To separate generalization, the authors condition on a prior model $\Theta$ to define **unintended memorization**:
 
-```
-mem_U(X, Θ̂, Θ) = I([X|Θ], Θ̂) = H(X|Θ) - H(X|(Θ, Θ̂))
-```
+$$
+\text{mem}_U(X, \hat{\Theta}, \Theta) = I(X|\Theta; \hat{\Theta}) = H(X|\Theta) - H(X|(\Theta, \hat{\Theta}))
+$$
 
 And **generalization** (intended memorization):
 
-```
-mem_I(X, Θ̂, Θ) = mem(X, Θ̂) - mem_U(X, Θ̂, Θ)
-```
+$$
+\text{mem}_I(X, \hat{\Theta}, \Theta) = \text{mem}(X, \hat{\Theta}) - \text{mem}_U(X, \hat{\Theta}, \Theta)
+$$
 
-**Proposition (Super-additivity of Unintended Memorization)**: For i.i.d. dataset X = (X₁, ..., Xₙ):
+**Proposition (Super-additivity of Unintended Memorization)**: For i.i.d. dataset $X = (X_1, \dots, X_n)$:
 
-```
-Σᵢ mem_U(Xᵢ, Θ̂, Θ) ≤ mem_U(X, Θ̂, Θ) ≤ H(Θ̂)
-```
+$$
+\sum_{i} \text{mem}_U(X_i, \hat{\Theta}, \Theta) \leq \text{mem}_U(X, \hat{\Theta}, \Theta) \leq H(\hat{\Theta})
+$$
 
 This shows that summing per-sample unintended memorization gives a lower bound on dataset-level memorization.
 
@@ -72,25 +72,28 @@ The statistical definition only applies to random variables. Since we observe on
 
 **Kolmogorov memorization**:
 
-```
-mem^K(θ̂, x) = I^K(θ̂, x) = H^K(x) - H^K(x|θ̂)
-```
+$$
+\text{mem}^K(\hat{\theta}, x) = I^K(\hat{\theta}; x) = H^K(x) - H^K(x|\hat{\theta})
+$$
 
 Unintended and intended variants:
 
-```
-mem^K_U(x, θ, θ̂) = H^K(x|θ) - H^K(x|(θ, θ̂))
-mem^K_I(x, θ, θ̂) = mem^K(x, θ̂) - mem^K_U(x, θ, θ̂)
-```
+$$
+\text{mem}^K_U(x, \theta, \hat{\theta}) = H^K(x|\theta) - H^K(x|(\theta, \hat{\theta}))
+$$
 
-**Proposition (Kolmogorov ≈ Shannon)**: Over i.i.d. dataset distributions, the expected value of Kolmogorov memorization approximates Shannon memorization within a constant ε.
+$$
+\text{mem}^K_I(x, \theta, \hat{\theta}) = \text{mem}^K(x, \hat{\theta}) - \text{mem}^K_U(x, \theta, \hat{\theta})
+$$
+
+**Proposition (Kolmogorov ≈ Shannon)**: Over i.i.d. dataset distributions, the expected value of Kolmogorov memorization approximates Shannon memorization within a constant $\varepsilon$.
 
 ### 2.3 Practical Estimation
 
 Since Kolmogorov complexity is uncomputable, the authors approximate it using **arithmetic coding**:
 
-- **H^K(x|θ̂)**: Estimated by negative log-likelihood under the trained model, i.e. -log(p(x|θ̂))
-- **H^K(x|θ̂, θ)**: Uses the better compression from both models, i.e. -log(max{p(x|θ̂), p(x|θ)})
+- $H^K(x|\hat{\theta})$: Estimated by negative log-likelihood under the trained model, i.e. $-\log p(x|\hat{\theta})$
+- $H^K(x|\hat{\theta}, \theta)$: Uses the better compression from both models, i.e. $-\log \max\{p(x|\hat{\theta}),\; p(x|\theta)\}$
 
 Reference model θ choices:
 - Synthetic data: exact underlying data distribution
@@ -102,11 +105,11 @@ Reference model θ choices:
 
 ### 3.1 Capacity Definition
 
-```
-Capacity(L) = max_X mem(X, L(X))
-```
+$$
+\text{Capacity}(L) = \max_X \text{mem}(X, L(X))
+$$
 
-When model capacity is reached, mem(X, L(X)) no longer increases with dataset size.
+When model capacity is reached, $\text{mem}(X, L(X))$ no longer increases with dataset size.
 
 ### 3.2 Experimental Setup
 
@@ -229,15 +232,15 @@ Membership inference is strictly higher than extraction in every case. In some c
 
 For a fixed model capacity, membership inference follows a roughly sigmoidal form with respect to dataset size:
 
-```
-Membership_F1(θ, D) = (1/2)(1 + c₁ · σ(c₂ · (Capacity(θ)/|D| + c₃)))
-```
+$$
+\text{Membership}_{F_1}(\theta, \mathcal{D}) = \frac{1}{2}\left(1 + c_1 \cdot \sigma\left(c_2 \cdot \left(\frac{\text{Capacity}(\theta)}{|\mathcal{D}|} + c_3\right)\right)\right)
+$$
 
-where σ(x) = 1/(1 + e^(-x)).
+where $\sigma(x) = \frac{1}{1 + e^{-x}}$.
 
-**Limiting behavior**: As |D| → ∞, membership inference performance decreases to 0.5 (essentially random). For a model trained on an infinite dataset, both membership inference and extraction are predicted to be impossible.
+**Limiting behavior**: As $|\mathcal{D}| \rightarrow \infty$, membership inference performance decreases to 0.5 (essentially random). For a model trained on an infinite dataset, both membership inference and extraction are predicted to be impossible.
 
-Optimal constants found via non-linear least squares: **c₁ = 1.34, c₂ = -0.034, c₃ = -33.14**.
+Optimal constants found via non-linear least squares: $c_1 = 1.34$, $c_2 = -0.034$, $c_3 = -33.14$.
 
 ![Figure 12: Scaling law curves for membership inference overlaid with empirical data.](/images/papers/lm-memorization-capacity/fig4_membership_inference.png)
 
