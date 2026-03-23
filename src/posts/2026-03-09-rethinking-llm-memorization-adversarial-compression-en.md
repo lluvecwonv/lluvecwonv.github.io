@@ -365,6 +365,23 @@ Three key reasons this paper matters:
 
 **Third, new memorization research framework.** Reframing "did it memorize?" as "can it compress?" shifts memorization from binary classification to continuous spectrum.
 
+## Paper References
+
+Links to all papers cited in this post:
+
+- **Carlini et al., 2023** — Quantifying Memorization Across Neural Language Models: [https://arxiv.org/abs/2202.07646](https://arxiv.org/abs/2202.07646)
+- **Nasr et al., 2023** — Scalable Extraction of Training Data from (Production) Language Models: [https://arxiv.org/abs/2311.17035](https://arxiv.org/abs/2311.17035)
+- **Zhang et al., 2023** — Counterfactual Memorization in Neural Language Models: [https://arxiv.org/abs/2112.12938](https://arxiv.org/abs/2112.12938)
+- **Zou et al., 2023** — Universal and Transferable Adversarial Attacks on Aligned Language Models (GCG): [https://arxiv.org/abs/2307.15043](https://arxiv.org/abs/2307.15043)
+- **Andriushchenko et al., 2023** — Jailbreaking Leading Safety-Aligned LLMs with Simple Adaptive Attacks (Random Search): [https://arxiv.org/abs/2404.02151](https://arxiv.org/abs/2404.02151)
+- **Biderman et al., 2023** — Pythia: A Suite for Analyzing Large Language Models: [https://arxiv.org/abs/2304.01373](https://arxiv.org/abs/2304.01373)
+- **Li et al., 2023** — Textbooks Are All You Need II: phi-1.5: [https://arxiv.org/abs/2309.05463](https://arxiv.org/abs/2309.05463)
+- **Touvron et al., 2023** — Llama 2: Open Foundation and Fine-Tuned Chat Models: [https://arxiv.org/abs/2307.09288](https://arxiv.org/abs/2307.09288)
+- **Maini et al., 2024** — TOFU: A Task of Fictitious Unlearning for LLMs: [https://arxiv.org/abs/2401.06121](https://arxiv.org/abs/2401.06121)
+- **Eldan & Russinovich, 2023** — Who's Harry Potter? Approximate Unlearning in LLMs: [https://arxiv.org/abs/2310.02238](https://arxiv.org/abs/2310.02238)
+- **Shi et al., 2024** — Detecting Pretraining Data from Large Language Models (ICLR 2024): [https://arxiv.org/abs/2310.16789](https://arxiv.org/abs/2310.16789)
+- **Sanfilippo, 2006** — SMAZ (Short String Compression Library): [https://github.com/antirez/smaz](https://github.com/antirez/smaz)
+
 ## Personal Commentary
 
 This paper reads as mutually complementary with **Detecting Pretraining Data from Large Language Models** (Shi et al., ICLR 2024).
