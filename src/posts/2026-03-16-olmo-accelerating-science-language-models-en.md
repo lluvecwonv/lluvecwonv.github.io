@@ -136,7 +136,55 @@ Both clusters produced nearly identical results despite minor batch size differe
 
 OLMo-7B is competitive across the board. Notably achieves 48.5 on ARC-challenge, matching Llama 2 7B for the top score.
 
-### 4.2 Adaptation Evaluation (Table 4)
+**Training Progression (Figure 1):**
+
+![Figure 1: Accuracy score progression of OLMo-7B on 8 core end-tasks](/images/olmo/figure1_accuracy.png)
+
+*Figure 1: Accuracy score progression of OLMo-7B on 8 core end-tasks from the Catwalk evaluation suite. We can see the benefit of decaying LR to 0 in the final 1000 steps of training on most tasks.*
+
+### 4.2 Intrinsic Language Modeling Evaluation (Paloma)
+
+**Setup**
+
+For intrinsic evaluations, Paloma proposes a range of analyses, from inspection of performance in each domain separately to more summarized results over combinations of domains. Results are reported at two levels of granularity: (1) the aggregate performance over 11 of the 18 sources in Paloma as in (Magnusson et al., 2023), and (2) more fine-grained results over each of these sources individually.
+
+This particular subset of 11 sources from Paloma excludes sources that are not publicly available, involve fringe or toxic text, or consist of code data not supported by Paloma's decontamination approach. The included sources are:
+
+| Source | Type |
+|--------|------|
+| C4 (Raffel et al., 2020) | Web crawl |
+| mC4-en (Chung et al., 2023) | Multilingual web crawl (English) |
+| Wikitext 103 (Merity et al., 2016) | Wikipedia |
+| Penn Treebank (Marcus et al., 1999) | Parsed corpus |
+| RedPajama (Together Computer, 2023) | Multi-source |
+| Falcon-RefinedWeb (Penedo et al., 2023) | Web crawl |
+| Dolma (Soldaini et al., 2024) | Multi-source |
+| M2D2 S2ORC (Reid et al., 2022) | Academic papers |
+| M2D2 Wikipedia (Reid et al., 2022) | Wikipedia |
+| C4 100 domains (Chronopoulou et al., 2022) | Domain-specific web |
+| Dolma 100 Subreddits (Soldaini et al., 2024) | Reddit |
+
+To allow for a fair comparison between models with different vocabularies, **bits per byte** as defined by Gao et al. (2020) is reported over the test sets of these sources.
+
+**Results (Figure 2):**
+
+![Figure 2: Bits per byte on 11 evaluation data sources from Paloma](/images/olmo/figure2_paloma.png)
+
+*Figure 2: Bits per byte on 11 evaluation data sources from Paloma and their combination. OLMo's training data was explicitly decontaminated against Paloma.*
+
+In the **Sources Combined** subplot, OLMo-7B shows competitive fit against 6 comparably-sized language models on the combination of 11 data sources from Paloma — especially notable given its training data was explicitly decontaminated against Paloma.
+
+Through the comparison of final models (shapes) and intermediate checkpoints (dashed lines), the OLMo results follow similar scaling trends of other models. Note that the performance of intermediate checkpoints is influenced by where that checkpoint occurs in the learning rate schedule. Models trained for fewer steps tend to have steeper training curves without necessarily being more sample efficient if training duration were fixed. MPT-7B nevertheless stands out as improving ahead of the other models in this subplot. This could be due to a number of factors, including pretraining data composition and its match to the domains in Paloma (e.g., MPT trains on 27% non-Common Crawl data rather than 18% for LLaMA, 12.2% for RedPajama, and 11.2% for OLMo) as well as various data preprocessing decisions (e.g., MPT's use of semantic deduplication by Abbas et al., 2023, on C4).
+
+The fine-grained per-source analysis reveals greater variation in sample efficiency, largely driven by the similarity of training and evaluation distributions:
+
+- **Common Crawl-predominated evaluations (C4, etc.):** OLMo-7B fares well, though different ways of postprocessing Common Crawl are best fit by models trained with that specific data (e.g., Falcon-7B on Falcon RefinedWeb)
+- **Non-scraped web sources (WikiText-103, M2D2 S2ORC, M2D2 Wikipedia):** OLMo-7B is less sample efficient compared to other models
+- **RedPajama:** Shows a similar pattern, as only 2 of its 7 domains are from Common Crawl, and Paloma weights domains within each source equally
+
+Since heterogeneous data from curated sources like Wikipedia and ArXiv papers is scarcer than scraped web text, maintaining sample efficiency for fit to these distributions of language will be challenging as pretraining corpora are scaled.
+
+### 4.3 Adaptation Evaluation (Table 4)
 
 | Model | MMLU (0-shot ↑) | AlpacaEval (% win ↑) | ToxiGen (% Toxic ↓) | TruthfulQA (% Info+True ↑) |
 |-------|-----------------|---------------------|---------------------|---------------------------|
@@ -148,7 +196,7 @@ OLMo-7B is competitive across the board. Notably achieves 48.5 on ARC-challenge,
 
 Instruction tuning dramatically improves OLMo-7B. MMLU jumps from 28.3 to 47.3, ToxiGen drops from 14.4% to 1.7% after DPO.
 
-### 4.3 Carbon Emissions (Table 6)
+### 4.4 Carbon Emissions (Table 6)
 
 | Model | GPU | Power (MWh) | Emissions (tCO₂eq) |
 |-------|-----|-------------|---------------------|
