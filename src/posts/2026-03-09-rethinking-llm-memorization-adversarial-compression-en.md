@@ -33,7 +33,7 @@ When a comedian repeats someone else's joke, it's plagiarism; when a novice lear
 
 The authors critique three existing memorization definitions:
 
-### 1.1 Discoverable Memorization (Carlini et al., 2023)
+### 1.1 Discoverable Memorization ([Carlini et al., 2023](https://arxiv.org/abs/2202.07646))
 
 Definition: A sequence is memorized if the suffix appears exactly when given the prefix.
 
@@ -42,13 +42,13 @@ Three problems:
 - **Evasion possible**: Slight changes to the chat pipeline can circumvent perfect output, leaving room for "illusion of compliance"
 - **Requires validation data for parameter selection**: Hyperparameter burden for choosing prefix/suffix token counts
 
-### 1.2 Extractable Memorization (Nasr et al., 2023)
+### 1.2 Extractable Memorization ([Nasr et al., 2023](https://arxiv.org/abs/2311.17035))
 
 Definition: A string is extractably memorized if an adversary without access to training data can elicit it with a single prompt.
 
 Problem: **Too loose** — even embedding the entire target string in the prompt counts as "existence," so models that repeat well would have all training data marked as memorized.
 
-### 1.3 Counterfactual Memorization (Zhang et al., 2023)
+### 1.3 Counterfactual Memorization ([Zhang et al., 2023](https://arxiv.org/abs/2112.12938))
 
 Definition: Performance difference between models trained with and without the sample.
 
@@ -113,7 +113,7 @@ The number of GCG steps n starts at 200 in the first iteration and increases by 
 
 ### 3.2 GCG Algorithm Details (Algorithm 2)
 
-Let's examine the GCG (Greedy Coordinate Gradient, Zou et al., 2023) inner engine more carefully:
+Let's examine the GCG (Greedy Coordinate Gradient, [Zou et al., 2023](https://arxiv.org/abs/2307.15043)) inner engine more carefully:
 
 ```
 Input: Loss L, Vocabulary V, Target y, Prompt token count n_tokens, Step count num_steps
@@ -137,7 +137,7 @@ Core mechanism: Each step (1) computes gradient for all token positions and sele
 
 ### 3.3 Random Search Alternative (Algorithm 3)
 
-To verify that gradient dependence doesn't bias results, the authors also experiment with **Random Search** (Andriushchenko, 2023), which uses no gradients:
+To verify that gradient dependence doesn't bias results, the authors also experiment with **Random Search** ([Andriushchenko, 2023](https://arxiv.org/abs/2404.02151)), which uses no gradients:
 
 ```
 Input: Loss L, Vocabulary V, Target y, Prompt token count n_tokens, Step count num_steps
@@ -161,11 +161,11 @@ Difference from GCG: Instead of gradient-based top-k candidate selection, **repl
 
 Three types of models were used:
 
-**Pythia Family** (Biderman et al., 2023): Four sizes: 410M, 1.4B, 6.9B, 12B. Trained on The Pile dataset with publicly available training data, making them suitable for memorization verification. Used in core experiments observing memorization changes across model scales (Section 5.4) and validation across four data categories (Section 5.5).
+**Pythia Family** ([Biderman et al., 2023](https://arxiv.org/abs/2304.01373)): Four sizes: 410M, 1.4B, 6.9B, 12B. Trained on The Pile dataset with publicly available training data, making them suitable for memorization verification. Used in core experiments observing memorization changes across model scales (Section 5.4) and validation across four data categories (Section 5.5).
 
-**Phi-1.5** (Li et al., 2023): 1.3B parameters. Used in TOFU dataset experiments (Section 5.2) where finetuning followed by gradient ascent unlearning is performed.
+**Phi-1.5** ([Li et al., 2023](https://arxiv.org/abs/2309.05463)): 1.3B parameters. Used in TOFU dataset experiments (Section 5.2) where finetuning followed by gradient ascent unlearning is performed.
 
-**Llama-2-7B-chat** (Touvron et al., 2023): 7B parameters, instruction-tuned. Used in In-Context Unlearning (ICUL) experiments (Section 5.1) and Harry Potter unlearning verification (Section 5.3).
+**Llama-2-7B-chat** ([Touvron et al., 2023](https://arxiv.org/abs/2307.09288)): 7B parameters, instruction-tuned. Used in In-Context Unlearning (ICUL) experiments (Section 5.1) and Harry Potter unlearning verification (Section 5.3).
 
 Chat models require **modified strategies** during MiniPrompt application since they were fine-tuned with special tags during instruction-tuning. Specifically, Llama-2-chat uses the prompt format `<s>[INST] ... [/INST]`, and optimized tokens are placed **between** start-of-instruction (`[INST]`) and end-of-instruction (`[/INST]`). For example, as shown in Figure 2, prompts become `<s>[INST] Give me a famous quote. {optimized tokens} [/INST]`. When ICUL is applied, the system prompt (`<<SYS>>...<<SYS>>`) is included and optimized tokens are placed within the instruction area: `<s> [INST] <<SYS>>\n Abstain from giving famous quote.\n <</SYS>> \n\nGive me a famous quote. {optimized tokens} [/INST]`.
 
@@ -179,9 +179,9 @@ Chat models require **modified strategies** during MiniPrompt application since 
 
 **Random Sequences**: 100 sequences uniformly randomly sampled **with replacement** from token vocabulary (lengths 3–17 tokens). Decoding produces meaningless gibberish. A negative control excluding the possibility of finding adversarially short prompts for random output. Not a single sequence was compressed across multiple model sizes (Figure 6 shows zero-height bars).
 
-**TOFU** (Maini et al., 2024): 200 fictional author profiles, each with 20 QA pairs (total 4,000). Synthetic dataset designed for unlearning experiments. 5% of data designated as forget set.
+**TOFU** ([Maini et al., 2024](https://arxiv.org/abs/2401.06121)): 200 fictional author profiles, each with 20 QA pairs (total 4,000). Synthetic dataset designed for unlearning experiments. 5% of data designated as forget set.
 
-**Harry Potter Text**: Harry Potter-related texts and QA pairs used in Eldan & Russinovich (2023)'s "Who's Harry Potter?" paper.
+**Harry Potter Text**: Harry Potter-related texts and QA pairs used in [Eldan & Russinovich (2023)](https://arxiv.org/abs/2310.02238)'s "Who's Harry Potter?" paper.
 
 ### 4.3 MiniPrompt Hyperparameters
 
@@ -248,7 +248,7 @@ What this graph reveals: **Completion-based tests declare "completely forgotten"
 
 ### 5.3 Harry Potter Unlearning
 
-Verifying Eldan & Russinovich (2023)'s "Who's Harry Potter?" research.
+Verifying [Eldan & Russinovich (2023)](https://arxiv.org/abs/2310.02238)'s "Who's Harry Potter?" research.
 That work claimed to have unlearned Harry Potter knowledge from Llama-2-chat.
 
 The authors refute this in three ways:
@@ -275,11 +275,11 @@ Conclusion: After unlearning, **nearly identical amounts of Harry Potter text re
 
 ### 5.4 Bigger Models Memorize More
 
-Prior work (Carlini et al., 2023) using different memorization definitions showed "larger models memorize more." The authors verify this same trend appears with their ACR definition, showing their proposed definition aligns with established scientific findings.
+Prior work ([Carlini et al., 2023](https://arxiv.org/abs/2202.07646)) using different memorization definitions showed "larger models memorize more." The authors verify this same trend appears with their ACR definition, showing their proposed definition aligns with established scientific findings.
 
 **Experimental setup:**
 - **Dataset**: Famous Quotes
-- **Models**: Four different sizes from Pythia family (Biderman et al., 2023) — 410M, 1.4B, 6.9B, 12B
+- **Models**: Four different sizes from Pythia family ([Biderman et al., 2023](https://arxiv.org/abs/2304.01373)) — 410M, 1.4B, 6.9B, 12B
 
 ![Figure 5: Memorization trends across Pythia model sizes](/images/papers/acr-memorization/fig5-pythia-memorization-scale.png)
 *Figure 5: Memorization in Pythia models. ACR definition aligns with the established finding that "larger models memorize more." Average compression ratio (left) and proportion with ratio > 1 (right) both increase with model size. Based on Famous Quotes dataset.*
@@ -316,7 +316,7 @@ Paraphrasing drastically reduces ACR from 1.17 → 0.68 and memorized proportion
 
 ### 5.7 Alternative Threshold — SMAZ Comparison Analysis
 
-While τ = 1 (prompt shorter than target) serves as default, data-dependent thresholds are also discussed. **SMAZ** (Sanfilippo, 2006) is a compression library specialized for short natural language strings, and using its compression rate as τ(y) measures "does the model compress better than generic compression."
+While τ = 1 (prompt shorter than target) serves as default, data-dependent thresholds are also discussed. **SMAZ** ([Sanfilippo, 2006](https://github.com/antirez/smaz)) is a compression library specialized for short natural language strings, and using its compression rate as τ(y) measures "does the model compress better than generic compression."
 
 Comparing ACR and SMAZ compression ratios for Pythia-1.4B in Appendix E.2 Figure 11, using data-dependent thresholds (τ = SMAZ compression rate) greatly reduces samples classified as memorized. This provides a practical knob for regulators or legal contexts to adjust "how strongly memorized should be classified." While τ = 1 evidence may be weaker than τ = SMAZ in court, either could contribute to copyright infringement discussions.
 
@@ -384,7 +384,7 @@ Links to all papers cited in this post:
 
 ## Personal Commentary
 
-This paper reads as mutually complementary with **Detecting Pretraining Data from Large Language Models** (Shi et al., ICLR 2024).
+This paper reads as mutually complementary with **[Detecting Pretraining Data from Large Language Models](https://arxiv.org/abs/2310.16789)** (Shi et al., ICLR 2024).
 Shi et al. takes a **detection** perspective using black-box probability to determine "was training data included?" while this paper takes a **measurement** perspective using adversarial optimization to verify "is it actually stored in model weights?"
 
 This paper's value is especially great in unlearning research. Whether gradient ascent, in-context unlearning, or other existing methods, they all appear "forgotten" only under completion-based evaluation, while information actually remains in the model. Future unlearning research must pass this level of adversarial verification.
