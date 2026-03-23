@@ -142,6 +142,19 @@
   overflow: hidden;
 }
 
+.content a {
+  color: #6366f1;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: color 0.2s, text-decoration-color 0.2s;
+}
+
+.content a:hover {
+  color: #818cf8;
+  text-decoration-thickness: 2px;
+}
+
 .content strong {
   color: var(--blog-post-title);
   font-weight: 600;
