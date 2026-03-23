@@ -85,8 +85,8 @@ export default function CV() {
               <em>Proceedings of the Korea Computer Congress</em>, 2024.
             </li>
             <li>
-              <strong>C. Yoon</strong> and H. Song, "Measuring Memorization in Large Language Models via Near-Duplicate Sample Generation,"
-              <em>Proceedings of the Korea Software Congress</em>, 2025.
+              <strong>C. Yoon</strong> and H. Song, "Large Language Model Unlearning based on Question Answering,"
+              <em>Proceedings of the Korea Software Congress</em>, 2024.
             </li>
           </ul>
         </section>
