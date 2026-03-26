@@ -23,11 +23,15 @@ language: ko
 
 ## 1. 논문 개요
 
-대규모 언어 모델(LLM)에서 학습 데이터 유출(training data leakage)은 저작권·라이선스 위반과 개인식별정보(PII) 유출이라는 두 가지 중요한 문제를 야기한다.
+언어 모델(LM)의 암기(memorization) — 즉, 학습 데이터를 테스트 시점에서 그대로(verbatim) 재생성하는 경향 — 에 대한 기존 연구는 다양한 동기에서 출발한다. 저작권 침해(Shi et al., 2023; Karamolegkou et al., 2023; Meeus et al., 2024), 프라이버시 유출(Carlini et al., 2018; 2022b; Brown et al., 2022; Mireshghallah et al., 2022), 또는 보간(interpolation)이 일반화로 이어지는 과정의 과학적 이해(Mallinar et al., 2022; Feldman, 2021; Tirumala et al., 2022; Henighan et al., 2023a) 등이 그것이다. 이러한 목표들은 공통점을 공유하면서도, 때로는 서로 모순되는 암기의 개념을 형성한다.
 
-기존의 **Extractable Memorization** (Carlini et al., 2022)은 모델이 학습 데이터를 높은 확률로 그대로 생성하는 경우를 "암기"로 분류하지만, **모델의 일반화 능력을 간과**한다. 예를 들어, "The murder was committed by"라는 프롬프트에 "John Doe"가 나오는 것은 암기가 아니라 "John Doe"가 흔한 이름이기 때문이다.
+최근 Schwarzschild et al. (2024)은 인간의 암기 행동에서 영감을 받아 LM 암기를 세 가지로 분류하는 taxonomy를 제안했다: (1) **Recitation** — 인간이 반복 노출을 통해 직접 인용을 외우듯, LM이 고빈도로 중복된 시퀀스를 그대로 암송하는 것, (2) **Reconstruction** — 인간이 일반적 패턴을 기억하고 빈칸을 채워 구절을 재구성하듯, LM이 본질적으로 예측 가능한 보일러플레이트 템플릿을 재구성하는 것, (3) **Recollection** — 인간이 단 한 번의 노출 후 일화적 기억을 산발적으로 떠올리듯, LM이 학습 중 드물게 본 시퀀스를 회상하는 것.
 
-**Counterfactual Memorization** (Zhang et al., 2023)은 보다 정교하지만, 모든 학습 시퀀스에 대해 별도의 baseline 모델을 학습해야 하므로 프로덕션 모델에 적용하기 매우 비현실적이다.
+이처럼 암기 현상은 단순히 "학습 데이터를 그대로 생성했는가"만으로 판단하기 어렵다. 대규모 언어 모델(LLM)에서 학습 데이터 유출(training data leakage)은 저작권·라이선스 위반(Chang et al., 2023)과 개인식별정보(PII) 유출(Carlini et al., 2021; Mozes et al., 2023)이라는 심각한 문제를 야기하지만, 기존 메트릭은 진정한 암기와 통계적으로 흔한 시퀀스의 일반화를 제대로 구분하지 못한다.
+
+기존의 **Extractable Memorization** (Carlini et al., 2022)은 모델이 학습 데이터를 높은 확률로 그대로 생성하는 경우를 "암기"로 분류하지만, **모델의 일반화 능력을 간과**한다. 예를 들어, "The murder was committed by"라는 프롬프트에 "John Doe"가 나오는 것은 암기가 아니라 "John Doe"가 흔한 이름이기 때문이다. 위 taxonomy 관점에서 이것은 reconstruction에 해당하며, 진정한 memorization(recollection)과는 구별되어야 한다.
+
+**Counterfactual Memorization** (Zhang et al., 2023)은 보다 정교하게 일반화와 암기를 분리하지만, 모든 학습 시퀀스에 대해 별도의 baseline 모델을 학습해야 하므로 프로덕션 모델에 적용하기 매우 비현실적이다.
 
 본 논문이 제안하는 **Prior-Aware (PA) Memorization**은:
 
@@ -486,3 +490,29 @@ Area Chair는 다음과 같이 정리했다:
 3. **기존 메트릭과의 불충분한 비교**: Counterfactual memorization과의 직접적 head-to-head 비교, 그리고 Schwarzschild et al. (2024), Wang et al. (2025) 등 다른 training-free 메트릭과의 비교 부재
 4. **수학적 엄밀성과 표기법 문제**: Equation 1 유도, 연산자 정의, notation 일관성 등
 5. **SATML 데이터셋 관련 부정확한 주장**: 데이터셋의 속성에 대한 잘못된 가정이 "놀라운 발견"의 신뢰성을 약화시킴
+
+---
+
+## 10. 관련 연구 (Related Work)
+
+### 10.1 Memorization 정의 및 측정
+
+언어 모델의 암기 현상에 대한 연구는 크게 세 가지 관점에서 진행되어 왔다.
+
+**Extractable Memorization.** Carlini et al. (2021, 2022)은 모델이 학습 데이터를 verbatim으로 생성할 수 있는지를 측정하는 extractable memorization 개념을 정립했다. 이 접근법은 prefix를 프롬프트로 제공했을 때 모델이 정확한 suffix를 생성하는지를 평가한다. 그러나 이 메트릭은 통계적으로 흔한 시퀀스의 생성(일반화)과 진정한 암기를 구분하지 못한다는 한계가 있다.
+
+**Counterfactual Memorization.** Zhang et al. (2023)은 타겟 시퀀스를 포함하여 학습한 모델과 포함하지 않고 학습한 모델의 성능 차이를 측정하는 counterfactual memorization을 제안했다. 이 접근법은 일반화와 암기를 원리적으로 분리할 수 있지만, 모든 시퀀스에 대해 별도의 baseline 모델을 학습해야 하므로 대규모 모델에 적용하기가 계산적으로 비현실적이다.
+
+**Memorization Taxonomy.** Schwarzschild et al. (2024)은 인간의 암기 행동에 기반한 세 가지 유형의 taxonomy를 제안했다: recitation(반복 노출된 고빈도 시퀀스의 암송), reconstruction(예측 가능한 보일러플레이트 패턴의 재구성), recollection(드물게 노출된 시퀀스의 회상). 이 분류는 기존 단일 메트릭으로는 포착할 수 없는 암기의 다양한 양상을 체계적으로 구분한다.
+
+### 10.2 저작권 및 프라이버시 관점
+
+LM 암기 연구의 주요 동기 중 하나는 저작권 침해와 프라이버시 유출이다. Shi et al. (2023)은 학습 데이터의 저작권 침해를 탐지하는 방법을 제안했고, Karamolegkou et al. (2023)과 Meeus et al. (2024)는 모델 출력에서 저작권이 있는 콘텐츠의 재생성 문제를 분석했다. 프라이버시 측면에서는 Carlini et al. (2018, 2022b), Brown et al. (2022), Mireshghallah et al. (2022) 등이 모델이 학습 데이터의 개인정보를 유출할 수 있음을 실증적으로 보여주었다.
+
+### 10.3 일반화와 암기의 관계
+
+Feldman (2021)은 long-tail 분포의 학습 데이터에서 암기가 일반화에 필수적일 수 있다는 이론적 프레임워크를 제시했다. Tirumala et al. (2022)은 모델 규모와 학습 진행에 따른 암기 패턴을 분석했으며, Henighan et al. (2023a)은 scaling law 관점에서 암기와 일반화의 관계를 연구했다. Mallinar et al. (2022)은 보간(interpolation) 기반의 행동이 일반화로 이어지는 메커니즘을 탐구했다. 이들 연구는 암기가 단순히 부정적 현상이 아니라, 모델의 일반화 능력과 깊이 연관된 복잡한 현상임을 시사한다.
+
+### 10.4 Training-free Memorization 메트릭
+
+본 논문의 PA Memorization 외에도 추가 학습 없이 암기를 측정하려는 시도들이 있다. Schwarzschild et al. (2024)은 training-free 메트릭을 제안하여 PA Memorization과 비교의 대상이 되며, Wang et al. (2025)은 개념적으로 유사한 정의를 제안했다. 리뷰어들이 지적한 바와 같이, 이들 메트릭과의 직접적 비교는 PA Memorization의 우위를 입증하기 위해 중요한 과제로 남아 있다.

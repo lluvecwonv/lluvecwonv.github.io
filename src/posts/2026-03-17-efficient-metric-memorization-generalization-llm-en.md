@@ -23,11 +23,15 @@ This work proposes **Prior-Aware (PA) Memorization**, a computationally efficien
 
 ## 1. Introduction
 
-Training data leakage from Large Language Models (LLMs) has been a concern for two important reasons: (a) copyright and licensing violations, which have been the subject of several lawsuits (Chang et al., 2023; Kadrey v. Meta Platforms, Inc.; The New York Times Company v. Microsoft Corporation), and (b) leakage of sensitive data such as Personally Identifiable Information (PII) (Carlini et al., 2021; Mozes et al., 2023).
+Prior work on language model memorization — the tendency to generate exact copies of training samples at test time — varies widely in stated motivation. Papers might focus on copyright (Shi et al., 2023; Karamolegkou et al., 2023; Meeus et al., 2024), privacy (Carlini et al., 2018; 2022b; Brown et al., 2022; Mireshghallah et al., 2022), or scientifically understanding how interpolation (Mallinar et al., 2022) leads to generalization (Feldman, 2021; Tirumala et al., 2022; Henighan et al., 2023a). Although these objectives share commonalities, they also drive distinct and sometimes contradictory notions of memorization.
 
-Prior approaches to quantifying memorization often **overlook the models' capacity to generalize**, conflating genuine memorization with the generation of statistically common sequences. For example, a prompt like "The murder was committed by" may yield "John Doe" with high probability not because the model memorized this sequence, but because "John Doe" is a **common placeholder name**.
+Recently, Schwarzschild et al. (2024) proposed a taxonomy inspired by colloquial distinctions of human memorization behavior, defining three types of LM memorization: (1) **Recitation** — LMs recite highly duplicated sequences, just as humans recite direct quotes committed to memory through repeated exposure; (2) **Reconstruction** — LMs reconstruct inherently predictable boilerplate templates, just as humans reconstruct a passage by remembering a general pattern and filling in the gaps; (3) **Recollection** — LMs recollect sequences seen rarely during training, just as humans sporadically recollect an episodic memory or fragment after a single exposure.
 
-**Counterfactual Memorization** (Zhang et al., 2023) measures how models trained with and without the target sequence would perform, but requires training several "counterfactual" or "baseline" models for every training sequence, making it **very impractical to reproduce on production language models**.
+This diversity of memorization phenomena underscores that training data leakage from Large Language Models (LLMs) cannot be assessed by simply checking whether the model reproduces training data verbatim. Training data leakage raises serious concerns including copyright and licensing violations (Chang et al., 2023; Kadrey v. Meta Platforms, Inc.; The New York Times Company v. Microsoft Corporation) and leakage of sensitive data such as Personally Identifiable Information (PII) (Carlini et al., 2021; Mozes et al., 2023), but existing metrics fail to properly distinguish true memorization from generalization of statistically common sequences.
+
+Prior approaches to quantifying memorization often **overlook the models' capacity to generalize**, conflating genuine memorization with the generation of statistically common sequences. For example, a prompt like "The murder was committed by" may yield "John Doe" with high probability not because the model memorized this sequence, but because "John Doe" is a **common placeholder name**. In the taxonomy above, this would correspond to reconstruction rather than true memorization (recollection).
+
+**Counterfactual Memorization** (Zhang et al., 2023) more precisely separates generalization from memorization, but requires training several "counterfactual" or "baseline" models for every training sequence, making it **very impractical to reproduce on production language models**.
 
 This paper introduces **Prior-Aware (PA) Memorization**, which:
 
@@ -482,3 +486,29 @@ The main reasons for rejection:
 3. **Insufficient comparisons**: Lack of direct head-to-head comparison with counterfactual memorization and other training-free metrics (Schwarzschild et al. 2024, Wang et al. 2025)
 4. **Mathematical rigor and notation issues**: Equation 1 derivation, operator definitions, notation consistency
 5. **Inaccurate claims about SATML dataset**: Wrong assumptions about the dataset's properties undermine the credibility of "surprising findings"
+
+---
+
+## 10. Related Work
+
+### 10.1 Memorization Definitions and Measurement
+
+Research on memorization in language models has progressed along three main threads.
+
+**Extractable Memorization.** Carlini et al. (2021, 2022) established the concept of extractable memorization, measuring whether a model can generate training data verbatim. This approach evaluates whether the model produces the exact suffix when prompted with a prefix. However, this metric has a fundamental limitation: it cannot distinguish between generation of statistically common sequences (generalization) and true memorization.
+
+**Counterfactual Memorization.** Zhang et al. (2023) proposed counterfactual memorization, which measures the performance difference between a model trained with the target sequence and one trained without it. While this approach can in principle separate generalization from memorization, it requires training separate baseline models for every target sequence, making it computationally infeasible for large-scale models.
+
+**Memorization Taxonomy.** Schwarzschild et al. (2024) proposed a taxonomy based on colloquial distinctions of human memorization behavior, defining three types: recitation (verbatim reproduction of highly duplicated sequences through repeated exposure), reconstruction (reproducing inherently predictable boilerplate templates by remembering general patterns), and recollection (sporadic recall of rarely-seen sequences after minimal exposure). This classification systematically distinguishes diverse aspects of memorization that cannot be captured by a single metric.
+
+### 10.2 Copyright and Privacy Perspectives
+
+A key motivation for LM memorization research is copyright infringement and privacy leakage. Shi et al. (2023) proposed methods for detecting copyright infringement in training data, while Karamolegkou et al. (2023) and Meeus et al. (2024) analyzed the reproduction of copyrighted content in model outputs. On the privacy front, Carlini et al. (2018, 2022b), Brown et al. (2022), and Mireshghallah et al. (2022) empirically demonstrated that models can leak personal information from training data.
+
+### 10.3 Relationship Between Generalization and Memorization
+
+Feldman (2021) presented a theoretical framework suggesting that memorization may be necessary for generalization in long-tail distributed training data. Tirumala et al. (2022) analyzed memorization patterns across model scales and training progression, while Henighan et al. (2023a) studied the relationship between memorization and generalization from a scaling law perspective. Mallinar et al. (2022) explored the mechanisms by which interpolation-driven behavior leads to generalization. These studies suggest that memorization is not merely a negative phenomenon but a complex one deeply intertwined with a model's generalization capabilities.
+
+### 10.4 Training-free Memorization Metrics
+
+Beyond the PA Memorization proposed in this paper, there have been other attempts to measure memorization without additional training. Schwarzschild et al. (2024) proposed a training-free metric that serves as a comparison target for PA Memorization, and Wang et al. (2025) proposed a conceptually similar definition. As reviewers noted, direct comparison with these metrics remains an important open challenge for establishing the advantages of PA Memorization.
