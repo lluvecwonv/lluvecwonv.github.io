@@ -1,15 +1,15 @@
 ---
 title: "Hubble: A Model Suite to Advance the Study of LLM Memorization - Paper Analysis"
 date: 2026-03-27
-summary: "An analysis of the ICLR 2025 paper presenting Hubble, a fully open-source model suite designed for systematic study of LLM memorization. Through standard/perturbed model variants (1B/8B parameters, 100B/500B tokens), the paper quantitatively measures memorization risks across copyright, privacy, and test set contamination domains, establishing dilution and ordering as two best practices. Also demonstrates Hubble's utility as a benchmark for membership inference attacks and machine unlearning."
-tags: [LLM, Memorization, Privacy, Copyright, Test Set Contamination, Machine Unlearning, Membership Inference, Open Source, ICLR 2025, Research Notes]
+summary: "An analysis of the ICLR 2026 paper presenting Hubble, a fully open-source model suite designed for systematic study of LLM memorization. Through standard/perturbed model variants (1B/8B parameters, 100B/500B tokens), the paper quantitatively measures memorization risks across copyright, privacy, and test set contamination domains, establishing dilution and ordering as two best practices. Also demonstrates Hubble's utility as a benchmark for membership inference attacks and machine unlearning."
+tags: [LLM, Memorization, Privacy, Copyright, Test Set Contamination, Machine Unlearning, Membership Inference, Open Source, ICLR 2026, Research Notes]
 category: Research Notes
 language: en
 ---
 
 # Hubble: a Model Suite to Advance the Study of LLM Memorization
 
-**Venue:** ICLR 2025
+**Venue:** ICLR 2026 (Oral)
 **Authors:** Johnny Tian-Zheng Wei, Ameya Godbole, Mohammad Aflah Khan, Ryan Wang, Xiaoyuan Zhu, James Flemings, Nitya Kashyap, Krishna P. Gummadi, Willie Neiswanger, Robin Jia
 **Affiliations:** University of Southern California, Max Planck Institute for Software Systems
 **Paper Link:** [Project Page](https://allegro-lab.github.io/hubble/)

@@ -1,15 +1,15 @@
 ---
 title: "Hubble: LLM 암기(Memorization) 연구를 위한 모델 스위트 논문 분석"
 date: 2026-03-27
-summary: "LLM 암기 현상을 체계적으로 연구하기 위해 설계된 완전 오픈소스 모델 스위트 Hubble을 소개하는 ICLR 2025 논문 분석. Standard/Perturbed 변형 모델(1B/8B, 100B/500B 토큰)을 통해 저작권·프라이버시·테스트셋 오염 세 도메인에 걸친 암기 리스크를 정량적으로 측정하고, 희석(dilution)과 순서(ordering)라는 두 가지 모범 사례를 확립. Membership Inference Attack 및 Machine Unlearning 벤치마크로서의 활용도 제시."
-tags: [LLM, Memorization, Privacy, Copyright, Test Set Contamination, Machine Unlearning, Membership Inference, Open Source, ICLR 2025, 연구노트]
+summary: "LLM 암기 현상을 체계적으로 연구하기 위해 설계된 완전 오픈소스 모델 스위트 Hubble을 소개하는 ICLR 2026 논문 분석. Standard/Perturbed 변형 모델(1B/8B, 100B/500B 토큰)을 통해 저작권·프라이버시·테스트셋 오염 세 도메인에 걸친 암기 리스크를 정량적으로 측정하고, 희석(dilution)과 순서(ordering)라는 두 가지 모범 사례를 확립. Membership Inference Attack 및 Machine Unlearning 벤치마크로서의 활용도 제시."
+tags: [LLM, Memorization, Privacy, Copyright, Test Set Contamination, Machine Unlearning, Membership Inference, Open Source, ICLR 2026, 연구노트]
 category: 연구노트
 language: ko
 ---
 
 # Hubble: a Model Suite to Advance the Study of LLM Memorization
 
-**학회:** ICLR 2025
+**학회:** ICLR 2026 (Oral)
 **저자:** Johnny Tian-Zheng Wei, Ameya Godbole, Mohammad Aflah Khan, Ryan Wang, Xiaoyuan Zhu, James Flemings, Nitya Kashyap, Krishna P. Gummadi, Willie Neiswanger, Robin Jia
 **소속:** University of Southern California, Max Planck Institute for Software Systems
 **논문 링크:** [프로젝트 페이지](https://allegro-lab.github.io/hubble/)
