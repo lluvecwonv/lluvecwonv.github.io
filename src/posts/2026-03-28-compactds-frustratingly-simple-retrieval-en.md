@@ -1,18 +1,19 @@
 ---
 title: "CompactDS: Frustratingly Simple Retrieval Improves Challenging, Reasoning-Intensive Benchmarks"
 date: 2026-03-28
-summary: "Challenges the prevailing view that RAG is ineffective for reasoning-intensive tasks. Introduces CompactDS, a 380B-word diverse, high-quality web-scale datastore with a two-stage ANN+Exact Search pipeline enabling sub-second retrieval on a single node (456GB RAM). With LLaMA 3.1 8B, achieves +10% on MMLU, +33% on MMLU Pro, +14% on GPQA, and +19% on MATH. Outperforms Google Search-based RAG and matches complex agentic systems like Search-o1. NeurIPS 2025 submission."
-tags: [RAG, Retrieval, LLM, Datastore, Dense Retrieval, NeurIPS 2025, Research Notes]
+summary: "Challenges the prevailing view that RAG is ineffective for reasoning-intensive tasks. Introduces CompactDS, a 380B-word diverse, high-quality web-scale datastore with a two-stage ANN+Exact Search pipeline enabling sub-second retrieval on a single node (456GB RAM). With LLaMA 3.1 8B, achieves +10% on MMLU, +33% on MMLU Pro, +14% on GPQA, and +19% on MATH. Outperforms Google Search-based RAG and matches complex agentic systems like Search-o1. Published at ICLR 2026."
+tags: [RAG, Retrieval, LLM, Datastore, Dense Retrieval, ICLR 2026, Research Notes]
 category: Research Notes
 language: en
 ---
 
 # Frustratingly Simple Retrieval Improves Challenging, Reasoning-Intensive Benchmarks
 
-**Venue:** NeurIPS 2025 (Preprint)
+**Venue:** ICLR 2026
 **Authors:** Xinxi Lyu*, Michael Duan*, Rulin Shao, Pang Wei Koh, Sewon Min
-**Affiliations:** Allen Institute for AI (Ai2), UIUC, USC, University of Washington, UC Berkeley
+**Affiliations:** University of Illinois Urbana-Champaign, University of Southern California, Allen Institute for AI, University of Washington, UC Berkeley
 **arXiv:** [2507.01297](https://arxiv.org/abs/2507.01297)
+**OpenReview:** [Forum](https://openreview.net/forum?id=9lPq01iKOV)
 **Data:** [HuggingFace - alrope/CompactDS-102GB](https://huggingface.co/datasets/alrope/CompactDS-102GB)
 
 ---
@@ -77,6 +78,8 @@ Starting from Common Crawl (894B words), taking the union of C4 and DCLM-Baselin
 **Challenge:** 1.9B passages × 768 dimensions = **5.4TB** vector data — cannot fit in memory.
 
 **Solution: ANN + Exact Search Two-Stage Pipeline**
+
+![Figure 1: Two-stage dense retrieval pipeline with CompactDS](/figures/compactds/figure1_pipeline.png)
 
 **Stage 1 — Approximate Nearest Neighbor (ANN) via IVFPQ:**
 - Uses Contriever-msmarco as E_Approx
@@ -154,7 +157,7 @@ This design follows the DiskANN approach but has not been widely adopted due to 
 
 ### 5.2 Comparison with MassiveDS (Table 2)
 
-![Table 2: Pipeline Comparison](/figures/compactds/table2_pipeline_comparison.png)
+![Table 2: CompactDS vs MassiveDS MMLU Comparison](/figures/compactds/table2_massiveds.png)
 
 | System | RAM Usage | MMLU AVG | Overall AVG |
 |--------|----------|----------|-------------|
@@ -166,31 +169,22 @@ This design follows the DiskANN approach but has not been widely adopted due to 
 
 CompactDS achieves **higher MMLU performance using only 4% of MassiveDS's RAM**. This demonstrates the effectiveness of careful datastore construction (filtering + diverse sources) combined with the ANN + Exact Search pipeline.
 
-### 5.3 Effect of Exact Search
+### 5.3 Effect of Exact Search (Table 4)
 
-From the ablation in Table 2:
+![Table 4: Retrieval Pipeline Comparison (K=1,000)](/figures/compactds/table4_pipeline.png)
+
+From the ablation in Table 4:
 - ANN(Contriever) + ES(Contriever): No significant improvement over ANN-only
 - ANN(Contriever) + ES(**GritLM**): Meaningful improvement (AVG 53.8 → 55.1)
 - **The more expressive model (GritLM) is the primary driver of improvement** — the key benefit of the two-stage design
 
-### 5.4 Index Size Ablation (Table 3)
+### 5.4 Oracle Reranking Upper Bound (Table 3)
 
-![Table 3: FAISS Index Size](/figures/compactds/table3_faiss_index.png)
-
-| Configuration | Index Size | AVG |
-|---------------|-----------|-----|
-| Subquantizers=64 | 125GB | 54.1 |
-| Subquantizers=256 | 456GB | 55.1 |
-
-**4× compression reduces the index to 125GB with only 1% performance drop** — feasible even in memory-constrained environments.
-
-### 5.5 Oracle Reranking Upper Bound (Table 4)
-
-![Table 4: Oracle Performance](/figures/compactds/table4_oracle.png)
+![Table 3: Oracle Performance](/figures/compactds/table3_oracle.png)
 
 With oracle reranking selecting the 3 best passages from 100 candidates:
-- Average improvement: 14.5% → **32.6%** (vs No Retrieval)
-- An 8B model **surpasses the 70B model's no-retrieval performance**
+- Average improvement: 8.0% → **16.2%** (vs No Retrieval)
+- An 8B Oracle model (AVG 71.2) **surpasses the 70B model's no-retrieval performance (AVG 70.1)**
 
 This shows CompactDS already contains highly useful information, and **better retrieval/reranking or stronger LLMs** could yield significantly higher performance.
 
@@ -210,6 +204,12 @@ This shows CompactDS already contains highly useful information, and **better re
 - **Effective across model families:** Significant improvements with Mistral and Qwen3
 - GPQA is an exception at 70B — baseline is already very strong (e.g., Physics 26.7→64.2)
 
+### 5.7 Qualitative Analysis (Table 6)
+
+![Table 6: Example of top retrieved passage from CompactDS on GPQA](/figures/compactds/table6_qualitative.png)
+
+Table 6 shows an example of a passage retrieved by CompactDS for a GPQA question. For a question about the fraction of hydrogen atoms in the second excited state in the atmosphere of Sirius, the retrieved passage contains a similar problem with solution steps, assisting the model's reasoning process.
+
 ---
 
 ## 6. Comparison with Google Search
@@ -221,9 +221,9 @@ A competitive web search RAG pipeline built with Google Programmable Search Engi
 - olmOCR for PDF parsing (superior to PDFPlumber used in prior work)
 - 13-gram overlap decontamination + huggingface.co blocking
 
-### 6.2 CompactDS vs Google Search (Table 8)
+### 6.2 CompactDS vs Google Search (Table 7)
 
-![Table 8: Web vs Local](/figures/compactds/table8_web_vs_local.png)
+![Table 7: Search Engine vs CompactDS Comparison (LLaMA 3.1 8B Instruct)](/figures/compactds/table7_web_vs_local.png)
 
 | Method | MMLU STEM | MMLU Pro | AGI Eval | MATH | GPQA Phys | AVG |
 |--------|-----------|---------|---------|------|-----------|-----|
@@ -235,9 +235,9 @@ A competitive web search RAG pipeline built with Google Programmable Search Engi
 
 **CompactDS consistently outperforms Google Search:** 14% vs 6% average relative improvement. The gap is especially large on MMLU Pro (54.6 vs 44.0) and MATH (55.9 vs 51.4).
 
-### 6.3 QwQ 32B + Search-o1 Comparison (Table 9)
+### 6.3 QwQ 32B + Search-o1 Comparison (Table 8)
 
-![Table 9: QwQ Comparison](/figures/compactds/table9_qwq.png)
+![Table 8: QwQ 32B CompactDS vs Search-o1 Comparison](/figures/compactds/table8_qwq.png)
 
 | Method | Self-contained? | GPQA Diamond | MATH-500 |
 |--------|----------------|-------------|----------|
