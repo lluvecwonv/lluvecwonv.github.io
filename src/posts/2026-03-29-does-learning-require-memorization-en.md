@@ -145,45 +145,127 @@ TV(Dist_{h~A(S)}[h(x)], Dist_{x'~M_x, h~A(S)}[h(x')]) ≤ 1 - λ_ℓ
 
 **Linear classifiers:** In high dimension (d ≫ n), when distinct subpopulations are sufficiently uncorrelated, subpopulation coupling holds. Specifically, for (τ, τ²/(8√n))-independent datasets, any approximately margin-maximizing linear classifier achieves coupling λ₁ ≥ 1 - δ (Theorem 4).
 
-## 4. Formal Definition of Memorization and Privacy
+## 4. Memorization, Privacy, and Stability
 
-### 4.1 Label Memorization Definition
+The preceding sections discussed memorization informally. This section gives a formal definition of label memorization and demonstrates that fitting the training data requires label memorization whenever there is sufficient (statistical or computational) uncertainty in the labels. This allows showing that limits on the memorization ability of an algorithm translate into a loss of accuracy (on long-tailed distributions), and that even relatively weak forms of differential privacy imply the algorithm cannot memorize well.
+
+### 4.1 Label Memorization Definition (Definition 4.1)
+
+To measure the ability of algorithm A to memorize labels, the author examines how much the labeled example (x, y) affects the prediction of the model on x:
 
 ```
 mem(A, S, i) := Pr_{h~A(S)}[h(x_i) = y_i] - Pr_{h~A(S\i)}[h(x_i) = y_i]
 ```
 
-where S\i denotes S with (x_i, y_i) removed. A large value indicates the algorithm has memorized that label.
+where S\i denotes S with (x_i, y_i) removed. The effect is measured as the total variation distance between the distributions of the indicator of the label being y. Strictly speaking, the memorization value can be negative (in which case it equals the negation of the TV distance), but for most practical algorithms this value is expected to be non-negative.
 
-**Key property:** The expectation of the average memorization value equals the expected generalization gap. Thus a large generalization gap implies that a significant fraction of labels is memorized.
+This definition is closely related to leave-one-out stability. LOO stability upper bounds the expected memorization:
+
+```
+(1/n) · E_{S~P^n}[Σ_{i∈[n]} mem(A, S, i)] ≤ LOOstab(P, A)
+```
+
+**Lemma 4.2 (Memorization equals Generalization Gap):** For every distribution P and any learning algorithm A:
+
+```
+(1/n) · E_{S~P^n}[Σ_{i∈[n]} mem(A, S, i)] = E_{S~P^n}[err_S(A, S)] - E_{S'~P^{n-1}}[err_P(A, S')]
+```
+
+where err_S(A, S) is the expected empirical error of A on S. Since E[err_P(A, S')] differs from the expected generalization error by typically less than 1/n, **a large generalization gap indicates that many labels are memorized and vice versa.**
+
+**Lemma 4.3 (Fitting requires Memorization):** If A cannot predict the label y_i of x_i without observing it, then it needs to memorize it to fit it:
+
+```
+Pr_{h~A(S)}[h(x_i) ≠ y_i] = Pr_{h~A(S\i)}[h(x_i) ≠ y_i] - mem(A, S, i)
+```
+
+In particular, for singleton examples:
+
+```
+errn_S(A, 1) = Σ_{i: x_i ∈ X_{S#1}} [Pr_{h~A(S\i)}[h(x_i) ≠ y_i] - mem(A, S, i)]
+```
+
+There are two reasons why an algorithm A cannot predict the label on x_i without observing it. First, **statistical uncertainty** — measured by ‖ρ‖_∞ := max_{y∈Y} ρ(y), where 1 - ‖ρ‖_∞ is the error of the Bayes optimal predictor. Second, **computational limitations** — even if a simple model explaining the data exists, the learning algorithm may not be able to find it. For example, using a pseudo-random labeling function [Goldreich et al., 1986] achieves the uniform prior for all polynomial-time algorithms.
+
+**Lemma 4.4 (Uncertainty implies need for memorization):** For an arbitrary label distribution ρ:
+
+```
+Pr_{y~ρ, h~A(S^{i←y})}[h(x) ≠ y] ≥ 1 - ‖ρ‖_∞ - E_{y~ρ}[mem(A, S^{i←y}, i)]
+```
+
+where S^{i←y} denotes S with (x_i, y) in place of (x_i, y_i). Extending to all singletons:
+
+```
+E[errn_S(A, 1)] ≥ E[Σ_{i: x_i ∈ X_{S#1}} (1 - ‖F(x_i|S\i)‖_∞ - mem(A, S, i))]
+```
+
+where F(x_i|S\i) is the conditional distribution over x_i's label after observing all other examples. The proof follows from Definition 4.1: Pr[h(x)=y] = Pr_{A(S\i)}[h(x)=y] + mem(A, S^{i←y}, i), so taking the expectation over ρ yields an upper bound of max_{y'} Pr[y'=y] = ‖ρ‖_∞.
 
 ### 4.2 Cost of Limited Memorization
 
-**Definition:** Algorithm A is γ-memorization limited if mem(A, S, i) ≤ γ for all S, i.
+**Definition 4.5 (γ-memorization limited):** A learning algorithm A is γ-memorization limited if for all S ∈ (X,Y)^n and all i ∈ [n], mem(A, S, i) ≤ γ.
 
-**Corollary (Theorem 1 + Lemma 5):** For γ-memorization limited algorithms:
+Bounds on memorization ability result directly from various techniques such as implicit and explicit regularization and model compression. One can think of these techniques as minimizing the sum of some notion of capacity scaled by a regularization parameter λ and the empirical error. Fitting a label not correctly predicted from the rest of the dataset requires increasing the capacity, so a regularized algorithm will not fit the example if the capacity increase (scaled by λ) does not outweigh the decrease in empirical error.
+
+**Corollary 4.6 (Excess error of γ-memorization limited algorithms):** In the setting of Theorem 2.4, for any γ-memorization limited algorithm A:
 
 ```
-ε̄(π, F, A) ≥ opt(π, F) + τ₁ · E[Σ_{singleton i} conf(S,i,F) · (1 - ‖F(x_i|S\i)‖_∞ - γ)]
+ε̄(π, F, A) ≥ opt(π, F) + τ₁ · E[Σ_{i: x_i ∈ X_{S#1}} conf(S,i,F) · (1 - ‖F(x_i|S\i)‖_∞ - γ)]
 ```
 
-For Zipf prior with N ≥ n, any γ-memorization limited algorithm with γ < 1 - 1/|Y| has excess error of Ω(1).
+The bound depends on the uncertainty 1 - ‖F(x_i|S\i)‖_∞. For example, if labeling under f ~ F is uniform and k-wise independent for k upper-bounding the typical number of distinct points, then with high probability ‖F(x_i|S\i)‖_∞ = 1/|Y|.
+
+**Key conclusions:** For Zipf prior with N ≥ n:
+
+- Any γ-memorization limited algorithm with γ < 1 - 1/|Y| has **excess error of Ω(1)**
+- Any algorithm achieving optimal generalization error must memorize **Ω(n) labels**
+- In particular, it must have a **generalization gap of Ω(1)**
+
+These conclusions hold **even with noise**. In the random classification noise model where the correct label f(x) is replaced with a uniformly random one with probability 1 - κ, we have conf(S, i, F) ≥ κ for singleton examples. Thus even noisy labels need to be memorized as long as κ = Ω(1).
 
 ### 4.3 Cost of Differential Privacy
 
-**Theorem 5:** For an (ε, δ)-differentially label-private prediction algorithm:
+Memorization of training data can be undesirable — it enables **black-box membership inference attacks** [Shokri et al., 2017; Long et al., 2017, 2018; Truex et al., 2018] and **extraction of planted secrets from language models** [Carlini et al., 2019]. The standard defense is **differential privacy (DP)** [Dwork et al., 2006], which limits the output distribution's sensitivity to individual data points. Despite significant progress, DP models still lag substantially behind non-DP state-of-the-art.
+
+The author proves that some of this gap is **inherent** due to long-tailed data, even for a very weak form of privacy: label privacy for predictions.
+
+**Definition 4.7 ((ε,δ)-differentially label-private prediction):** Algorithm A satisfies this if for every x ∈ X and datasets S, S' differing only in a single label, for any label subset Y':
 
 ```
-E[errn_S(A, 1)] ≥ E[Σ_{singleton i} (1 - e^ε · ‖F(x_i|S\i)‖_∞ - δ)]
+Pr_{h~A(S)}[h(x) ∈ Y'] ≤ e^ε · Pr_{h~A(S')}[h(x) ∈ Y'] + δ
 ```
 
-DP algorithms with ε = O(1) cannot memorize individual labels, so on long-tailed distributions, accuracy loss is inherent.
+Any algorithm satisfying this is (e^ε - 1 + δ)-memorization limited.
+
+**Theorem 4.8 (DP limits memorization):** For (ε, δ)-differentially label-private prediction algorithm A and arbitrary label distribution ρ:
+
+```
+Pr_{y~ρ, h~A(S^{i←y})}[h(x) = y] ≤ e^ε · ‖ρ‖_∞ + δ
+```
+
+This yields:
+
+```
+E[errn_S(A, 1)] ≥ E[Σ_{i: x_i ∈ X_{S#1}} (1 - e^ε · ‖F(x_i|S\i)‖_∞ - δ)]
+```
+
+And consequently:
+
+```
+ε̄(π, F, A) ≥ opt(π, F) + τ₁ · E[Σ_{i: x_i ∈ X_{S#1}} conf(S,i,F) · (1 - e^ε · ‖F(x_i|S\i)‖_∞ - δ)]
+```
+
+The proof follows from the DP definition: Pr[h(x)=y] ≤ e^ε · Pr_{A(S)}[h(x)=y] + δ, so taking the expectation over ρ yields e^ε · ‖ρ‖_∞ + δ.
+
+**Extension to ℓ examples via group privacy:** If ℓ labels are changed, the resulting distributions are (ℓε, ℓ·e^{ℓ-1}·δ)-close. The total weight of subpopulations with at most ℓ examples is significant in most modern datasets, formally explaining at least some of the gap between DP and non-DP results.
+
+**Uniform stability:** Uniform prediction stability [Bousquet & Elisseeff, 2002; Dwork & Feldman, 2018] requires that changing any point changes the label distribution on any point by at most γ in TV distance. γ-uniform stability implies both γ-memorization limited and (0, γ)-differentially private for predictions, so Corollary 4.6 applies.
 
 ### 4.4 Disparate Effect on Minority Subgroups
 
-The cost of limiting memorization differs across subgroups, quantified numerically.
+Corollary 4.6 and Theorem 4.8 imply that limiting memorization increases generalization error on long-tailed distributions. Crucially, the excess error depends on the prior π, problem hardness, and sample count n, implying that **when the data distribution is a mixture of subgroups with different properties, the cost of limiting memorization can differ across subgroups**. In particular, the cost is higher for smaller subgroups or those with more distinct subpopulations. These effects were empirically confirmed for DP by [Bagdasaryan & Shmatikov, 2019] and for model compression by [Hooker et al., 2020a, 2020b], who also demonstrated that the error increase is **most pronounced on atypical examples**.
 
-**Setup:** 10-class classification, N = 5,000 subpopulations, Zipf prior, n = 50,000, γ = 0.5
+**Numerical example:** 10-class classification, N = 5,000 subpopulations, Zipf prior, γ = 0.5 (the choice of γ does not affect comparisons as it scales excess error uniformly across subgroups)
 
 | Scenario | opt(π, F) | Cost of limited memorization |
 |----------|-----------|------------------------------|
@@ -191,7 +273,14 @@ The cost of limiting memorization differs across subgroups, quantified numerical
 | Fewer samples (N=5000, n=10000) | ≈ 0.113 | ≈ 0.035 |
 | Harder problem (N=25000, n=50000) | ≈ 0.107 | ≈ 0.031 |
 
-In a mixture P = 5/6·P₁ + 1/6·P₂, the **cost of limited memorization is more than twice higher for the smaller subgroup**. This aligns with empirical findings that DP training causes disproportionate accuracy drops on underrepresented subgroups [Bagdasaryan & Shmatikov, 2019].
+**Mixture analysis:**
+
+- **P = 5/6·P₁ + 1/6·P₂** (baseline + fewer samples, n=60,000): Each subgroup retains the same optimum and memorization cost, but the **cost of limited memorization is more than twice higher for the smaller subgroup**
+- **P = 1/2·P₁ + 1/2·P₃** (baseline + harder problem, n=100,000): The **cost of limited memorization is twice higher for the harder subgroup**
+
+The cost of memorization with 10 classes and γ = 0.5 equals the cost of (label) differential privacy for predictions with ε = ln(6) and δ ≈ 0, so the same conclusions follow from Theorem 4.8.
+
+Understanding these disparate effects enables mitigation strategies: applying **different levels of regularization (or compression)** per subgroup to balance costs, or using **different privacy parameters** per subgroup (assuming the additional privacy risk is justified by accuracy gains).
 
 ## 5. Known Empirical Evidence
 
