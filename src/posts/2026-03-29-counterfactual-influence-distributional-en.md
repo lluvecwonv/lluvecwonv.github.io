@@ -65,13 +65,46 @@ where $A_j$ is a model trained on $D_j$, and $\mathcal{L}_{A_j}(x_t)$ is its los
 
 **Total target dataset $D_t$:** $N_t = 1,500$ records (1,000 unique + 500 near-duplicate)
 
-### 3.3 Computing the Influence Matrix
+### 3.3 Computing the Influence Matrix: Why 1,000 Models Are Needed
 
-- **$M = 1,000$ models** trained
-- Each model $A_j$: each record independently included with probability 0.5 → **average training set size $N_t/2 = 750$**
-- **Partition matrix** $P \in \{0, 1\}^{N_t \times M}$
-- **Full influence matrix** $I \in \mathbb{R}^{N_t \times N_t}$: $I_{it} = \mathcal{I}(x_i \Rightarrow x_t)$
-- Diagonal entries = self-influence
+The influence $\mathcal{I}(x_i \Rightarrow x_t)$ is an **expectation**. A single model gives only one loss value for "$x_i$ included" — far too noisy for reliable estimation. Therefore, **many models must be trained to approximate the expectation**.
+
+**Concrete procedure:**
+
+**Step 1. Generate the partition matrix**
+
+Create a binary matrix $P \in \{0, 1\}^{1500 \times 1000}$ (1,500 records × 1,000 models). Each entry $p_{ij}$ is sampled **independently with probability 0.5**:
+
+$$p_{ij} = \begin{cases} 1 & \text{(include record } x_i \text{ in model } A_j\text{'s training data)} \\ 0 & \text{(exclude)} \end{cases}$$
+
+Each model $A_j$'s training set $D_j$ thus contains **~750 records on average**, with different records included for different models.
+
+**Step 2. Train 1,000 models**
+
+Fine-tune GPT-Neo 1.3B on each $D_j$, producing 1,000 distinct models.
+
+**Step 3. Measure loss for all records on all models**
+
+For each trained model $A_j$, compute the loss $\mathcal{L}_{A_j}(x_t)$ for **all 1,500 records** $x_t$. This yields a $1500 \times 1000$ loss matrix.
+
+**Step 4. Estimate influence — the key trick**
+
+To estimate the influence of a specific pair $(x_i, x_t)$:
+
+- Among the 1,000 models, those where **$x_i$ was included** (~500 models): compute the mean of $\mathcal{L}_{A_j}(x_t)$
+- Among the 1,000 models, those where **$x_i$ was excluded** (~500 models): compute the mean of $\mathcal{L}_{A_j}(x_t)$
+
+$$\hat{\mathcal{I}}(x_i \Rightarrow x_t) = \underset{j: p_{ij}=0}{\text{mean}}[\mathcal{L}_{A_j}(x_t)] - \underset{j: p_{ij}=1}{\text{mean}}[\mathcal{L}_{A_j}(x_t)]$$
+
+This estimates **how much $x_i$ reduces the loss on $x_t$** (i.e., how much it helps).
+
+**Why this method is efficient:**
+
+The key insight is that **the same 1,000 models can estimate all $(x_i, x_t)$ pairs simultaneously**. Each model $A_j$ contributes information about every record pair through the partition matrix's $j$-th column. This fills the entire $1,500 \times 1,500 = 2,250,000$ influence matrix.
+
+**For self-influence:** When $x_i = x_t$, this becomes "the difference in loss on itself when included vs. excluded from training" — these are the diagonal entries. They are estimated from the same 1,000 models.
+
+**Result:** The complete influence matrix $I \in \mathbb{R}^{1500 \times 1500}$, where diagonal = self-influence, off-diagonal = cross-influence.
 
 ### 3.4 Measuring Extraction
 

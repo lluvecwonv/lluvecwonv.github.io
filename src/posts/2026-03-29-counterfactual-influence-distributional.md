@@ -65,13 +65,46 @@ $$\mathcal{I}(x_i \Rightarrow x_t) = \underset{A_j: x_i \notin D_j}{\mathbb{E}} 
 
 **전체 타겟 데이터셋 $D_t$:** $N_t = 1,500$개 레코드 (unique 1,000 + near-duplicate 500)
 
-### 3.3 Influence Matrix 계산
+### 3.3 Influence Matrix 계산: 왜 1,000개 모델이 필요한가
 
-- **$M = 1,000$개 모델** 학습
-- 각 모델 $A_j$의 학습 데이터 $D_j$: 각 레코드를 독립적으로 확률 0.5로 포함/제외 → **평균 크기 $N_t/2 = 750$**
-- **Partition matrix** $P \in \{0, 1\}^{N_t \times M}$: $p_{ij} = 1$이면 $x_i$가 $D_j$에 포함
-- **전체 influence matrix** $I \in \mathbb{R}^{N_t \times N_t}$: $I_{it} = \mathcal{I}(x_i \Rightarrow x_t)$
-- 대각선 = self-influence
+influence $\mathcal{I}(x_i \Rightarrow x_t)$는 **기댓값(expectation)**이다. 모델 1개로는 "$x_i$가 포함된 경우의 loss" 하나만 얻을 수 있을 뿐, 안정적인 추정이 불가능하다. 따라서 **수많은 모델을 학습하여 기댓값을 근사**해야 한다.
+
+**구체적 절차:**
+
+**Step 1. Partition matrix 생성**
+
+1,500개 레코드 × 1,000개 모델의 이진 행렬 $P \in \{0, 1\}^{1500 \times 1000}$을 만든다. 각 원소 $p_{ij}$는 **독립적으로 확률 0.5**로 0 또는 1이 된다.
+
+$$p_{ij} = \begin{cases} 1 & \text{(레코드 } x_i \text{를 모델 } A_j \text{의 학습 데이터에 포함)} \\ 0 & \text{(제외)} \end{cases}$$
+
+따라서 각 모델 $A_j$의 학습 데이터 $D_j$는 **평균 750개 레코드**를 포함하며, 어떤 레코드가 포함되는지는 모델마다 다르다.
+
+**Step 2. 1,000개 모델 학습**
+
+각 모델 $A_j$를 해당 $D_j$에서 GPT-Neo 1.3B를 파인튜닝하여 학습한다. 이렇게 1,000개의 서로 다른 모델이 생긴다.
+
+**Step 3. 각 모델에서 모든 레코드의 loss 측정**
+
+학습된 각 모델 $A_j$에 대해, **모든 1,500개 레코드** $x_t$의 loss $\mathcal{L}_{A_j}(x_t)$를 계산한다. 이 결과로 $1500 \times 1000$ 크기의 loss 행렬을 얻는다.
+
+**Step 4. Influence 추정 — 핵심 트릭**
+
+특정 쌍 $(x_i, x_t)$의 influence를 추정하려면:
+
+- 1,000개 모델 중 **$x_i$가 포함된 모델들** (약 500개): 이 모델들의 $\mathcal{L}_{A_j}(x_t)$ 평균을 구함
+- 1,000개 모델 중 **$x_i$가 제외된 모델들** (약 500개): 이 모델들의 $\mathcal{L}_{A_j}(x_t)$ 평균을 구함
+
+$$\hat{\mathcal{I}}(x_i \Rightarrow x_t) = \underset{j: p_{ij}=0}{\text{mean}}[\mathcal{L}_{A_j}(x_t)] - \underset{j: p_{ij}=1}{\text{mean}}[\mathcal{L}_{A_j}(x_t)]$$
+
+즉, "$x_i$가 없을 때의 평균 loss"에서 "$x_i$가 있을 때의 평균 loss"를 빼면, **$x_i$가 $x_t$의 loss를 얼마나 줄이는지**(= 얼마나 도움이 되는지)를 추정할 수 있다.
+
+**왜 이 방법이 효율적인가:**
+
+핵심은 **같은 1,000개 모델로 모든 $(x_i, x_t)$ 쌍의 influence를 동시에 추정**할 수 있다는 점이다. 모델 $A_j$를 학습하면, partition matrix의 $j$번째 열이 어떤 레코드가 포함/제외되었는지를 알려주므로, 이 모델 하나로 모든 레코드 쌍에 대한 정보를 기여한다. 결과적으로 $1,500 \times 1,500 = 2,250,000$개의 influence 값을 모두 채울 수 있다.
+
+**Self-influence의 경우:** $x_i = x_t$일 때, 즉 "자기 자신이 학습에 포함되었을 때 vs 제외되었을 때 자기 자신에 대한 loss 차이"가 대각선 원소가 된다. 이것도 동일한 1,000개 모델에서 추정된다.
+
+**결과:** 전체 influence matrix $I \in \mathbb{R}^{1500 \times 1500}$이 완성되며, 대각선 = self-influence, 비대각선 = cross-influence이다.
 
 ### 3.4 Extractability 측정
 
