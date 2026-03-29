@@ -1,5 +1,5 @@
 ---
-title: "OLMo 2: 완전 오픈소스 LLM의 새로운 이정표 (2 OLMo 2 Furious)"
+title: "OLMo 2: A New Milestone in Fully Open Language Models (2 OLMo 2 Furious) 논문 정리"
 date: "2026-03-21"
 summary: "Allen Institute for AI(Ai2)의 OLMo 2는 7B, 13B, 32B 파라미터의 완전 오픈소스 언어 모델로, 학습 데이터/코드/체크포인트를 모두 공개하면서도 Qwen 2.5, Llama 3.1 등 기존 오픈웨이트 모델과 경쟁력 있는 성능을 달성했다."
 tags: ["LLM", "OLMo", "Open Source", "Pretraining", "Post-Training", "RLVR"]

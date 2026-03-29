@@ -1,5 +1,5 @@
 ---
-title: "MUSE: 언어 모델을 위한 6차원 머신 언러닝 평가 벤치마크"
+title: "MUSE: Machine Unlearning Six-Way Evaluation for Language Models 논문 정리"
 date: 2026-03-10
 category: 연구노트
 tags: [Machine Unlearning, LLM, Privacy, Copyright, Benchmark, NeurIPS 2024]

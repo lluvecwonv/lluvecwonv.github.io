@@ -1,5 +1,5 @@
 ---
-title: "CompactDS: 놀랍도록 단순한 검색이 추론 집약적 벤치마크를 개선한다"
+title: "CompactDS: Frustratingly Simple Retrieval Improves Challenging, Reasoning-Intensive Benchmarks 논문 정리"
 date: 2026-03-28
 summary: "기존 RAG가 추론 집약적 태스크에 무효하다는 통념을 뒤집는 연구. 380B 단어 규모의 다양하고 고품질인 웹 스케일 데이터스토어 CompactDS를 구축하고, ANN+Exact Search 2단계 파이프라인으로 단일 노드에서 서브초 지연 검색을 달성. LLaMA 3.1 8B에서 MMLU +10%, MMLU Pro +33%, GPQA +14%, MATH +19% 향상. Google Search 기반 RAG를 능가하며, Search-o1 같은 복잡한 에이전틱 RAG 시스템에도 필적. ICLR 2026 논문."
 tags: [RAG, Retrieval, LLM, Datastore, Dense Retrieval, ICLR 2026, 연구노트]

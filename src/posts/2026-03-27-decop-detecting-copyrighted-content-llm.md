@@ -1,5 +1,5 @@
 ---
-title: "DE-COP: LLM 학습 데이터 내 저작권 콘텐츠 탐지 논문 분석"
+title: "DE-COP: Detecting Copyrighted Content in LLM Training Data 논문 분석"
 date: 2026-03-27
 summary: "LLM의 학습 데이터에 저작권 콘텐츠가 포함되었는지를 다지선다형 질문(MCQA) 방식으로 탐지하는 DE-COP 방법론을 제안하는 ICML 2024 논문 분석. 원문과 패러프레이즈를 선택지로 제시하여 모델이 verbatim 텍스트를 얼마나 잘 식별하는지 측정. logit 접근 가능 모델에서 기존 최고 방법(Min-K%-Prob) 대비 9.6% AUC 개선, 완전 블랙박스 모델에서도 평균 72% 정확도 달성. BookTection(165권) 및 arXivTection(50편) 벤치마크 제공."
 tags: [LLM, Memorization, Copyright, Membership Inference, Black-Box Detection, ICML 2024, 연구노트]
