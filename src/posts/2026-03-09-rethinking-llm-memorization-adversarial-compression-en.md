@@ -28,8 +28,23 @@ If a model can reproduce training data using a prompt **shorter than the target 
 
 ## 1. Introduction — Why Do We Need a New Memorization Definition?
 
-Whether an LLM **memorizes** or **generalizes** from training data is a critical question legally, ethically, and technically.
-When a comedian repeats someone else's joke, it's plagiarism; when a novice learns by listening to a master's recording, it's learning — the distinction is subtle even for humans, and far more difficult for LLMs.
+A central question in the discussion of LLMs concerns the extent to which they **memorize** their training data versus how they **generalize** to new tasks and settings. Most practitioners seem to (at least informally) believe that LLMs do some degree of both: they clearly memorize parts of the training data — for example, are often able to reproduce large portions of training data verbatim [Carlini et al., 2023] — but they also seem to learn from this data, allowing them to generalize to new settings.
+
+The precise extent to which they do one or the other has **massive implications for the practical and legal aspects** of such models [Cooper et al., 2023]. Do LLMs truly produce new content, or do they only remix their training data? Should the act of training on copyrighted data be deemed unfair use of data, or should fair use be judged by the model's memorization? With respect to people, we distinguish plagiarizing content from learning from it, but how should this extend to LLMs? The answer to such questions inherently relates to the extent to which LLMs memorize their training data.
+
+However, even **defining memorization** for LLMs is challenging and many existing definitions leave a lot to be desired. Certain formulations claim that a passage from the training data is memorized if the LLM can reproduce it exactly [Nasr et al., 2023], but this ignores situations where, for instance, a prompt instructs the model to exactly repeat some phrase. Other formulations define memorization by whether prompting an LLM with a portion of text from the training set results in the completion of that training datum [Carlini et al., 2023], but these formalisms rely fundamentally on the completions being a certain size, and typically very lengthy generations are required for sufficient certainty of memorization.
+
+More crucially, these definitions are **too permissive** because they ignore situations where model developers can (for legal compliance) post-hoc "align" an LLM by instructing their models not to produce certain copyrighted content [Ippolito et al., 2023]. But has such an instructed model really not memorized the sample in question, or does the model still contain all the information about the datum in its weights while it hides behind an **illusion of compliance**? Asking such questions becomes critical because this illusion of "unlearning" can often be easily broken, as shown in Sections 4.1 and 4.3.
+
+In this work, the authors propose a new definition of memorization based on a **compression argument**. A phrase present in the training data is memorized if we can make the model reproduce the phrase using a prompt **(much) shorter than the phrase itself**. Operationalizing this definition requires finding the shortest adversarial input prompt that is specifically optimized to produce a target output. The ratio of input to output tokens is called the **Adversarial Compression Ratio (ACR)**. In other words, memorization is inherently tied to whether a certain output can be represented in a compressed form, beyond what language models can do with typical text.
+
+The authors argue that such a definition provides an intuitive notion of memorization — if a certain phrase exists within the LLM training data (e.g., is not itself generated text) and it can be reproduced with fewer input tokens than output tokens, then the phrase must be stored somehow within the weights of the LLM. Although it may be more natural to consider compression in terms of the LLM-based notions of input/output perplexity, the authors argue that a simple compression ratio based on input/output token counts provides a more intuitive explanation to non-technical audiences, and has the potential to serve as a legal basis for important questions about memorization and permissible data use.
+
+In addition to its intuitive nature, this definition has several other desirable qualities:
+
+- It appropriately ascribes many famous quotes as being memorized by existing LLMs (i.e., they have high ACR values)
+- Text not in the training data of an LLM, such as samples posted on the internet after the training period, are not compressible (their ACR is low)
+- Examining several unlearning methods using ACR shows that they do not substantially affect the memorization of the model — even after explicit finetuning, models asked to "forget" certain pieces of content are still able to reproduce them with a high ACR, not much smaller than with the original model
 
 The authors critique three existing memorization definitions:
 
