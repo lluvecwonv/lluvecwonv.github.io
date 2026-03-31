@@ -96,18 +96,6 @@ export default function Blog() {
       })
   }, [posts, activeCategory, blogLocale, searchQuery, activeTheme])
 
-  // Count posts per theme (for badge display)
-  const themeCounts = useMemo(() => {
-    if (activeCategory !== '연구노트') return {}
-    const langFiltered = posts
-      .filter((p) => p.category === '연구노트' && p.language === blogLocale)
-    const counts: Record<string, number> = { '전체': langFiltered.length }
-    researchThemes.slice(1).forEach((theme) => {
-      counts[theme] = langFiltered.filter((p) => getPostTheme(p) === theme).length
-    })
-    return counts
-  }, [posts, activeCategory, blogLocale])
-
   // Group posts by theme for accordion view (연구노트 only)
   const groupedByTheme = useMemo(() => {
     if (activeCategory !== '연구노트') return []
