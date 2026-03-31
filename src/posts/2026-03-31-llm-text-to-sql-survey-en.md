@@ -2,7 +2,7 @@
 title: "Large Language Model Enhanced Text-to-SQL Generation: A Survey — Paper Summary"
 date: 2026-03-31
 summary: "This survey systematically classifies LLM-based Text-to-SQL approaches into four categories — Prompt, Fine-Tuning, Task-Training, and LLM Agent — while comprehensively reviewing 20+ datasets and four evaluation metrics (EM, EX, VES, TS). It covers 20+ methods from DIN-SQL to MAC-SQL, providing a detailed taxonomy of backbone models, optimization strategies, and error handling mechanisms."
-tags: [LLM, Text-to-SQL, NLP, Prompt Engineering, Fine-Tuning, Agent, Survey, 연구노트]
+tags: [LLM, Text-to-SQL, NLP, Prompt Engineering, Fine-Tuning, Survey, 연구노트]
 category: 연구노트
 language: en
 ---
