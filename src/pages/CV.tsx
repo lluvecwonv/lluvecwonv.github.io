@@ -31,7 +31,7 @@ export default function CV() {
           <div className={styles.entry}>
             <div className={styles.entryHeader}>
               <strong>Master of Computer Science</strong>
-              <span className={styles.date}>Mar. 2024 – Present</span>
+              <span className={styles.date}>Mar. 2024 – Feb. 2026</span>
             </div>
             <div className={styles.entryDetail}>
               <span>Jeonbuk National University, Jeonju, Republic of Korea</span>
