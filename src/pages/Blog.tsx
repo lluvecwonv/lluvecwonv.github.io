@@ -16,6 +16,7 @@ const TravelGlobe = lazy(() => import('../components/TravelGlobe'))
 const CAT_PHOTO_URL = 'https://images.weserv.nl/?url=xspdvydnpreiccnpzunm.supabase.co/storage/v1/object/public/blog-images/cat-geumbi.heic&output=jpg&q=85'
 
 type ViewMode = 'grid' | 'list'
+const POSTS_PER_PAGE = 8
 
 export default function Blog() {
   const navigate = useNavigate()
@@ -30,6 +31,7 @@ export default function Blog() {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeTheme, setActiveTheme] = useState<ResearchTheme>('전체')
   const [expandedThemes, setExpandedThemes] = useState<Set<string>>(new Set())
+  const [currentPage, setCurrentPage] = useState(1)
 
   const toggleTheme = (theme: string) => {
     setExpandedThemes((prev) => {
@@ -68,6 +70,7 @@ export default function Blog() {
   // Reset theme filter when switching away from 연구노트
   const handleCategoryChange = (cat: Category) => {
     setActiveCategory(cat)
+    setCurrentPage(1)
     if (cat !== '연구노트') setActiveTheme('전체')
   }
 
@@ -120,6 +123,18 @@ export default function Blog() {
       }))
       .filter((group) => group.posts.length > 0)
   }, [posts, activeCategory, blogLocale, searchQuery])
+
+  // Pagination for non-연구노트 categories
+  const totalPages = Math.max(1, Math.ceil(filteredPosts.length / POSTS_PER_PAGE))
+  const paginatedPosts = useMemo(() => {
+    const start = (currentPage - 1) * POSTS_PER_PAGE
+    return filteredPosts.slice(start, start + POSTS_PER_PAGE)
+  }, [filteredPosts, currentPage])
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   return (
     <>
@@ -199,7 +214,7 @@ export default function Blog() {
                 className={styles.searchInput}
                 placeholder={blogLocale === 'ko' ? '논문 제목, 태그, 내용으로 검색...' : 'Search by title, tags, content...'}
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1) }}
               />
               {searchQuery && (
                 <button
@@ -318,20 +333,53 @@ export default function Blog() {
                 <TravelGlobe />
               </Suspense>
             ) : (
-              <div className={viewMode === 'grid' ? styles.grid : styles.list}>
-                {filteredPosts.map((post, i) => (
-                  <BlogCard
-                    key={post.slug}
-                    post={post}
-                    index={i}
-                    viewMode={viewMode}
-                    onDelete={isAdmin && post.source !== 'local' ? () => handleDelete(post.slug, post.title) : undefined}
-                  />
-                ))}
-                {filteredPosts.length === 0 && (
-                  <p className={styles.empty}>{t.empty}</p>
+              <>
+                <div className={viewMode === 'grid' ? styles.grid : styles.list}>
+                  {paginatedPosts.map((post, i) => (
+                    <BlogCard
+                      key={post.slug}
+                      post={post}
+                      index={i}
+                      viewMode={viewMode}
+                      onDelete={isAdmin && post.source !== 'local' ? () => handleDelete(post.slug, post.title) : undefined}
+                    />
+                  ))}
+                  {filteredPosts.length === 0 && (
+                    <p className={styles.empty}>{t.empty}</p>
+                  )}
+                </div>
+                {totalPages > 1 && (
+                  <div className={styles.pagination}>
+                    <button
+                      className={styles.pageBtn}
+                      disabled={currentPage === 1}
+                      onClick={() => handlePageChange(currentPage - 1)}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <polyline points="15 18 9 12 15 6" />
+                      </svg>
+                    </button>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <button
+                        key={page}
+                        className={`${styles.pageBtn} ${currentPage === page ? styles.pageActive : ''}`}
+                        onClick={() => handlePageChange(page)}
+                      >
+                        {page}
+                      </button>
+                    ))}
+                    <button
+                      className={styles.pageBtn}
+                      disabled={currentPage === totalPages}
+                      onClick={() => handlePageChange(currentPage + 1)}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <polyline points="9 18 15 12 9 6" />
+                      </svg>
+                    </button>
+                  </div>
                 )}
-              </div>
+              </>
             )}
           </div>
         </div>
