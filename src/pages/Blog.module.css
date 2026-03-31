@@ -356,6 +356,122 @@
   white-space: nowrap;
 }
 
+/* ── Accordion (연구노트 grouped view) ── */
+.accordionContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.accordionToolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.accordionSummary {
+  font-size: 13px;
+  color: var(--blog-text-muted);
+  font-weight: 500;
+}
+
+.accordionActions {
+  display: flex;
+  gap: 8px;
+}
+
+.accordionToggleAll {
+  font-size: 12px;
+  color: var(--blog-subtitle);
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--blog-border);
+  background: transparent;
+  transition: all var(--transition-fast);
+}
+
+.accordionToggleAll:hover {
+  border-color: var(--blog-border-strong);
+  color: var(--blog-title);
+}
+
+.accordionGroup {
+  border: 1px solid var(--blog-border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--blog-surface);
+  transition: border-color var(--transition-fast);
+}
+
+.accordionGroup:hover {
+  border-color: var(--blog-border-strong);
+}
+
+.accordionHeader {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  color: var(--blog-title);
+}
+
+.accordionHeader:hover {
+  background: var(--blog-active-bg);
+}
+
+.accordionLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.accordionArrow {
+  flex-shrink: 0;
+  color: var(--blog-subtitle);
+  transition: transform 0.2s ease;
+}
+
+.accordionOpen .accordionArrow {
+  transform: rotate(90deg);
+}
+
+.accordionTitle {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+
+.accordionBadge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 100px;
+  background: var(--accent);
+  color: #fff;
+  line-height: 1.4;
+}
+
+.accordionGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  padding: 0 16px 16px;
+}
+
+.accordionList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 16px 16px;
+}
+
 /* ── Responsive ── */
 @media (max-width: 900px) {
   .heroRow {
@@ -383,6 +499,10 @@
     grid-template-columns: 1fr;
   }
 
+  .accordionGrid {
+    grid-template-columns: 1fr;
+  }
+
   .title {
     font-size: 26px;
   }
@@ -400,5 +520,11 @@
   .toolbarActions {
     width: 100%;
     justify-content: space-between;
+  }
+
+  .accordionToolbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
 }

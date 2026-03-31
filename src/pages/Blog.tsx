@@ -5,8 +5,8 @@ import BlogCard from '../components/BlogCard'
 import LocaleToggle from '../components/LocaleToggle'
 import { useAdminAuth } from '../context/AdminAuthContext'
 import { useBlogTheme } from '../context/BlogThemeContext'
-import { getPosts, deletePost, categories } from '../data/posts'
-import type { Post, Category } from '../data/posts'
+import { getPosts, deletePost, categories, researchThemes, getPostTheme } from '../data/posts'
+import type { Post, Category, ResearchTheme } from '../data/posts'
 import { useBlogLocale, getBlogPageText } from '../lib/blogI18n'
 import type { ProjectLocale } from '../data/projectTranslations'
 import styles from './Blog.module.css'
@@ -28,6 +28,25 @@ export default function Blog() {
   const [posts, setPosts] = useState<Post[]>([])
   const [toast, setToast] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
+  const [activeTheme, setActiveTheme] = useState<ResearchTheme>('전체')
+  const [expandedThemes, setExpandedThemes] = useState<Set<string>>(new Set())
+
+  const toggleTheme = (theme: string) => {
+    setExpandedThemes((prev) => {
+      const next = new Set(prev)
+      if (next.has(theme)) next.delete(theme)
+      else next.add(theme)
+      return next
+    })
+  }
+
+  const expandAll = () => {
+    setExpandedThemes(new Set(researchThemes.filter((t) => t !== '전체')))
+  }
+
+  const collapseAll = () => {
+    setExpandedThemes(new Set())
+  }
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -46,6 +65,12 @@ export default function Blog() {
     }
   }
 
+  // Reset theme filter when switching away from 연구노트
+  const handleCategoryChange = (cat: Category) => {
+    setActiveCategory(cat)
+    if (cat !== '연구노트') setActiveTheme('전체')
+  }
+
   // For 연구노트 category, filter by selected language; for others show all (default: ko posts only)
   const filteredPosts = useMemo(() => {
     const q = searchQuery.toLowerCase().trim()
@@ -57,6 +82,10 @@ export default function Blog() {
         (p.category === '연구노트' || p.category === '알고리즘') ? p.language === blogLocale : p.language === 'ko'
       )
       .filter((p) => {
+        if (activeCategory !== '연구노트' || activeTheme === '전체') return true
+        return getPostTheme(p) === activeTheme
+      })
+      .filter((p) => {
         if (!q) return true
         return (
           p.title.toLowerCase().includes(q) ||
@@ -65,6 +94,43 @@ export default function Blog() {
           p.content.toLowerCase().includes(q)
         )
       })
+  }, [posts, activeCategory, blogLocale, searchQuery, activeTheme])
+
+  // Count posts per theme (for badge display)
+  const themeCounts = useMemo(() => {
+    if (activeCategory !== '연구노트') return {}
+    const langFiltered = posts
+      .filter((p) => p.category === '연구노트' && p.language === blogLocale)
+    const counts: Record<string, number> = { '전체': langFiltered.length }
+    researchThemes.slice(1).forEach((theme) => {
+      counts[theme] = langFiltered.filter((p) => getPostTheme(p) === theme).length
+    })
+    return counts
+  }, [posts, activeCategory, blogLocale])
+
+  // Group posts by theme for accordion view (연구노트 only)
+  const groupedByTheme = useMemo(() => {
+    if (activeCategory !== '연구노트') return []
+    const q = searchQuery.toLowerCase().trim()
+    const langFiltered = posts
+      .filter((p) => p.category === '연구노트' && p.language === blogLocale)
+      .filter((p) => {
+        if (!q) return true
+        return (
+          p.title.toLowerCase().includes(q) ||
+          p.summary.toLowerCase().includes(q) ||
+          p.tags.some((tag) => tag.toLowerCase().includes(q)) ||
+          p.content.toLowerCase().includes(q)
+        )
+      })
+
+    return researchThemes
+      .filter((t) => t !== '전체')
+      .map((theme) => ({
+        theme,
+        posts: langFiltered.filter((p) => getPostTheme(p) === theme),
+      }))
+      .filter((group) => group.posts.length > 0)
   }, [posts, activeCategory, blogLocale, searchQuery])
 
   return (
@@ -166,7 +232,7 @@ export default function Blog() {
                   <button
                     key={cat}
                     className={`${styles.catBtn} ${activeCategory === cat ? styles.catActive : ''}`}
-                    onClick={() => setActiveCategory(cat)}
+                    onClick={() => handleCategoryChange(cat)}
                   >
                     {cat}
                   </button>
@@ -198,7 +264,68 @@ export default function Blog() {
               </div>
             </div>
 
-            {activeCategory === '여행' ? (
+            {/* Accordion grouped view for 연구노트 */}
+            {activeCategory === '연구노트' ? (
+              <div className={styles.accordionContainer}>
+                <div className={styles.accordionToolbar}>
+                  <span className={styles.accordionSummary}>
+                    {blogLocale === 'ko'
+                      ? `${groupedByTheme.length}개 분류, ${groupedByTheme.reduce((s, g) => s + g.posts.length, 0)}편의 논문`
+                      : `${groupedByTheme.length} categories, ${groupedByTheme.reduce((s, g) => s + g.posts.length, 0)} papers`}
+                  </span>
+                  <div className={styles.accordionActions}>
+                    <button className={styles.accordionToggleAll} onClick={expandAll}>
+                      {blogLocale === 'ko' ? '모두 펼치기' : 'Expand All'}
+                    </button>
+                    <button className={styles.accordionToggleAll} onClick={collapseAll}>
+                      {blogLocale === 'ko' ? '모두 접기' : 'Collapse All'}
+                    </button>
+                  </div>
+                </div>
+
+                {groupedByTheme.map((group) => (
+                  <div key={group.theme} className={styles.accordionGroup}>
+                    <button
+                      className={`${styles.accordionHeader} ${expandedThemes.has(group.theme) ? styles.accordionOpen : ''}`}
+                      onClick={() => toggleTheme(group.theme)}
+                    >
+                      <div className={styles.accordionLeft}>
+                        <svg
+                          className={styles.accordionArrow}
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <polyline points="9 18 15 12 9 6" />
+                        </svg>
+                        <span className={styles.accordionTitle}>{group.theme}</span>
+                        <span className={styles.accordionBadge}>{group.posts.length}</span>
+                      </div>
+                    </button>
+                    {expandedThemes.has(group.theme) && (
+                      <div className={viewMode === 'grid' ? styles.accordionGrid : styles.accordionList}>
+                        {group.posts.map((post, i) => (
+                          <BlogCard
+                            key={post.slug}
+                            post={post}
+                            index={i}
+                            viewMode={viewMode}
+                            onDelete={isAdmin && post.source !== 'local' ? () => handleDelete(post.slug, post.title) : undefined}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+
+                {groupedByTheme.length === 0 && (
+                  <p className={styles.empty}>{t.empty}</p>
+                )}
+              </div>
+            ) : activeCategory === '여행' ? (
               <Suspense fallback={<p className={styles.empty}>{t.globeLoading}</p>}>
                 <TravelGlobe />
               </Suspense>
