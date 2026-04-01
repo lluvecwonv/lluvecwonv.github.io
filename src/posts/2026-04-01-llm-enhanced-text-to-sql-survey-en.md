@@ -3,7 +3,7 @@ title: Large Language Model Enhanced Text-to-SQL Generation: A Survey
 date: 2026-04-01
 summary: A comprehensive survey on LLM-enhanced Text-to-SQL generation, systematically analyzing four major categories of techniques including prompt engineering, fine-tuning, task-specific training, and agent-based systems. The paper reviews benchmark datasets, evaluation metrics, state-of-the-art performance, and identifies persistent challenges including natural language ambiguity, complex schema handling, and sophisticated query generation.
 tags: [LLM, Text-to-SQL, Survey, "Prompt Engineering", "Fine-tuning", Agent, "Multi-Agent", "Research Notes"]
-category: Research Notes
+category: 연구노트
 language: en
 ---
 

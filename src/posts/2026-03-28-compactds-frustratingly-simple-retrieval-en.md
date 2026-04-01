@@ -3,7 +3,7 @@ title: "CompactDS: Frustratingly Simple Retrieval Improves Challenging, Reasonin
 date: 2026-03-28
 summary: "Challenges the prevailing view that RAG is ineffective for reasoning-intensive tasks. Introduces CompactDS, a 380B-word diverse, high-quality web-scale datastore with a two-stage ANN+Exact Search pipeline enabling sub-second retrieval on a single node (456GB RAM). With LLaMA 3.1 8B, achieves +10% on MMLU, +33% on MMLU Pro, +14% on GPQA, and +19% on MATH. Outperforms Google Search-based RAG and matches complex agentic systems like Search-o1. Published at ICLR 2026."
 tags: [RAG, Retrieval, LLM, Datastore, Dense Retrieval, ICLR 2026, Research Notes]
-category: Research Notes
+category: 연구노트
 language: en
 ---
 

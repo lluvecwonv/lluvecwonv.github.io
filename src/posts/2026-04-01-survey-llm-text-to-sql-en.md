@@ -3,7 +3,7 @@ title: A Survey on Employing Large Language Models for Text-to-SQL Tasks
 date: 2026-04-01
 summary: A comprehensive survey published in ACM Computing Surveys 2024 on leveraging Large Language Models for Text-to-SQL tasks. Detailed analysis of prompt engineering, fine-tuning techniques, and experimental results including state-of-the-art benchmarks.
 tags: [LLM, Text-to-SQL, Survey, Prompt Engineering, Fine-tuning, Spider, BIRD, ACM, Research Notes]
-category: Research Notes
+category: 연구노트
 language: en
 ---
 

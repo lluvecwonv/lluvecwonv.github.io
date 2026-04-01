@@ -3,7 +3,7 @@ title: "Awesome LLM-based Text2SQL: A Comprehensive Resource Collection"
 date: 2026-04-01
 summary: "A comprehensive compilation of resources for LLM-based Text-to-SQL task. Includes 9 survey papers, 5 benchmarks, 14 datasets, 40+ In-Context Learning methods, 15+ Fine-tuning approaches, and various tools for natural language-to-SQL conversion research and applications."
 tags: [LLM, Text-to-SQL, Awesome List, GitHub, Survey, Benchmark, Spider, BIRD, Research]
-category: Research Notes
+category: 연구노트
 language: en
 ---
 

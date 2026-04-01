@@ -3,7 +3,7 @@ title: "The Surprising Effectiveness of Membership Inference with Simple N-Gram 
 date: 2026-03-11
 summary: "COLM 2025 paper. Addresses temporal distribution shift problems in existing MIA benchmarks and proposes new datasets: WikiMIA_2024 Hard and TULU Mix. Achieves membership inference attacks using only model output text based on n-gram coverage, matching or surpassing white-box attack performance. Comprehensive experiments on GPT-3.5/4/4o, LLaMA, TULU, Pythia, OLMo, and more."
 tags: [MIA, Membership Inference, Privacy, LLM, N-Gram, Black-Box Attack, Research Notes]
-category: Research Notes
+category: 연구노트
 language: en
 ---
 

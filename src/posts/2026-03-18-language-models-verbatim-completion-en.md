@@ -3,7 +3,7 @@ title: "Language Models May Verbatim Complete Text They Were Not Explicitly Trai
 date: 2026-03-18
 summary: "A paper by Ken Ziyu Liu et al. from Google and Stanford University, published at ICML 2025. This work demonstrates that LLMs can verbatim complete text sequences that are 'non-members' under n-gram based membership definitions. After removing extracted sequences from training data and retraining from scratch, ~40% are still completed (lingering sequences). Furthermore, adversarially constructed fine-tuning datasets (casing flips, token dropouts, chunking) with zero n-gram overlap can force verbatim completion of unseen target texts. This reveals fundamental limitations of n-gram membership definitions with implications for privacy, copyright, and AI safety."
 tags: [LLM, Memorization, Data Membership, n-gram, Verbatim Completion, Privacy, Copyright, ICML 2025, Research Notes]
-category: Research Notes
+category: 연구노트
 language: en
 ---
 

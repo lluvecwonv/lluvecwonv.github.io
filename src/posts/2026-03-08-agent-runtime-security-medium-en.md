@@ -3,7 +3,7 @@ title: Security Operations in the Agent Era: Why Shift-Left Alone Is Not Enough
 date: 2026-03-08
 summary: Based on Medium's latest AI agent security article, this post summarizes runtime control and integrated cost-security operational points for agent systems.
 tags: [AI, Agent, Security, FinOps, Medium]
-category: AI/Dev
+category: AI/개발
 language: en
 ---
 

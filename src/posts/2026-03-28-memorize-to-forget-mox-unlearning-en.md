@@ -3,7 +3,7 @@ title: "Memorize to Forget: Machine Unlearning without Gradient Ascent via Model
 date: 2026-03-28
 summary: "Analysis of MOX (MOdel eXtrapolation), a novel machine unlearning method that avoids gradient ascent's catastrophic collapse by training a memorization model via GD on the forget set, then extrapolating toward the reference model to obtain the forget model. Achieves FQ 0.0677, MU 0.6528 on TOFU benchmark, outperforming GA/NPO baselines with stable training. On MUSE, achieves Utility Preservation 54.8 with Privacy Leakage -18.4. Under review at ICLR 2026."
 tags: [Machine Unlearning, LLM, Gradient Ascent, Model Extrapolation, Privacy, ICLR 2026, Research Notes]
-category: Research Notes
+category: 연구노트
 language: en
 ---
 

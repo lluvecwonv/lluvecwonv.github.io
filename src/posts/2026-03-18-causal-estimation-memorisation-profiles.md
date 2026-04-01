@@ -3,7 +3,7 @@ title: "Causal Estimation of Memorisation Profiles"
 date: 2026-03-18
 summary: "Pietro Lesci et al. (Cambridge, ETH Zürich)의 ACL 2024 Long Paper. 계량경제학의 이중차분법(Difference-in-Differences)을 활용하여 LLM의 메모리제이션을 인과적으로 추정하는 새로운 방법을 제안한다. Pythia 모델 수트(70M~12B)에서 메모리제이션 프로파일을 분석한 결과, (i) 큰 모델일수록 메모리제이션이 강하고 지속적이며, (ii) 데이터 순서와 학습률에 의해 결정되고, (iii) 모델 크기 간 안정적인 추세를 보여 작은 모델에서 큰 모델의 메모리제이션을 예측할 수 있음을 발견하였다."
 tags: [LLM, Memorisation, Causal Inference, Difference-in-Differences, Pythia, Privacy, Copyright, ACL 2024, Research Notes]
-category: Research Notes
+category: 연구노트
 language: ko
 ---
 

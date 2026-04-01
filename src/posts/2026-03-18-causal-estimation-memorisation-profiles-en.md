@@ -3,7 +3,7 @@ title: "Causal Estimation of Memorisation Profiles"
 date: 2026-03-18
 summary: "A paper by Pietro Lesci et al. from University of Cambridge and ETH Zürich, published at ACL 2024 (Long Paper). This work proposes a new, principled, and efficient method to estimate memorisation based on the difference-in-differences (DiD) design from econometrics. Using this method to characterise memorisation profiles of the Pythia model suite (70M–12B), the authors find that memorisation is (i) stronger and more persistent in larger models, (ii) determined by data order and learning rate, and (iii) stable across model sizes, making memorisation in larger models predictable from smaller ones."
 tags: [LLM, Memorisation, Causal Inference, Difference-in-Differences, Pythia, Privacy, Copyright, ACL 2024, Research Notes]
-category: Research Notes
+category: 연구노트
 language: en
 ---
 

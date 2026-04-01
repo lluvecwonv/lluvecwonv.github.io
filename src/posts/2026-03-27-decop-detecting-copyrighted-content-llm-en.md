@@ -3,7 +3,7 @@ title: "DE-COP: Detecting Copyrighted Content in LLM Training Data - Paper Analy
 date: 2026-03-27
 summary: "An analysis of the ICML 2024 paper proposing DE-COP, a method to detect copyrighted content in LLM training data using multiple-choice question answering (MCQA). By presenting verbatim text alongside paraphrases and measuring how well a model identifies the original, DE-COP achieves 9.6% AUC improvement over Min-K%-Prob on models with logit access, and 72% average accuracy on fully black-box models where prior methods achieve only ~4%. Introduces BookTection (165 books) and arXivTection (50 papers) benchmarks."
 tags: [LLM, Memorization, Copyright, Membership Inference, Black-Box Detection, ICML 2024, Research Notes]
-category: Research Notes
+category: 연구노트
 language: en
 ---
 

@@ -3,7 +3,7 @@ title: "Paper Review: Recite, Reconstruct, Recollect – Memorization in LMs as 
 date: 2026-03-18
 summary: "A paper by USVSN Sai Prashanth, Alvin Deng, Kyle O'Brien, Naomi Saphra, Katherine Lee et al. from EleutherAI, Google DeepMind, and Harvard University, published at ICLR 2025. Rather than treating memorization as a homogeneous phenomenon, this work proposes a taxonomy inspired by human memory: Recitation (highly duplicated sequences), Reconstruction (inherently predictable templates), and Recollection (rare sequences). Using Pythia models (70M–12B) trained on The Pile, the authors demonstrate that different factors influence memorization likelihood differently depending on the taxonomic category, and that recollection grows fastest with model scale. A logistic regression predictor based on this taxonomy outperforms both a generic baseline and an optimally partitioned model."
 tags: [LLM, Memorization, Taxonomy, Pythia, Recitation, Reconstruction, Recollection, ICLR 2025, Research Notes]
-category: Research Notes
+category: 연구노트
 language: en
 ---
 

@@ -3,7 +3,7 @@ title: "Preserving Privacy Through DeMemorization: An Unlearning Technique For M
 date: 2026-03-12
 summary: "EMNLP 2023 paper. DeMem framework using PPO-based reinforcement learning to mitigate memorization in LLMs. Uses negative BERTScore as a reward signal to learn a paraphrasing policy, achieving ~94% N-SacreBLEU with only ~0.5% performance loss compared to Knowledge Unlearning. Comprehensive experiments on 6 models across 9 benchmarks."
 tags: [LLM, Memorization, Privacy, Unlearning, Reinforcement Learning, PPO, EMNLP, Research Notes]
-category: Research Notes
+category: 연구노트
 language: en
 ---
 

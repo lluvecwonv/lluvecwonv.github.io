@@ -3,7 +3,7 @@ title: Latest Medium AI Article: How GPT-4o mini Changes Product Design
 date: 2026-03-10
 summary: Based on a Medium AI article posted on 2026-03-09, this post summarizes the cost-latency-quality tradeoff in the GPT-4o mini era and provides a product design checklist.
 tags: [AI, Medium, GPT-4o mini, Product Design, Scaling Laws]
-category: AI/Dev
+category: AI/개발
 language: en
 ---
 

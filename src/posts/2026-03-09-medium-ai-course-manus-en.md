@@ -3,7 +3,7 @@ title: Deterministic Enterprise Governance: Latest AI Governance Article from Me
 date: 2026-03-09
 summary: Based on a Medium AI article from 2026-03-09, this post summarizes practical points about deterministic governance and process intelligence architecture for agent operations.
 tags: [AI, Medium, Governance, Agent, Enterprise]
-category: AI/Dev
+category: AI/개발
 language: en
 ---
 

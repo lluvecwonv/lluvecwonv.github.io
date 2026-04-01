@@ -3,7 +3,7 @@ title: "Paper Review: How Much Do Language Models Memorize?"
 date: 2026-03-22
 summary: "A paper from FAIR at Meta, Google DeepMind, Cornell University, and NVIDIA. The authors propose a new framework for quantitatively measuring how much language models memorize their training data. They formally separate memorization into unintended memorization and generalization using compression-based information theory. They measure that GPT-family transformers have an approximate capacity of 3.6 bits-per-parameter, and show that double descent begins exactly when data capacity exceeds model capacity. They also propose scaling laws for membership inference and validate on models up to 1.5B parameters."
 tags: [LLM, Memorization, Capacity, Information Theory, Kolmogorov Complexity, Scaling Laws, Membership Inference, Privacy, Research Notes]
-category: Research Notes
+category: 연구노트
 language: en
 ---
 

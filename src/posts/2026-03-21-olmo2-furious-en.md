@@ -3,7 +3,7 @@ title: "OLMo 2: A New Milestone in Fully Open Language Models (2 OLMo 2 Furious)
 date: "2026-03-21"
 summary: "OLMo 2 from Allen Institute for AI (Ai2) is a family of 7B, 13B, and 32B fully open language models that release training data, code, and checkpoints while achieving competitive performance against open-weight models like Qwen 2.5 and Llama 3.1."
 tags: ["LLM", "OLMo", "Open Source", "Pretraining", "Post-Training", "RLVR"]
-category: "Paper Review"
+category: "논문 리뷰"
 language: "en"
 ---
 

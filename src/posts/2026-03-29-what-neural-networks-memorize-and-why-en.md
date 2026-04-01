@@ -3,7 +3,7 @@ title: "What Neural Networks Memorize and Why: Discovering the Long Tail via Inf
 date: 2026-03-29
 summary: "First empirical validation of the long tail theory of memorization: label memorization in deep learning is necessary for close-to-optimal generalization on long-tailed distributions. Using subsampled memorization and influence estimators with 2,000–4,000 models on MNIST, CIFAR-100, and ImageNet, the paper shows memorized examples have higher marginal utility than random examples and discovers substantial high-influence train-test pairs where memorized training examples significantly boost accuracy on visually similar test examples. Most memorization happens in deep representations, not the last layer."
 tags: [Deep Learning, Memorization, Long Tail, Influence Estimation, Generalization, Privacy, ImageNet, CIFAR-100, Research Note]
-category: Research Note
+category: 연구노트
 language: en
 ---
 

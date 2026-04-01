@@ -3,7 +3,7 @@ title: "Measuring Memorization in Language Models via Probabilistic Extraction P
 date: 2026-04-01
 summary: "NAACL 2025 paper from Google DeepMind, Google, Microsoft Research, Stanford, and Northeastern. The authors point out the limitations of greedy-sampled discoverable extraction and propose (n,p)-discoverable extraction, which accounts for multiple queries under non-deterministic sampling. With no additional computational overhead, it can approximate extraction probability from a single query, revealing up to 5x higher extraction rates than greedy on Pythia 12B."
 tags: [LLM, Memorization, Privacy, Extraction, Sampling, NAACL, Research Notes]
-category: Research Notes
+category: 연구노트
 language: en
 ---
 

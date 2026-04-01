@@ -3,7 +3,7 @@ title: Claude Imports Memory: The Moment AI Assistant Switching Costs Drop
 date: 2026-03-07
 summary: Based on Medium AI weekly report, this post explains how Claude's memory import feature lowers user switching costs for AI assistants.
 tags: [AI, Claude, Anthropic, Medium, Productivity]
-category: AI/Dev
+category: AI/개발
 language: en
 ---
 

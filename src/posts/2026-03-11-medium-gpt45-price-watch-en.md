@@ -3,7 +3,7 @@ title: Latest Medium AI News: Product Operational Questions Raised by GPT-4.5 Pr
 date: 2026-03-11
 summary: Based on the latest Medium AI issues as of March 11, 2026 (Korean time), this post explains how to redesign product cost structures when launching high-performance models.
 tags: [AI, Medium, GPT-4.5, LLM Pricing, Product Strategy]
-category: AI/Dev
+category: AI/개발
 language: en
 ---
 

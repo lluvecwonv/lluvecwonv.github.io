@@ -3,7 +3,7 @@ title: SQL-of-Thought: Multi-agentic Text-to-SQL with Guided Error Correction
 date: 2026-04-01
 summary: This paper presents SQL-of-Thought, a multi-agentic framework leveraging six LLM-based agents for text-to-SQL conversion with guided error correction. The framework incorporates a systematic error taxonomy of 9 categories with 31 sub-categories and achieves 91.59% execution accuracy on the Spider dataset, surpassing existing methods.
 tags: [LLM, Text-to-SQL, Multi-Agent, Error Correction, SQL-of-Thought, Spider, NeurIPS, Research]
-category: Research Notes
+category: 연구노트
 language: en
 ---
 

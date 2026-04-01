@@ -3,7 +3,7 @@ title: "The Mosaic Memory of Large Language Models - Paper Analysis"
 date: 2026-03-29
 summary: "Analysis of a paper demonstrating that LLMs memorize by assembling information from similar sequences (fuzzy duplicates), a phenomenon called 'mosaic memory'. Across Llama-3.2, Phi-2, Gemma-2, and GPT-Neo, fuzzy duplicates with 10% token replacement contribute ρ=0.50–0.60 of an exact duplicate's memorization impact, and even 50% replacement yields ρ=0.15–0.19. The mosaic memory is shown to be predominantly syntactic rather than semantic, and fuzzy duplicates are found to be ubiquitous in real-world training data."
 tags: [LLM, Memorization, Fuzzy Duplicate, Mosaic Memory, Privacy, MIA, Deduplication, SlimPajama, Research Note]
-category: Research Note
+category: 연구노트
 language: en
 ---
 

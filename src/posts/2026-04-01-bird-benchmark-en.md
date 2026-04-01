@@ -3,7 +3,7 @@ title: Can LLM Already Serve as A Database Interface? A BIg Bench for Large-Scal
 date: 2026-04-01
 summary: The BIRD benchmark, presented at NeurIPS 2023, is a large-scale benchmark for evaluating LLM capabilities on Text-to-SQL tasks in realistic database environments. Comprising 12,751 question-SQL pairs across 95 real-world databases totaling 33.4 GB, it addresses realistic challenges including dirty data and external knowledge requirements.
 tags: [LLM, Text-to-SQL, BIRD, Benchmark, NeurIPS, Database, Evaluation, ResearchNote]
-category: Research Notes
+category: 연구노트
 language: en
 ---
 

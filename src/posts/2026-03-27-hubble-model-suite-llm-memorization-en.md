@@ -3,7 +3,7 @@ title: "Hubble: A Model Suite to Advance the Study of LLM Memorization - Paper A
 date: 2026-03-27
 summary: "An analysis of the ICLR 2026 paper presenting Hubble, a fully open-source model suite designed for systematic study of LLM memorization. Through standard/perturbed model variants (1B/8B parameters, 100B/500B tokens), the paper quantitatively measures memorization risks across copyright, privacy, and test set contamination domains, establishing dilution and ordering as two best practices. Also demonstrates Hubble's utility as a benchmark for membership inference attacks and machine unlearning."
 tags: [LLM, Memorization, Privacy, Copyright, Test Set Contamination, Machine Unlearning, Membership Inference, Open Source, ICLR 2026, Research Notes]
-category: Research Notes
+category: 연구노트
 language: en
 ---
 

@@ -3,7 +3,7 @@ title: "Counterfactual Influence as a Distributional Quantity - Paper Analysis"
 date: 2026-03-29
 summary: "ICML 2025 paper showing that self-influence alone severely underestimates memorization risks in the presence of near-duplicates. Computing the full influence matrix with 1,000 GPT-Neo 1.3B models on Natural Questions, records with near-duplicates have 3x lower self-influence but 5x higher extractability (BLEU). The proposed Top-1 Influence Margin effectively distinguishes unique records from those with near-duplicates. On CIFAR-10, influence distributions alone reveal natural near-duplicates."
 tags: [LLM, Memorization, Counterfactual Influence, Near-Duplicate, Extractability, Privacy, ICML 2025, Research Note]
-category: Research Note
+category: 연구노트
 language: en
 ---
 

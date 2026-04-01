@@ -81,9 +81,7 @@ export default function Blog() {
       ? posts
       : posts.filter((p) => p.category === activeCategory)
     )
-      .filter((p) =>
-        (p.category === '연구노트' || p.category === '알고리즘') ? p.language === blogLocale : p.language === 'ko'
-      )
+      .filter((p) => p.language === blogLocale)
       .filter((p) => {
         if (activeCategory !== '연구노트' || activeTheme === '전체') return true
         return getPostTheme(p) === activeTheme
@@ -152,12 +150,10 @@ export default function Blog() {
                 </p>
               </div>
               <div className={styles.headerActions}>
-                {(activeCategory === '연구노트' || activeCategory === '알고리즘') && (
-                  <LocaleToggle
-                    value={blogLocale as ProjectLocale}
-                    onChange={(v) => setBlogLocale(v as 'ko' | 'en')}
-                  />
-                )}
+                <LocaleToggle
+                  value={blogLocale as ProjectLocale}
+                  onChange={(v) => setBlogLocale(v as 'ko' | 'en')}
+                />
                 <button
                   type="button"
                   className={styles.themeBtn}

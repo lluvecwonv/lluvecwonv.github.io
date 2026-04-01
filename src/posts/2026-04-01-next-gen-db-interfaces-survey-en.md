@@ -3,7 +3,7 @@ title: "Next-Generation Database Interfaces: A Survey of LLM-based Text-to-SQL"
 date: 2026-04-01
 summary: "A comprehensive survey published in IEEE TKDE 2025 on LLM-based Text-to-SQL systems. This work provides an extensive taxonomy of approaches (ICL and Fine-tuning), technical challenges, benchmark analysis, and state-of-the-art results including GPT-4 achieving 85.3% EX on Spider."
 tags: [LLM, Text-to-SQL, Survey, TKDE, ICL, Fine-tuning, Spider, BIRD, Research Notes]
-category: Research Notes
+category: 연구노트
 language: en
 ---
 

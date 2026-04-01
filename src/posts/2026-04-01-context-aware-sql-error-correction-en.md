@@ -3,7 +3,7 @@ title: Context-Aware SQL Error Correction Using Few-Shot Learning
 date: 2026-04-01
 summary: Paper review of NVIDIA's few-shot learning-based SQL error correction method. This study introduces a context-aware SQL error correction approach leveraging similarity across Natural Language Queries (NLQ), error information, and SQL. The paper demonstrates effective error correction using RAG systems and achieves improved execution accuracy through systematic evaluation of multiple information integration strategies.
 tags: [LLM, Text-to-SQL, Error Correction, Few-Shot Learning, RAG, FAISS, CIKM, NVIDIA, Research Notes]
-category: Research Notes
+category: 연구노트
 language: en
 ---
 

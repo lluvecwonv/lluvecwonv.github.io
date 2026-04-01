@@ -3,7 +3,7 @@ title: "RewardFlow: Propagating Reward in the State Graphs of Agentic Learning w
 date: 2026-03-11
 summary: "ICLR 2026 Submission (Rejected). This paper proposes RewardFlow, a state graph-based reward propagation framework to address the sparse reward problem in multi-turn RL for LLM agents. By extending GRPO's trajectory-level rewards to the state level and generating dense rewards through BFS-based backpropagation, the method achieves Sokoban +28%, ALFWorld +12.5% improvements. Comprehensive analysis with OpenReview reviewer feedback (Rating 0/4/6)."
 tags: [LLM, Reinforcement Learning, GRPO, Reward Shaping, Credit Assignment, Agentic AI, Research Notes]
-category: Research Notes
+category: 연구노트
 language: en
 ---
 
