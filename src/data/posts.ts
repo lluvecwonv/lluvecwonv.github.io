@@ -5,10 +5,10 @@ export type Category = '전체' | 'AI/개발' | '연구노트' | '알고리즘' 
 export const categories: Category[] = ['전체', 'AI/개발', '연구노트', '알고리즘', '인사이트', '여행', '일상']
 
 // Research themes for 연구노트 sub-filtering
-export type ResearchTheme = '전체' | 'Memorization' | 'Unlearning' | 'MIA' | 'Reinforcement Learning' | 'RAG' | 'Open Source LLM' | 'Agentic AI' | '기타'
+export type ResearchTheme = '전체' | 'Memorization' | 'Unlearning' | 'MIA' | 'Reinforcement Learning' | 'RAG' | 'Open Source LLM' | 'Agentic AI' | 'Text-to-SQL' | '기타'
 
 export const researchThemes: ResearchTheme[] = [
-  '전체', 'Memorization', 'Unlearning', 'MIA', 'Reinforcement Learning', 'RAG', 'Open Source LLM', 'Agentic AI', '기타'
+  '전체', 'Memorization', 'Unlearning', 'MIA', 'Reinforcement Learning', 'RAG', 'Open Source LLM', 'Agentic AI', 'Text-to-SQL', '기타'
 ]
 
 // Map of keywords to themes — if any tag contains a keyword, the post belongs to that theme
@@ -20,6 +20,7 @@ const themeKeywords: Record<Exclude<ResearchTheme, '전체' | '기타'>, string[
   'RAG': ['rag', 'retrieval'],
   'Open Source LLM': ['olmo', 'open source'],
   'Agentic AI': ['agentic', 'agent', 'multi-agent'],
+  'Text-to-SQL': ['text-to-sql', 'text2sql', 'sql', 'spider', 'bird', 'din-sql', 'sql-of-thought'],
 }
 
 export function getPostTheme(post: Post): ResearchTheme {
