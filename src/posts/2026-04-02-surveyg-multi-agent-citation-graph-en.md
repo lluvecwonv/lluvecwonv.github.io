@@ -2,7 +2,7 @@
 title: "SurveyG: Multi-Agent LLM Framework with Hierarchical Citation Graph"
 date: 2026-04-02
 summary: "SurveyG structures papers into a three-layer hierarchical citation graph (Foundation→Development→Frontier) capturing citation dependencies and semantic relatedness. Multi-agent LLMs traverse this graph horizontally and vertically to produce multi-level summaries, followed by a validation stage ensuring consistency, coverage, and factual accuracy."
-tags: [Survey Generation, Multi-Agent, Citation Graph, LLM, Research Notes]
+tags: [Report Generation, Survey Generation, Multi-Agent, Citation Graph, LLM, Research Notes]
 category: 연구노트
 language: en
 ---

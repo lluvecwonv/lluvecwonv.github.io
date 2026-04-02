@@ -5,10 +5,10 @@ export type Category = '전체' | 'AI/개발' | '연구노트' | '알고리즘' 
 export const categories: Category[] = ['전체', 'AI/개발', '연구노트', '알고리즘', '인사이트', '여행', '일상']
 
 // Research themes for 연구노트 sub-filtering
-export type ResearchTheme = '전체' | 'Memorization' | 'Unlearning' | 'MIA' | 'Reinforcement Learning' | 'RAG' | 'Open Source LLM' | 'Agentic AI' | 'Text-to-SQL' | '기타'
+export type ResearchTheme = '전체' | 'Memorization' | 'Unlearning' | 'MIA' | 'Reinforcement Learning' | 'Report Generation' | 'RAG' | 'Open Source LLM' | 'Agentic AI' | 'Text-to-SQL' | '기타'
 
 export const researchThemes: ResearchTheme[] = [
-  '전체', 'Memorization', 'Unlearning', 'MIA', 'Reinforcement Learning', 'RAG', 'Open Source LLM', 'Agentic AI', 'Text-to-SQL', '기타'
+  '전체', 'Memorization', 'Unlearning', 'MIA', 'Reinforcement Learning', 'Report Generation', 'RAG', 'Open Source LLM', 'Agentic AI', 'Text-to-SQL', '기타'
 ]
 
 // Map of keywords to themes — if any tag contains a keyword, the post belongs to that theme
@@ -17,6 +17,7 @@ const themeKeywords: Record<Exclude<ResearchTheme, '전체' | '기타'>, string[
   'Unlearning': ['unlearning', 'machine unlearning'],
   'MIA': ['mia', 'membership inference'],
   'Reinforcement Learning': ['reinforcement learning', '강화학습', 'rl', 'ppo', 'grpo', 'dapo', 'rloo'],
+  'Report Generation': ['report generation', 'survey generation', 'automated survey'],
   'RAG': ['rag', 'retrieval'],
   'Open Source LLM': ['olmo', 'open source'],
   'Agentic AI': ['agentic', 'agent', 'multi-agent'],

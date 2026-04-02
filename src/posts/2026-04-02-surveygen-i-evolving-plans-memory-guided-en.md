@@ -2,7 +2,7 @@
 title: "SurveyGen-I: Consistent Survey Generation with Evolving Plans and Memory"
 date: 2026-04-02
 summary: "SurveyGen-I addresses consistency in long survey generation through coarse-to-fine retrieval, PlanEvo (dynamic planning with evolving memory), and CaM-Writing (citation-aware memory-guided generation). Achieves 8.5% content quality improvement, 27% citation density increase, and 2x more distinct references vs. strongest baseline."
-tags: [Survey Generation, LLM, Memory-Guided, Planning, IJCNLP, Research Notes]
+tags: [Report Generation, Survey Generation, LLM, Memory-Guided, Planning, IJCNLP, Research Notes]
 category: 연구노트
 language: en
 ---

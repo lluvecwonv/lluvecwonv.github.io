@@ -2,7 +2,7 @@
 title: "Speed Always Wins: A Survey on Efficient Architectures for LLMs"
 date: 2026-04-02
 summary: "Systematic examination of efficient LLM architectures that address Transformer's quadratic complexity bottleneck. Covers four families: linear sequence modeling (Mamba, RWKV, Linear Attention), sparse sequence modeling (local/dilated/hash-based attention), efficient full attention variants (FlashAttention, MQA, GQA), and sparse Mixture-of-Experts (Switch Transformer, Mixtral)."
-tags: [LLM, Efficient Architecture, Transformer, Mamba, MoE, Linear Attention, Survey, Research Notes]
+tags: [Report Generation, LLM, Efficient Architecture, Transformer, Mamba, MoE, Linear Attention, Survey, Research Notes]
 category: 연구노트
 language: en
 ---

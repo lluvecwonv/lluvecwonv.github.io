@@ -2,7 +2,7 @@
 title: "A Comprehensive Survey of RAG: Evolution, Current Landscape and Future Directions"
 date: 2026-04-02
 summary: "Traces RAG's evolution from early concepts (Lewis et al. 2020, REALM) through retrieval advances (sparse→dense→hybrid) to modern approaches (Self-RAG, Corrective RAG, Adaptive RAG). Covers scalability, bias, ethical concerns, and hallucination mitigation challenges."
-tags: [RAG, Survey, LLM, Knowledge-Intensive, Evolution, Research Notes]
+tags: [Report Generation, RAG, Survey, LLM, Knowledge-Intensive, Evolution, Research Notes]
 category: 연구노트
 language: en
 ---

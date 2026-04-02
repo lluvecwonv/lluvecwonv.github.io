@@ -2,7 +2,7 @@
 title: "Retrieval-Augmented Generation for AI-Generated Content: A Survey"
 date: 2026-04-02
 summary: "A comprehensive survey on how RAG is applied across multiple AIGC modalities — text, code, images, audio, video, 3D, and science. Covers the fundamental retrieval-generation pipeline, modality-specific techniques, and future research directions including cross-modal RAG and evaluation standardization."
-tags: [RAG, Retrieval-Augmented Generation, AIGC, LLM, Survey, Research Notes]
+tags: [Report Generation, RAG, Retrieval-Augmented Generation, AIGC, LLM, Survey, Research Notes]
 category: 연구노트
 language: en
 ---

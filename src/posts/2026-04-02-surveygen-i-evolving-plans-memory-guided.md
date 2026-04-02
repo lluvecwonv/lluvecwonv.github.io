@@ -2,7 +2,7 @@
 title: "SurveyGen-I: 진화하는 계획과 메모리 기반 서베이 생성"
 date: 2026-04-02
 summary: "SurveyGen-I는 coarse-to-fine 검색, 적응적 계획(PlanEvo), 메모리 기반 생성(CaM-Writing)을 결합한 서베이 자동 생성 프레임워크다. 기존 최강 베이스라인 대비 콘텐츠 품질 8.5% 향상, 인용 밀도 27% 증가, 고유 참고 문헌 수 2배 이상 달성한다."
-tags: [Survey Generation, LLM, Memory-Guided, Planning, IJCNLP, 연구노트]
+tags: [Report Generation, Survey Generation, LLM, Memory-Guided, Planning, IJCNLP, 연구노트]
 category: 연구노트
 language: ko
 ---

@@ -2,7 +2,7 @@
 title: "SurveyGen: Quality-Aware Scientific Survey Generation with LLMs"
 date: 2026-04-02
 summary: "SurveyGen presents a large-scale dataset of 4,200+ human-written surveys with 242,143 cited references and quality metadata, along with QUAL-SG, a quality-aware RAG framework that incorporates paper quality indicators into literature retrieval for higher-quality survey generation."
-tags: [Survey Generation, LLM, RAG, Quality-Aware, Dataset, EMNLP, Research Notes]
+tags: [Report Generation, Survey Generation, LLM, RAG, Quality-Aware, Dataset, EMNLP, Research Notes]
 category: 연구노트
 language: en
 ---

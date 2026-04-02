@@ -2,7 +2,7 @@
 title: "Retrieval-Augmented Generation for AI-Generated Content: 종합 서베이"
 date: 2026-04-02
 summary: "RAG(Retrieval-Augmented Generation)가 텍스트, 코드, 이미지, 오디오, 비디오, 3D, 과학 등 다양한 AIGC 모달리티에 어떻게 적용되는지를 체계적으로 정리한 서베이. RAG의 기본 구조(검색→생성 파이프라인)에서부터 각 모달리티별 특화 기법, 향후 연구 방향까지 포괄한다."
-tags: [RAG, Retrieval-Augmented Generation, AIGC, LLM, Survey, 연구노트]
+tags: [Report Generation, RAG, Retrieval-Augmented Generation, AIGC, LLM, Survey, 연구노트]
 category: 연구노트
 language: ko
 ---

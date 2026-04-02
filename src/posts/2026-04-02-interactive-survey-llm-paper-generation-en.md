@@ -2,7 +2,7 @@
 title: "InteractiveSurvey: An LLM-based Personalized and Interactive Survey Paper Generation System"
 date: 2026-04-02
 summary: "InteractiveSurvey enables users to generate structured, multi-modal survey papers through an interactive pipeline where they can customize reference categorization, outlines, and content at each stage. The system outperforms mainstream LLMs and state-of-the-art survey generation systems across 40 topics from 8 research fields, producing a high-quality survey with ~50 references in just 35 minutes."
-tags: [Survey Generation, LLM, Interactive, Personalized, Research Notes]
+tags: [Report Generation, Survey Generation, LLM, Interactive, Personalized, Research Notes]
 category: 연구노트
 language: en
 ---

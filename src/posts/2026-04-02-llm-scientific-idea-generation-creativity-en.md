@@ -2,7 +2,7 @@
 title: "LLMs for Scientific Idea Generation: A Creativity-Centered Survey"
 date: 2026-04-02
 summary: "A systematic survey of LLM-driven scientific ideation through the lens of creativity theory. Applies Boden's taxonomy (exploratory/combinational/transformational) and Rhodes' 4Ps framework to analyze five method families: external knowledge augmentation, prompt-based distributional steering, inference-time scaling, multi-agent collaboration, and parameter-level adaptation."
-tags: [LLM, Scientific Discovery, Creativity, Idea Generation, Survey, Research Notes]
+tags: [Report Generation, LLM, Scientific Discovery, Creativity, Idea Generation, Survey, Research Notes]
 category: 연구노트
 language: en
 ---

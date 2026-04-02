@@ -2,7 +2,7 @@
 title: "A Survey on Code Generation with LLM-based Agents"
 date: 2026-04-02
 summary: "Traces the evolution of LLM-based code generation agents, identifying three core features: autonomy (independent workflow management), expanded task scope (full SDLC coverage), and engineering practicality. Categorizes single-agent and multi-agent architectures, surveys applications across the entire software development lifecycle, and catalogs representative tools."
-tags: [Code Generation, LLM, Agent, SDLC, Multi-Agent, Survey, Research Notes]
+tags: [Report Generation, Code Generation, LLM, Agent, SDLC, Multi-Agent, Survey, Research Notes]
 category: 연구노트
 language: en
 ---

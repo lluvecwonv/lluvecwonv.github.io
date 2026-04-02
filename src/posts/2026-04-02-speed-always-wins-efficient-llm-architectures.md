@@ -2,7 +2,7 @@
 title: "Speed Always Wins: 효율적 LLM 아키텍처 서베이"
 date: 2026-04-02
 summary: "Transformer의 고유한 한계(이차 복잡도, 메모리 병목)를 극복하기 위한 효율적 LLM 아키텍처를 체계적으로 분석한 서베이. 선형 시퀀스 모델링(Mamba, RWKV 등), 희소 시퀀스 모델링, 효율적 풀 어텐션 변형, 그리고 희소 Mixture-of-Experts(MoE)까지 포괄한다."
-tags: [LLM, Efficient Architecture, Transformer, Mamba, MoE, Linear Attention, Survey, 연구노트]
+tags: [Report Generation, LLM, Efficient Architecture, Transformer, Mamba, MoE, Linear Attention, Survey, 연구노트]
 category: 연구노트
 language: ko
 ---

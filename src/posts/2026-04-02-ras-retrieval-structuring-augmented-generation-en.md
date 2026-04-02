@@ -2,7 +2,7 @@
 title: "RAS: A Survey on Retrieval And Structuring Augmented Generation"
 date: 2026-04-02
 summary: "Goes beyond standard RAG by introducing a structuring stage between retrieval and generation. Examines retrieval mechanisms (sparse/dense/hybrid), text structuring techniques (taxonomy construction, hierarchical classification, information extraction), and LLM integration methods (prompt-based, reasoning frameworks, knowledge embedding)."
-tags: [RAG, RAS, Structured Knowledge, LLM, KDD, Survey, Research Notes]
+tags: [Report Generation, RAG, RAS, Structured Knowledge, LLM, KDD, Survey, Research Notes]
 category: 연구노트
 language: en
 ---
