@@ -1,5 +1,5 @@
 ---
-title: "RAG 종합 서베이: 진화, 현재, 미래 방향"
+title: "A Comprehensive Survey of Retrieval-Augmented Generation (RAG): Evolution, Current Landscape and Future Directions"
 date: 2026-04-02
 summary: "Retrieval-Augmented Generation(RAG)의 탄생부터 현재까지의 진화를 추적하는 포괄적 서베이. RAG의 기본 아키텍처, 검색-생성 통합 방식, 지식 집약적 태스크에서의 핵심 혁신, 그리고 확장성·편향·윤리적 과제까지 다룬다. CMU 연구팀 작성."
 tags: [Report Generation, RAG, Survey, LLM, Knowledge-Intensive, Evolution, 연구노트]

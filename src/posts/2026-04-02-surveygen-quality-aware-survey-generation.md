@@ -1,5 +1,5 @@
 ---
-title: "SurveyGen: 품질 인식 기반 과학 서베이 자동 생성"
+title: "SurveyGen: Quality-Aware Scientific Survey Generation with Large Language Models"
 date: 2026-04-02
 summary: "SurveyGen은 4,200편 이상의 인간 작성 서베이와 242,143편의 인용 문헌으로 구성된 대규모 데이터셋과 함께, 문헌 검색 시 품질 지표를 반영하는 QUAL-SG 프레임워크를 제안한다. 콘텐츠 품질, 인용 품질, 구조적 일관성을 종합 평가하며, RAG 파이프라인에 품질 인식(quality-aware) 검색을 통합하여 더 높은 품질의 원천 논문을 선별한다."
 tags: [Report Generation, Survey Generation, LLM, RAG, Quality-Aware, Dataset, EMNLP, 연구노트]

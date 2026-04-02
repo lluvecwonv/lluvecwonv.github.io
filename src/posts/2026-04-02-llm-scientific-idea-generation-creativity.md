@@ -1,5 +1,5 @@
 ---
-title: "LLM의 과학적 아이디어 생성: 창의성 중심 서베이"
+title: "Large Language Models for Scientific Idea Generation: A Creativity-Centered Survey"
 date: 2026-04-02
 summary: "LLM 기반 과학적 아이디어 생성 방법론을 창의성 관점에서 체계적으로 정리한 서베이. Boden 분류법(탐색적/결합적/변환적 창의성)과 Rhodes 4P 프레임워크(Person/Process/Product/Press)를 적용하여 5가지 방법론 계열 — 외부 지식 보강, 프롬프트 기반 분포 조향, 추론 시간 스케일링, 멀티에이전트 협업, 파라미터 수준 적응 — 을 분석한다."
 tags: [Report Generation, LLM, Scientific Discovery, Creativity, Idea Generation, Survey, 연구노트]

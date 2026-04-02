@@ -1,5 +1,5 @@
 ---
-title: "SurveyG: 계층적 인용 그래프와 멀티에이전트 LLM 기반 서베이 생성"
+title: "SurveyG: A Multi-Agent LLM Framework with Hierarchical Citation Graph for Automated Survey Generation"
 date: 2026-04-02
 summary: "SurveyG는 논문 간 인용 관계와 의미적 유사성을 계층적 그래프(Foundation→Development→Frontier)로 구조화한 뒤, 멀티에이전트 LLM이 수평·수직 탐색을 통해 다층 요약을 생성하고, 검증 단계를 거쳐 최종 서베이를 완성하는 프레임워크다."
 tags: [Report Generation, Survey Generation, Multi-Agent, Citation Graph, LLM, 연구노트]

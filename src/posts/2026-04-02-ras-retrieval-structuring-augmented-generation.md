@@ -1,5 +1,5 @@
 ---
-title: "RAS: 검색과 구조화 증강 생성 서베이"
+title: "A Survey on Retrieval And Structuring Augmented Generation (RAS)"
 date: 2026-04-02
 summary: "기존 RAG를 넘어 Retrieval And Structuring(RAS) 증강 생성을 제안하는 서베이. 동적 정보 검색과 구조화된 지식 표현(택소노미 구축, 계층적 분류, 정보 추출)을 통합하며, 프롬프트 기반 방법, 추론 프레임워크, 지식 임베딩 등 LLM과의 통합 기법을 분석한다."
 tags: [Report Generation, RAG, RAS, Structured Knowledge, LLM, KDD, Survey, 연구노트]

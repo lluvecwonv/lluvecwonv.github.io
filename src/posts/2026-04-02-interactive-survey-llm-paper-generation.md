@@ -1,5 +1,5 @@
 ---
-title: "InteractiveSurvey: LLM 기반 맞춤형 서베이 논문 자동 생성 시스템"
+title: "InteractiveSurvey: An LLM-based Personalized and Interactive Survey Paper Generation System"
 date: 2026-04-02
 summary: "InteractiveSurvey는 LLM을 활용하여 사용자가 대화형으로 서베이 논문을 생성할 수 있는 시스템이다. 온라인 검색과 사용자 업로드를 통해 참고 문헌을 수집하고, 참고 문헌 분류·아웃라인·본문 생성의 각 단계에서 사용자가 개입하여 커스터마이즈할 수 있다. 8개 분야 40개 주제에서 주류 LLM 및 기존 서베이 생성 시스템을 능가하며, 약 50편의 참고 문헌으로 35분 만에 고품질 서베이를 생성한다."
 tags: [Report Generation, Survey Generation, LLM, Interactive, Personalized, 연구노트]

@@ -1,5 +1,5 @@
 ---
-title: "LLM 에이전트 기반 코드 생성 서베이"
+title: "A Survey on Code Generation with LLM-based Agents"
 date: 2026-04-02
 summary: "LLM 기반 코드 생성 에이전트의 발전 궤적을 추적하는 서베이. 단일 에이전트 및 멀티에이전트 아키텍처의 핵심 기법을 분류하고, 전체 소프트웨어 개발 생명주기(SDLC) 전반에 걸친 적용을 분석한다. 자율성, 확장된 태스크 범위, 엔지니어링 실용성 강화라는 세 가지 핵심 특성을 제시한다."
 tags: [Report Generation, Code Generation, LLM, Agent, SDLC, Multi-Agent, Survey, 연구노트]
