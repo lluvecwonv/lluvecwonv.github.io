@@ -1,5 +1,5 @@
 ---
-title: "FlowPlan-G2P: A Structured Generation Framework for Transforming Scientific Papers into Patent Descriptions 논문 정리"
+title: "FlowPlan-G2P: A Structured Generation Framework for Transforming Scientific Papers into Patent Descriptions"
 date: 2026-03-31
 summary: "매년 350만 건 이상의 특허가 출원되는 상황에서, 과학 논문을 법적 요건을 충족하는 특허 명세서로 자동 변환하는 FlowPlan-G2P 프레임워크를 제안한 논문. Concept Graph Induction → Paragraph Planning → Graph-Conditioned Generation의 3단계 파이프라인으로 전문가의 인지적 워크플로를 모사하며, Pat-DEVAL 기준 모든 차원에서 기존 baseline을 크게 능가한다."
 tags: [LLM, Patent, NLG, Graph-to-Text, Structured Generation, Agentic AI, 연구노트]

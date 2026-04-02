@@ -1,5 +1,5 @@
 ---
-title: "Counterfactual Influence as a Distributional Quantity 논문 분석"
+title: "Counterfactual Influence as a Distributional Quantity"
 date: 2026-03-29
 summary: "Self-influence(자기 영향)만으로는 near-duplicate가 존재하는 환경에서 LLM 암기를 제대로 측정할 수 없음을 보인 ICML 2025 논문. GPT-Neo 1.3B를 Natural Questions 데이터셋에서 1,000개 모델로 학습하여 전체 influence matrix를 계산. Near-duplicate가 있는 레코드는 self-influence가 3배 낮지만 extractability(BLEU)는 5배 높음. Top-1 Influence Margin 지표를 제안하여 unique record와 near-duplicate를 효과적으로 구분. CIFAR-10에서도 influence distribution만으로 near-duplicate 식별 가능."
 tags: [LLM, Memorization, Counterfactual Influence, Near-Duplicate, Extractability, Privacy, ICML 2025, 연구노트]

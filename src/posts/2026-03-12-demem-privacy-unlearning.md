@@ -1,5 +1,5 @@
 ---
-title: "Preserving Privacy Through DeMemorization: An Unlearning Technique For Mitigating Memorization Risks In Language Models 논문 분석"
+title: "Preserving Privacy Through DeMemorization: An Unlearning Technique For Mitigating Memorization Risks In Language Models"
 date: 2026-03-12
 summary: "EMNLP 2023 논문. PPO 기반 강화학습으로 LLM의 메모리제이션을 완화하는 DeMem 프레임워크 제안. 음수 BERTScore를 보상 신호로 사용해 패러프레이징 정책을 학습하여, Knowledge Unlearning 대비 ~0.5% 성능 손실만으로 ~94% N-SacreBLEU 달성. GPT-Neo/OPT (125M~2.7B) 6개 모델, 9개 벤치마크 종합 실험."
 tags: [LLM, Memorization, Privacy, Unlearning, Reinforcement Learning, PPO, EMNLP, 연구노트]

@@ -1,5 +1,5 @@
 ---
-title: Claude가 메모리를 옮겨온다: AI 어시스턴트 전환 비용이 낮아지는 순간
+title: "Claude Imports Memory: The Moment AI Assistant Switching Costs Drop"
 date: 2026-03-07
 summary: Medium AI 주간 리포트 기반으로, Claude의 메모리 가져오기 기능이 사용자 전환 비용을 어떻게 낮추는지 정리했습니다.
 tags: [AI, Claude, Anthropic, Medium, 생산성]

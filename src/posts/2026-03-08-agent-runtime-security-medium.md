@@ -1,5 +1,5 @@
 ---
-title: 에이전트 시대의 보안 운영: Shift-Left만으로는 부족한 이유
+title: "Security Operations in the Agent Era: Why Shift-Left Alone Is Not Enough"
 date: 2026-03-08
 summary: Medium의 최신 AI 에이전트 보안 글을 바탕으로, 런타임 통제와 비용·보안 통합 운영 포인트를 정리했습니다.
 tags: [AI, Agent, Security, FinOps, Medium]

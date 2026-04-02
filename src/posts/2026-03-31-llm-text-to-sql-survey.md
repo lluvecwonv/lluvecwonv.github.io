@@ -1,5 +1,5 @@
 ---
-title: "Large Language Model Enhanced Text-to-SQL Generation: A Survey — 논문 정리"
+title: "Large Language Model Enhanced Text-to-SQL Generation: A Survey"
 date: 2026-03-31
 summary: "자연어를 SQL로 변환하는 Text-to-SQL 태스크에 대해 LLM 기반 접근법을 Prompt, Fine-Tuning, Task-Training, LLM Agent 4가지 카테고리로 체계적으로 분류하고, 20개 이상의 데이터셋과 4가지 평가 메트릭(EM, EX, VES, TS)을 종합적으로 정리한 서베이 논문입니다."
 tags: [LLM, Text-to-SQL, NLP, Prompt Engineering, Fine-Tuning, Survey, 연구노트]

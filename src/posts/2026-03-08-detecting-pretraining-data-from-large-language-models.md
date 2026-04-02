@@ -1,5 +1,5 @@
 ---
-title: Detecting Pretraining Data from Large Language Models 논문 정리
+title: "Detecting Pretraining Data from Large Language Models"
 date: 2026-03-08
 summary: ICLR 2024 논문 Detecting Pretraining Data from Large Language Models를 바탕으로, pretraining data detection 문제와 MIN-K% PROB, WIKI MIA, 핵심 실험 결과를 정리했습니다.
 tags: [LLM, Membership Inference, Pretraining, Memorization, 연구노트]

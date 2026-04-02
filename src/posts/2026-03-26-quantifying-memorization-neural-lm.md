@@ -1,5 +1,5 @@
 ---
-title: "Quantifying Memorization Across Neural Language Models 논문 분석"
+title: "Quantifying Memorization Across Neural Language Models"
 date: 2026-03-26
 summary: "LLM의 암기(memorization)를 대규모로 정량 분석한 최초의 종합 연구. GPT-Neo, T5, OPT 세 모델 패밀리에 걸쳐 (1) 모델 크기, (2) 데이터 중복 횟수, (3) 컨텍스트 길이가 암기에 미치는 영향을 세 가지 log-linear 관계로 정립. GPT-J 6B 모델이 학습 데이터의 최소 1%를 추출 가능하게 암기하고 있음을 실증. 중복 제거(deduplication)의 효과와 한계, discoverability 현상도 분석."
 tags: [LLM, Memorization, Privacy, Scaling Laws, Data Duplication, GPT-Neo, T5, OPT, 연구노트]

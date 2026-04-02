@@ -1,5 +1,5 @@
 ---
-title: "Recite, Reconstruct, Recollect: Memorization in LMs as a Multifaceted Phenomenon 논문 정리"
+title: "Recite, Reconstruct, Recollect: Memorization in LMs as a Multifaceted Phenomenon"
 date: 2026-03-18
 summary: "EleutherAI, Google DeepMind, Harvard University 등의 USVSN Sai Prashanth, Alvin Deng, Kyle O'Brien, Naomi Saphra, Katherine Lee 등이 ICLR 2025에 발표한 논문. LLM의 기억화(memorization)를 단일 현상으로 취급하지 않고, 인간의 기억 방식에서 영감을 받아 Recitation(암송), Reconstruction(재구성), Recollection(회상)의 세 가지 분류체계(taxonomy)로 구분한다. Pythia 모델(70M~12B)과 The Pile 코퍼스를 사용하여, 각 카테고리가 모델 크기와 학습 시간에 따라 서로 다르게 변화하며, 특히 Recollection이 가장 빠르게 증가함을 밝힌다. 이 분류체계를 기반으로 로지스틱 회귀 예측 모델을 구축하여, 분류체계 없는 베이스라인과 최적 파티션 모델보다 우수한 성능을 달성한다."
 tags: [LLM, Memorization, Taxonomy, Pythia, Recitation, Reconstruction, Recollection, ICLR 2025, 연구노트]

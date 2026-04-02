@@ -1,5 +1,5 @@
 ---
-title: "Language Models May Verbatim Complete Text They Were Not Explicitly Trained On 논문 정리"
+title: "Language Models May Verbatim Complete Text They Were Not Explicitly Trained On"
 date: 2026-03-18
 summary: "Google, Stanford University의 Ken Ziyu Liu et al.이 ICML 2025에 발표한 논문. LLM이 n-gram 기반 멤버십 정의에 따른 '비멤버(non-member)' 텍스트도 verbatim으로 완성할 수 있음을 보인다. 사전학습 데이터에서 추출된 시퀀스를 제거하고 처음부터 재학습해도 약 40%가 여전히 완성되며(lingering sequences), 적대적으로 구성한 파인튜닝 데이터(casing flip, token dropout, chunking)로 n-gram 중복 없이도 원본 텍스트를 verbatim 완성시킬 수 있다. 이는 n-gram 기반 멤버십 정의의 근본적 한계를 드러내며, 프라이버시·저작권·AI 안전성에 중요한 함의를 가진다."
 tags: [LLM, Memorization, Data Membership, n-gram, Verbatim Completion, Privacy, Copyright, ICML 2025, 연구노트]

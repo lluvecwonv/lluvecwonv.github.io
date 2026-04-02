@@ -1,5 +1,5 @@
 ---
-title: "PaperBanana: Automating Academic Illustration for AI Scientists 논문 정리"
+title: "PaperBanana: Automating Academic Illustration for AI Scientists"
 date: 2026-03-10
 summary: Google Cloud AI Research와 북경대의 공동 연구. 5개 특화 에이전트(Retriever, Planner, Stylist, Visualizer, Critic)를 오케스트레이션하여 학술 논문의 방법론 다이어그램과 통계 플롯을 자동 생성하는 agentic framework PaperBanana를 제안하고, NeurIPS 2025 기반 벤치마크에서 기존 베이스라인을 전면 초과 달성한 연구.
 tags: [Academic Illustration, Methodology Diagram, Statistical Plot, Multi-Agent, VLM, Image Generation, Agentic Framework, NeurIPS, 연구노트]

@@ -1,5 +1,5 @@
 ---
-title: Medium AI 최신 소식: GPT-4.5 가격 이슈가 던진 제품 운영 질문
+title: "Latest Medium AI News: Product Operational Questions Raised by GPT-4.5 Pricing"
 date: 2026-03-11
 summary: 2026년 3월 11일(한국시간) 기준으로 확인한 Medium AI 최신 이슈를 바탕으로, 고성능 모델 출시 시 제품 비용 구조를 어떻게 재설계해야 하는지 정리했습니다.
 tags: [AI, Medium, GPT-4.5, LLM Pricing, Product Strategy]

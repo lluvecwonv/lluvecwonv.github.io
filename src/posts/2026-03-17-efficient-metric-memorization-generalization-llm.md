@@ -1,5 +1,5 @@
 ---
-title: "Prior-Aware Memorization: An Efficient Metric for Distinguishing Memorization from Generalization in LLMs 논문 정리"
+title: "Prior-Aware Memorization: An Efficient Metric for Distinguishing Memorization from Generalization in LLMs"
 date: 2026-03-17
 summary: "LLM에서 암기(memorization)와 일반화(generalization)를 구분하는 계산 비용이 저렴한 새 메트릭 Prior-Aware(PA) Memorization 제안. 추가 모델 학습 없이 기존 LLM에 바로 적용 가능. Llama·OPT 모델 평가 결과, 기존에 '암기됨'으로 분류된 시퀀스의 55~90%가 실제로는 통계적으로 흔한(generalizable) 시퀀스임을 발견. Counterfactual Memorization과 양의 상관관계 확인. GPT-2 124M 모델 350개 이상 학습, Named Entity·Long Sequence·SATML Challenge 3가지 설정에서 평가."
 tags: [LLM, Memorization, Generalization, Privacy, Prior-Aware, Counterfactual Memorization, 연구노트]

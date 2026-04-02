@@ -1,5 +1,5 @@
 ---
-title: "A Multi-Perspective Analysis of Memorization in Large Language Models 논문 정리"
+title: "A Multi-Perspective Analysis of Memorization in Large Language Models"
 date: 2026-03-18
 summary: "The University of Tokyo의 Bowen Chen, Namgi Han, Yusuke Miyao가 발표한 논문. LLM의 기억화(memorization) 현상을 모델 크기 스케일링, 입출력 다이나믹스, 엔트로피 분석, 기억화 예측 등 다양한 관점에서 분석한다. Pythia 모델(70M~12B)과 Pile 코퍼스를 사용하여, (1) 기억화/비기억화 문장 수의 비선형적 변화, (2) 기억화/비기억화 콘텐츠 생성 시 boundary effect, (3) 임베딩 공간에서의 기억화 점수별 클러스터링, (4) Transformer를 이용한 기억화 예측 가능성을 밝힌다."
 tags: [LLM, Memorization, Scaling, Pythia, Boundary Effect, Embedding Dynamics, Entropy, 연구노트]

@@ -1,5 +1,5 @@
 ---
-title: Deterministic Enterprise Governance: Medium 최신 AI 거버넌스 글 정리
+title: "Deterministic Enterprise Governance: Latest AI Governance Article from Medium"
 date: 2026-03-09
 summary: 2026-03-09 Medium AI 최신 글을 바탕으로, 에이전트 운영에서 결정론적 거버넌스와 프로세스 인텔리전스 아키텍처의 실무 포인트를 정리했습니다.
 tags: [AI, Medium, 거버넌스, Agent, Enterprise]

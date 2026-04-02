@@ -1,5 +1,5 @@
 ---
-title: "Counterfactual Memorization in Neural Language Models 논문 정리"
+title: "Counterfactual Memorization in Neural Language Models"
 date: 2026-03-10
 summary: "Google Research, CMU, Google DeepMind, ETH Zürich의 NeurIPS 2023 논문. 사전학습 데이터의 특정 정보 기억 vs. 일반 지식을 구분하기 위한 인과적 프레임워크인 counterfactual memorization을 제안한다. 무작위 부분집합으로 400개 모델을 학습하여 각 학습 예제의 존재 여부가 모델 예측에 미치는 영향을 추정하면, 중복과 기억 간에 역의 상관관계(r = -0.39)를 발견한다. 테스트 시점에 정보 출처를 추적하는 counterfactual influence로 확장한다."
 tags: [LLM, 기억화, Counterfactual, Influence Functions, Privacy, NeurIPS, 연구노트]

@@ -1,5 +1,5 @@
 ---
-title: Medium AI 최신 글: GPT-4o mini가 바꾸는 제품 설계 포인트
+title: "Latest Medium AI Article: How GPT-4o mini Changes Product Design"
 date: 2026-03-10
 summary: 2026-03-09에 게시된 Medium AI 글을 바탕으로, GPT-4o mini 시대의 비용-지연시간-품질 트레이드오프와 제품 설계 체크리스트를 정리했습니다.
 tags: [AI, Medium, GPT-4o mini, Product Design, Scaling Laws]

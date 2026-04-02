@@ -1,5 +1,5 @@
 ---
-title: "PerProb: Indirectly Evaluating Memorization in Large Language Models 논문 정리"
+title: "PerProb: Indirectly Evaluating Memorization in Large Language Models"
 date: 2026-03-18
 summary: "City University of Hong Kong의 Yihan Liao, Jacky Keung, Xiaoxue Ma 등이 발표한 논문. LLM의 기억화(memorization) 취약성을 간접적으로 평가하기 위한 라벨 프리(label-free) 프레임워크 PerProb를 제안한다. Perplexity(PPL)와 평균 로그 확률(λ(W))을 활용하여 shadow 모델과 victim 모델의 출력 차이를 비교함으로써, 학습 데이터 라벨 없이도 기억화 행동을 추정한다. MIA를 4가지 공격 패턴으로 분류하고, GPT-2, GPT-Neo (1.3B, 2.7B)에서 5개 데이터셋으로 실험한다. Knowledge Distillation, Early Stopping, Differential Privacy 등 방어 전략의 효과도 평가한다."
 tags: [LLM, Memorization, MIA, Membership Inference Attack, Privacy, Perplexity, GPT-2, GPT-Neo, 연구노트]

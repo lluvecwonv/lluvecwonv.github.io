@@ -1,5 +1,5 @@
 ---
-title: Does Learning Require Memorization? A Short Tale about a Long Tail 논문 정리
+title: Does Learning Require Memorization? A Short Tale about a Long Tail
 date: 2026-03-29
 summary: STOC 2020 논문. 자연 데이터의 long-tailed 분포에서 memorization이 최적 일반화를 위해 필수적임을 이론적으로 증명한 연구. Memorization 없이는 희귀 subpopulation에서의 성능 손실이 불가피하며, differential privacy와 model compression의 정확도 하락도 이 관점에서 설명한다.
 tags: [LLM, Memorization, Long-tail, Generalization, Differential Privacy, STOC, 연구노트]

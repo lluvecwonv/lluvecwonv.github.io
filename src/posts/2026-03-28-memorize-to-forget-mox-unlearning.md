@@ -1,5 +1,5 @@
 ---
-title: "Memorize to Forget: Machine Unlearning without Gradient Ascent via Model Extrapolation 논문 정리"
+title: "Memorize to Forget: Machine Unlearning without Gradient Ascent via Model Extrapolation"
 date: 2026-03-28
 summary: "Gradient Ascent(GA)의 catastrophic collapse 문제를 회피하면서 Machine Unlearning을 달성하는 MOdel eXtrapolation(MOX) 방법론 제안. Forget set에 대해 GD로 memorization 모델을 학습한 뒤, reference 모델 방향으로 extrapolation하여 forget 모델을 획득. TOFU 벤치마크에서 평균 FQ 0.0677, MU 0.6528 달성하며 GA/NPO 대비 안정적 성능. MUSE에서도 Utility Preservation 54.8, Privacy Leakage -18.4로 최고 수준. ICLR 2026 투고 논문."
 tags: [Machine Unlearning, LLM, Gradient Ascent, Model Extrapolation, Privacy, ICLR 2026, 연구노트]

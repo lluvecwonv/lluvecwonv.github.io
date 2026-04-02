@@ -1,5 +1,5 @@
 ---
-title: "SoK: The Landscape of Memorization in LLMs — Mechanisms, Measurement, and Mitigation 논문 분석"
+title: "SoK: The Landscape of Memorization in LLMs — Mechanisms, Measurement, and Mitigation"
 date: 2026-03-12
 summary: "UC Berkeley & Google DeepMind의 LLM 메모리제이션 서베이(SoK). 메모리제이션의 정의 분류 체계(Outcome/Elicitation/Causal/Probabilistic), 영향 요인(모델 크기, 데이터 중복, 시퀀스 길이, 토크나이제이션, 샘플링), 학습 단계별 메모리제이션 동역학(Pre-training, SFT, RLHF, Distillation), 탐지 기법(Divergence Attack, Prefix Extraction, MIA, Soft Prompting), 완화 전략(Data Cleaning, DP, Unlearning, Activation Steering), 프라이버시/법적 리스크까지 종합 정리. 각 섹션별 Open Questions 포함."
 tags: [LLM, Memorization, Privacy, Survey, SoK, MIA, Differential Privacy, Unlearning, 연구노트]

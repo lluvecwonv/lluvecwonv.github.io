@@ -1,5 +1,5 @@
 ---
-title: "State of RL for Reasoning LLMs 논문 정리"
+title: "State of RL for Reasoning LLMs"
 date: 2026-03-20
 summary: "A. Weers의 블로그 포스트 정리. 추론(reasoning) LLM을 위한 강화학습(RL) 방법론의 현황을 종합 분석한다. REINFORCE, PPO, GRPO, RLOO, Dr. GRPO, DAPO, CISPO, MaxRL, DPPO, ScaleRL을 수식과 함께 비교하며, critic-free 접근법, 토큰 수준 집계, 완화된 trust region이 최근 트렌드임을 보인다."
 tags: [LLM, 강화학습, RL, PPO, GRPO, DAPO, RLOO, CISPO, DPPO, MaxRL, Reasoning, 연구노트]

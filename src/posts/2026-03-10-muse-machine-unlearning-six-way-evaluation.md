@@ -1,5 +1,5 @@
 ---
-title: "MUSE: Machine Unlearning Six-Way Evaluation for Language Models 논문 정리"
+title: "MUSE: Machine Unlearning Six-Way Evaluation for Language Models"
 date: 2026-03-10
 category: 연구노트
 tags: [Machine Unlearning, LLM, Privacy, Copyright, Benchmark, NeurIPS 2024]

@@ -1,5 +1,5 @@
 ---
-title: "The Mosaic Memory of Large Language Models 논문 분석"
+title: "The Mosaic Memory of Large Language Models"
 date: 2026-03-29
 summary: "LLM이 정확한 중복(exact duplicate)뿐 아니라 유사 중복(fuzzy duplicate)으로부터도 정보를 조합하여 암기하는 '모자이크 메모리(mosaic memory)' 현상을 밝힌 논문. Llama-3.2, Phi-2, Gemma-2, GPT-Neo 4개 모델에서 10% 토큰 교체 시 정확한 중복 대비 ρ=0.50–0.60의 암기 기여를, 50% 교체 시에도 ρ=0.15–0.19의 기여를 보임. 암기가 의미론적(semantic)보다 구문론적(syntactic)임을 실험적으로 입증하고, SlimPajama 데이터셋에서 fuzzy duplicate의 광범위한 존재를 확인."
 tags: [LLM, Memorization, Fuzzy Duplicate, Mosaic Memory, Privacy, MIA, Deduplication, SlimPajama, 연구노트]

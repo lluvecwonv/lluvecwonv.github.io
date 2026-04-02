@@ -1,5 +1,5 @@
 ---
-title: "How Much Do Language Models Memorize? 논문 정리"
+title: "How Much Do Language Models Memorize?"
 date: 2026-03-22
 summary: "FAIR at Meta, Google DeepMind, Cornell University의 논문. 언어모델이 데이터를 얼마나 기억하는지 정량적으로 측정하는 새로운 프레임워크를 제안한다. 기억화(memorization)를 unintended memorization(비의도적 기억)과 generalization(일반화)으로 분리하고, 압축 기반 정보이론을 활용하여 모델 용량(capacity)을 측정한다. GPT 계열 모델의 용량은 약 3.6 bits-per-parameter이며, 데이터 크기가 모델 용량을 초과할 때 double descent가 시작됨을 보인다. 또한 membership inference에 대한 스케일링 법칙을 제안하고 대형 모델에서 검증한다."
 tags: [LLM, Memorization, Capacity, Information Theory, Kolmogorov Complexity, Scaling Laws, Membership Inference, Privacy, 연구노트]

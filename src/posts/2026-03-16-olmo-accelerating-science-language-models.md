@@ -1,5 +1,5 @@
 ---
-title: "OLMo: Accelerating the Science of Language Models 논문 분석"
+title: "OLMo: Accelerating the Science of Language Models"
 date: 2026-03-16
 summary: "AI2(Allen Institute for AI)의 진정한 오픈 언어 모델 OLMo. 모델 가중치뿐 아니라 학습 데이터(Dolma, 3T 토큰), 학습 코드, 평가 코드, 500+ 중간 체크포인트까지 Apache 2.0으로 전면 공개. 7B 디코더 전용 트랜스포머(SwiGLU, RoPE, 비모수적 LayerNorm, 바이어스 제거). 2개 GPU 클러스터(LUMI AMD MI250X + MosaicML NVIDIA A100)에서 FSDP/ZeRO로 학습. 8개 코어 태스크 제로샷 평가에서 LLaMA-7B, Llama 2-7B, MPT-7B 등과 경쟁력 있는 성능(avg 69.3). SFT+DPO 적응 후 MMLU 28.3→46.2 향상. Paloma 퍼플렉시티 평가, 탄소 배출량(69.78 tCO₂eq) 보고 포함."
 tags: [LLM, Open Source, OLMo, AI2, Pretraining, Dolma, Evaluation, 연구노트]

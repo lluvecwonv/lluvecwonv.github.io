@@ -1,5 +1,5 @@
 ---
-title: Preserving Privacy Through DeMemorization 논문 정리
+title: "Preserving Privacy Through DeMemorization"
 date: 2026-03-09
 summary: EMNLP 2023 논문 Preserving Privacy Through DeMemorization을 바탕으로, RL 기반 unlearning인 DeMem의 문제의식, 관련 연구, 방법론, 핵심 실험 결과를 정리했습니다.
 tags: [LLM, Privacy, Memorization, Unlearning, Reinforcement Learning, 연구노트]

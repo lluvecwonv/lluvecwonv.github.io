@@ -1,5 +1,5 @@
 ---
-title: "What Neural Networks Memorize and Why: Discovering the Long Tail via Influence Estimation 논문 분석"
+title: "What Neural Networks Memorize and Why: Discovering the Long Tail via Influence Estimation"
 date: 2026-03-29
 summary: "딥러닝 알고리즘의 레이블 암기(label memorization) 현상이 long-tailed 데이터 분포에서 최적 일반화를 위해 필수적이라는 이론(long tail theory)을 최초로 실증적으로 검증한 논문. 서브샘플링 기반 memorization 및 influence 추정기를 설계하여 MNIST, CIFAR-100, ImageNet에서 2,000–4,000개 모델을 학습. 암기된 예제가 무작위 예제보다 높은 한계 유용성을 가지며, 암기된 학습 예제가 시각적으로 유사한 테스트 예제의 정확도를 크게 향상시키는 high-influence pair를 대량 발견. 대부분의 암기가 마지막 층이 아닌 깊은 표현(deep representation)에서 발생함을 실험적으로 입증."
 tags: [Deep Learning, Memorization, Long Tail, Influence Estimation, Generalization, Privacy, ImageNet, CIFAR-100, 연구노트]

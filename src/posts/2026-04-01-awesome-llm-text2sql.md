@@ -1,5 +1,5 @@
 ---
-title: "Awesome LLM-based Text2SQL: 포괄적 자료 수집소"
+title: "Awesome LLM-based Text2SQL: A Comprehensive Resource Collection"
 date: 2026-04-01
 summary: "LLM 기반 Text-to-SQL 작업에 대한 종합 자료 모음. 9개의 Survey 논문, 5개의 Benchmark, 14개의 Dataset, 40+ ICL 방법, 15+ Fine-tuning 방법, 그리고 다양한 도구들을 포함한 완전한 가이드"
 tags: [LLM, Text-to-SQL, Awesome List, GitHub, Survey, Benchmark, Spider, BIRD, 연구노트]
