@@ -49,13 +49,32 @@ PPTAgent는 두 단계(Stage)로 구성된다.
 
 $$S = \{e_1, e_2, \dots, e_n\} = f(C)$$
 
-각 요소는 타입, 콘텐츠, 스타일 속성(border, size, position 등)으로 정의된다. 이 방식은 스타일 속성을 수동으로 지정해야 하므로 자동 생성에 한계가 있다.
+각 요소는 (타입, 콘텐츠, 스타일 속성) 튜플로 정의된다. 예를 들어 `(Textbox, "Hello", {border, size, position, ...})`처럼 **요소의 내용뿐 아니라 위치·크기·테두리 등 스타일까지 모두 직접 지정**해야 한다. 이렇게 모든 styling attribute를 수동으로 명시하는 것은 자동 생성에서 매우 어렵다.
 
-PPTAgent는 입력 콘텐츠 $C$와 reference slide $R_j$를 받아 **실행 가능한 편집 액션 시퀀스**를 생성한다:
+PPTAgent는 완전히 다른 접근을 취한다. 슬라이드를 처음부터 만드는 대신, 이미 잘 디자인된 reference slide $R_j$를 가져와서 **코드로 편집**한다:
 
 $$A = \{a_1, a_2, \dots, a_m\} = g(C, R_j)$$
 
-각 액션 $a_i$는 한 줄의 실행 가능한 코드에 대응한다. 이렇게 하면 reference slide의 잘 디자인된 레이아웃과 스타일을 보존하면서 콘텐츠만 교체할 수 있다.
+여기서 각 액션 $a_i$는 **edit API 호출 한 줄**에 대응한다. 논문에서 제공하는 edit API는 다음과 같다:
+
+| API | 설명 |
+|---|---|
+| `replace_span(element, text)` | 텍스트 span의 내용을 교체 |
+| `replace_image(element, image)` | 이미지 요소의 소스를 교체 |
+| `del_span(element)` | 텍스트 span 삭제 |
+| `del_image(element)` | 이미지 요소 삭제 |
+| `clone_paragraph(element)` | 기존 paragraph를 복제 |
+
+예를 들어 "AI 트렌드" 주제의 새 슬라이드를 만든다면, LLM은 다음과 같은 **편집 코드 시퀀스**를 생성한다:
+
+```python
+replace_span("title_1", "2025 AI Trends")        # a1: 제목 교체
+replace_span("body_2", "Key developments in...")  # a2: 본문 교체
+replace_image("img_3", "ai_chart.png")            # a3: 이미지 교체
+del_span("footer_4")                              # a4: 불필요한 푸터 삭제
+```
+
+이렇게 하면 reference slide의 **레이아웃, 색상, 폰트, 위치 등 모든 디자인 속성은 그대로 유지**하면서 콘텐츠만 교체할 수 있다. LLM이 스타일을 하나하나 지정할 필요가 없어지는 것이 핵심이다.
 
 ### 2.2 Stage I: Presentation Analysis
 
@@ -76,7 +95,7 @@ Structural slides는 LLM의 long-context 능력을 활용하여 텍스트 특성
 
 **Slide Generation**: outline의 각 항목에 따라 슬라이드를 반복적으로 생성한다. 각 슬라이드는 reference slide의 레이아웃을 채택하면서 콘텐츠와 구조적 명확성을 유지한다.
 
-구체적으로, **edit-based API**를 설계하여 LLM이 reference slide를 편집할 수 있게 한다. 이 API는 슬라이드 요소의 편집(edit), 삭제(remove), 복제(duplicate)를 지원한다. 또한 XML 포맷의 복잡성을 해결하기 위해 reference slide를 **HTML representation**으로 렌더링하여 LLM이 더 직관적으로 이해할 수 있게 한다.
+구체적으로, 앞서 2.1에서 설명한 **edit-based API**(replace_span, replace_image, del_span, del_image, clone_paragraph)를 사용하여 LLM이 reference slide를 편집하는 코드를 생성한다. 이때 핵심적인 설계 결정은 LLM에 슬라이드를 어떤 포맷으로 보여줄 것인가이다. 원본 PowerPoint XML은 하나의 슬라이드가 1,000줄 이상으로 표현되어 LLM이 이해하기 어렵다. 이를 해결하기 위해 reference slide를 **HTML representation**으로 렌더링하여, LLM이 각 요소의 id와 내용을 직관적으로 파악하고 정확한 edit API 호출을 생성할 수 있게 한다.
 
 **Self-Correction Mechanism**: 생성된 편집 액션은 REPL(Read-Eval-Print Loop) 환경에서 실행된다. 액션이 reference slide에 적용되지 못하면, REPL이 실행 피드백(Python 에러 등)을 제공하고, LLM이 이를 분석하여 편집 액션을 수정한다. 이 과정을 유효한 슬라이드가 생성되거나 최대 재시도 횟수에 도달할 때까지 반복한다. 슬라이드당 최대 2회의 self-correction iteration을 허용한다.
 

@@ -49,13 +49,32 @@ The conventional method generates slide elements directly from input content $C$
 
 $$S = \{e_1, e_2, \dots, e_n\} = f(C)$$
 
-Each element is defined by its type, content, and styling attributes (border, size, position, etc.). This approach requires manual specification of styling attributes, which limits automated generation.
+Each element is defined as a (type, content, styling attributes) tuple, e.g., `(Textbox, "Hello", {border, size, position, ...})`. This means **not only the content but also every styling attribute like position, size, and borders must be explicitly specified**. Manually specifying all these styling attributes is extremely challenging for automated generation.
 
-PPTAgent takes input content $C$ and a reference slide $R_j$, generating a **sequence of executable editing actions**:
+PPTAgent takes a completely different approach. Instead of creating slides from scratch, it takes a well-designed reference slide $R_j$ and **edits it through code**:
 
 $$A = \{a_1, a_2, \dots, a_m\} = g(C, R_j)$$
 
-Each action $a_i$ corresponds to a line of executable code. This preserves the well-designed layouts and styles of reference slides while replacing only the content.
+Here, each action $a_i$ corresponds to **a single edit API call**. The paper provides the following edit APIs:
+
+| API | Description |
+|---|---|
+| `replace_span(element, text)` | Replace the content of a text span |
+| `replace_image(element, image)` | Replace the source of an image element |
+| `del_span(element)` | Delete a text span |
+| `del_image(element)` | Delete an image element |
+| `clone_paragraph(element)` | Create a duplicate of an existing paragraph |
+
+For example, to create a new slide about "AI Trends," the LLM generates the following **sequence of editing code**:
+
+```python
+replace_span("title_1", "2025 AI Trends")        # a1: replace title
+replace_span("body_2", "Key developments in...")  # a2: replace body text
+replace_image("img_3", "ai_chart.png")            # a3: replace image
+del_span("footer_4")                              # a4: remove unnecessary footer
+```
+
+This way, the reference slide's **layout, colors, fonts, positions — all design attributes are preserved** while only the content is replaced. The key insight is that the LLM no longer needs to specify styling attributes one by one.
 
 ### 2.2 Stage I: Presentation Analysis
 
@@ -76,7 +95,7 @@ For structural slides, LLMs' long-context capability is leveraged to analyze all
 
 **Slide Generation**: Slides are generated iteratively based on the outline entries. Each slide adopts the layout of the reference slide while ensuring consistency in content and structural clarity.
 
-Specifically, **edit-based APIs** are designed to enable LLMs to edit reference slides. These APIs support editing, removing, and duplicating slide elements. To address XML format complexity, reference slides are rendered into an **HTML representation**, offering a more precise and intuitive format. This HTML-based format, combined with the edit APIs, enables LLMs to perform precise content modifications.
+Specifically, the LLM generates code using the **edit-based APIs** described in Section 2.1 (replace_span, replace_image, del_span, del_image, clone_paragraph) to edit the reference slide. A critical design decision is how to present the slide to the LLM. The original PowerPoint XML represents a single slide in over 1,000 lines, making it difficult for LLMs to parse. To solve this, reference slides are rendered into an **HTML representation**, allowing the LLM to intuitively identify each element's id and content, and generate accurate edit API calls.
 
 **Self-Correction Mechanism**: Generated editing actions are executed within a REPL (Read-Eval-Print Loop) environment. When actions fail, the REPL provides execution feedback (Python errors, etc.), and the LLM analyzes this feedback to refine its actions. This process iterates until a valid slide is generated or the maximum retry limit (2 iterations per slide) is reached.
 
