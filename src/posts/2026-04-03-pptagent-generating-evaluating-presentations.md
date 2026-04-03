@@ -28,11 +28,11 @@ language: ko
 
 실제 사람이 프레젠테이션을 만드는 워크플로우를 생각해보면, 처음부터 복잡한 슬라이드를 한 번에 만드는 것이 아니라 **잘 만들어진 슬라이드를 참고하여 핵심 내용을 요약하고 옮기는** 과정을 거친다. PPTAgent는 이 직관에서 출발한다.
 
-하지만 이런 edit-based approach를 실현하는 데에는 두 가지 기술적 어려움이 있다.
+하지만 이런 edit-based approach를 실현하는 데에는 두 가지 핵심적인 기술적 어려움(challenge)이 있다.
 
-첫째, 프레젠테이션의 레이아웃과 모달리티가 복잡하기 때문에 LLM이 어떤 슬라이드를 reference로 사용해야 하는지 직접 판단하기 어렵다. 핵심 과제는 LLM이 reference presentation의 구조와 콘텐츠 패턴을 잘 이해하도록 하는 것이다.
+첫째, 프레젠테이션의 레이아웃과 모달리티가 복잡하기 때문에 LLM이 어떤 슬라이드를 reference로 사용해야 하는지 직접 판단하기 어렵다. 핵심 과제는 LLM이 reference presentation의 구조와 콘텐츠 패턴을 잘 이해하도록 하는 것이다. → 이를 해결하기 위해 **Stage I(Presentation Analysis)**에서 slide clustering과 schema extraction을 수행한다.
 
-둘째, 대부분의 프레젠테이션은 PowerPoint의 XML 포맷으로 저장되는데, 이 포맷은 장황하고 중복이 많아 LLM이 안정적으로 편집 작업을 수행하기 어렵다.
+둘째, 대부분의 프레젠테이션은 **PowerPoint의 XML 포맷**으로 저장되는데, 하나의 슬라이드가 **1,000줄 이상의 XML**로 표현될 정도로 장황하고 중복이 많다(Gryk, 2022). 이런 verbose한 XML을 LLM에 직접 입력하면 토큰 낭비가 심하고, 정확한 위치를 찾아 편집하는 것이 극도로 어렵다. → 이를 해결하기 위해 **XML을 HTML representation으로 렌더링**하여 LLM이 훨씬 간결하고 직관적인 포맷으로 슬라이드를 이해하고 편집할 수 있게 한다. Ablation study에서 이 HTML 렌더링(CodeRender)을 제거하면 성공률이 95.0%에서 74.6%로 급락하는 것이 이 기여의 중요성을 보여준다.
 
 ---
 

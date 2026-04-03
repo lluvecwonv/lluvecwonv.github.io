@@ -28,7 +28,11 @@ Existing approaches typically follow a **text-to-slides** paradigm, converting L
 
 Rather than creating complex presentations from scratch in a single pass, human workflows typically involve selecting exemplary slides as references and then summarizing and transferring key content onto them. PPTAgent is inspired by this process.
 
-However, achieving such an edit-based approach presents two technical challenges. First, due to the layout and modal complexity of presentations, it is difficult for LLMs to directly determine which slides should be referenced. The key challenge lies in enhancing LLMs' understanding of reference presentations' structure and content patterns. Second, most presentations are saved in PowerPoint's XML format, which is inherently verbose and redundant, making it challenging for LLMs to robustly perform editing operations.
+However, achieving such an edit-based approach presents two key technical challenges.
+
+First, due to the layout and modal complexity of presentations, it is difficult for LLMs to directly determine which slides should be referenced. The key challenge lies in enhancing LLMs' understanding of reference presentations' structure and content patterns. → To address this, **Stage I (Presentation Analysis)** performs slide clustering and schema extraction.
+
+Second, most presentations are saved in **PowerPoint's XML format**, where a single slide can span **over 1,000 lines of XML** — inherently verbose and redundant (Gryk, 2022). Feeding such verbose XML directly to LLMs wastes tokens and makes it extremely difficult to locate and edit specific elements accurately. → To address this, the authors **render XML into an HTML representation**, allowing LLMs to understand and edit slides in a much more concise and intuitive format. The ablation study confirms the importance of this contribution: removing the HTML rendering (CodeRender) causes the success rate to plummet from 95.0% to 74.6%.
 
 ---
 
