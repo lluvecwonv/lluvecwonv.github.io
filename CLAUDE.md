@@ -6,5 +6,11 @@
 6. 반드시 생성된 데이터는 디비에 추가할것
    - DB 직접 접근이 안 되는 경우, src/posts/ 에 마크다운 파일로 저장 후 git commit & push 하면 자동 배포됨
    - 블로그 포스트 작성 완료 후 반드시 git add → commit → push 까지 수행할 것
+   - git push가 인증 문제로 실패할 경우, 사용자에게 아래 명령어를 안내할 것:
+     ```
+     cd ~/Library/Mobile\ Documents/com~apple~CloudDocs/llm_lab/my_site
+     rm -f .git/HEAD.lock .git/index.lock
+     git push
+     ```
 7. 논문 리뷰 결과(accept/reject)가 있으면 리뷰어 코멘트, 점수, 리젝 사유도 상세히 포함할 것
 8. 블로그 포스트 제목에 논문 제목은 반드시 영어 원문 그대로 사용할 것 (한국어 번역 금지)
