@@ -63,8 +63,8 @@ export default function CV() {
               <em>International Conference on Artificial Intelligence in Education (AIED)</em>, 2025. <strong>(† Co-first authors)</strong>
             </li>
             <li>
-              <strong>C. Yoon</strong>, D. Kim, and H.-J. Song, "Selective Span-Level Unlearning for Large Language Models."
-              <em>(Under Review)</em>
+              <strong>C. Yoon</strong>, D. Kim, and H.-J. Song, "Selective Span-Level Unlearning for Large Language Models,"
+              <em>In Proceedings of the 64th Annual Meeting of the Association for Computational Linguistics (ACL)</em>, 2026. <strong>(Main)</strong>
             </li>
           </ul>
         </section>

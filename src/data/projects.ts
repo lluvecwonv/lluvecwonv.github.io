@@ -262,7 +262,7 @@ export const projects: Project[] = [
       '외부 모델 없이, 대상 모델의 gradient 신호만으로 언러닝 대상 span을 식별하는 2단계 프레임워크 제안.',
     tags: ['Unlearning', 'Span-level', 'LLM', 'Self-consistency', 'Gradient Analysis'],
     category: 'Trustworthy AI',
-    paper: 'Under Review',
+    paper: 'ACL 2026 (Main)',
     paperUrl: 'https://openreview.net/pdf?id=6MDIXIASF0',
     paperTitle: 'Selective Span-Level Unlearning for Large Language Models',
     thumbnail: '/projects/span-1.png',
