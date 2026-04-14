@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 550" width="800" height="550">
+  <defs>
+    <style>
+      .text-main { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; font-weight: 600; }
+      .text-label { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; }
+      .text-ko { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif; font-size: 12px; }
+      .text-code { font-family: 'Monaco', 'Menlo', 'Courier New', monospace; font-size: 12px; }
+      .layer-shadow { filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
+      .arrow-down { stroke: #999; stroke-width: 2; fill: none; stroke-dasharray: 5,5; }
+    </style>
+    <marker id="arrow-marker" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#999"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="550" fill="#fafafa"/>
+
+  <!-- Title -->
+  <text x="400" y="35" class="text-main" text-anchor="middle" fill="#1a1a1a" font-size="20">Dockerfile Layers (이미지 구성)</text>
+
+  <!-- Dockerfile on the left -->
+  <g id="dockerfile">
+    <rect x="40" y="80" width="200" height="420" fill="#f0f0f0" stroke="#999" stroke-width="2" rx="6"/>
+    <text x="140" y="105" class="text-main" text-anchor="middle" fill="#333">Dockerfile</text>
+
+    <text x="55" y="130" class="text-code" fill="#d63384" font-weight="600">FROM</text>
+    <text x="105" y="130" class="text-code" fill="#333">python:3.10</text>
+
+    <text x="55" y="160" class="text-code" fill="#d63384" font-weight="600">WORKDIR</text>
+    <text x="140" y="160" class="text-code" fill="#333">/app</text>
+
+    <text x="55" y="190" class="text-code" fill="#d63384" font-weight="600">COPY</text>
+    <text x="120" y="190" class="text-code" fill="#333">requirements.txt .</text>
+
+    <text x="55" y="220" class="text-code" fill="#d63384" font-weight="600">RUN pip install</text>
+    <text x="55" y="240" class="text-code" fill="#333">-r requirements.txt</text>
+
+    <text x="55" y="270" class="text-code" fill="#d63384" font-weight="600">COPY</text>
+    <text x="120" y="270" class="text-code" fill="#333">. .</text>
+
+    <text x="55" y="300" class="text-code" fill="#d63384" font-weight="600">EXPOSE</text>
+    <text x="140" y="300" class="text-code" fill="#333">8000</text>
+
+    <text x="55" y="330" class="text-code" fill="#d63384" font-weight="600">CMD</text>
+    <text x="105" y="330" class="text-code" fill="#333">uvicorn main:app</text>
+
+    <rect x="50" y="360" width="180" height="1" fill="#ddd"/>
+    <text x="140" y="385" class="text-ko" text-anchor="middle" fill="#666" font-size="11">각 명령어가 새로운</text>
+    <text x="140" y="402" class="text-ko" text-anchor="middle" fill="#666" font-size="11">레이어 생성</text>
+  </g>
+
+  <!-- Arrow to layers -->
+  <path d="M 240 300 L 300 300" class="arrow-down" marker-end="url(#arrow-marker)" stroke-width="2" stroke-dasharray="none"/>
+  <text x="270" y="290" class="text-ko" text-anchor="middle" fill="#2496ED" font-weight="600" font-size="12">빌드</text>
+
+  <!-- Layers on the right -->
+  <g id="layers" class="layer-shadow">
+    <!-- Layer 8: CMD (top, final) -->
+    <rect x="340" y="80" width="420" height="45" fill="#C3E88D" stroke="#558B2F" stroke-width="2" rx="4"/>
+    <text x="360" y="100" class="text-code" fill="#1B5E20" font-weight="600" font-size="13">CMD</text>
+    <text x="420" y="100" class="text-code" fill="#1B5E20" font-size="12">uvicorn main:app</text>
+    <text x="750" y="100" class="text-ko" text-anchor="end" fill="#558B2F" font-size="11" font-weight="600">레이어 8 (최상단)</text>
+
+    <!-- Layer 7: EXPOSE -->
+    <rect x="340" y="130" width="420" height="45" fill="#B3E5FC" stroke="#01579B" stroke-width="2" rx="4"/>
+    <text x="360" y="150" class="text-code" fill="#0D47A1" font-weight="600" font-size="13">EXPOSE</text>
+    <text x="430" y="150" class="text-code" fill="#0D47A1" font-size="12">8000</text>
+    <text x="750" y="150" class="text-ko" text-anchor="end" fill="#01579B" font-size="11" font-weight="600">레이어 7</text>
+
+    <!-- Layer 6: COPY . . -->
+    <rect x="340" y="180" width="420" height="45" fill="#FFE0B2" stroke="#E65100" stroke-width="2" rx="4"/>
+    <text x="360" y="200" class="text-code" fill="#BF360C" font-weight="600" font-size="13">COPY</text>
+    <text x="420" y="200" class="text-code" fill="#BF360C" font-size="12">. . (소스코드 복사)</text>
+    <text x="750" y="200" class="text-ko" text-anchor="end" fill="#E65100" font-size="11" font-weight="600">레이어 6</text>
+
+    <!-- Layer 5: RUN pip install -->
+    <rect x="340" y="230" width="420" height="45" fill="#F8BBD0" stroke="#880E4F" stroke-width="2" rx="4"/>
+    <text x="360" y="250" class="text-code" fill="#B0003D" font-weight="600" font-size="13">RUN</text>
+    <text x="410" y="250" class="text-code" fill="#B0003D" font-size="12">pip install -r requirements.txt</text>
+    <text x="750" y="250" class="text-ko" text-anchor="end" fill="#880E4F" font-size="11" font-weight="600">레이어 5</text>
+
+    <!-- Layer 4: COPY requirements.txt -->
+    <rect x="340" y="280" width="420" height="45" fill="#DCEDC8" stroke="#33691E" stroke-width="2" rx="4"/>
+    <text x="360" y="300" class="text-code" fill="#1B5E20" font-weight="600" font-size="13">COPY</text>
+    <text x="420" y="300" class="text-code" fill="#1B5E20" font-size="12">requirements.txt . (의존성)</text>
+    <text x="750" y="300" class="text-ko" text-anchor="end" fill="#33691E" font-size="11" font-weight="600">레이어 4</text>
+
+    <!-- Layer 3: WORKDIR -->
+    <rect x="340" y="330" width="420" height="45" fill="#E1BEE7" stroke="#4A148C" stroke-width="2" rx="4"/>
+    <text x="360" y="350" class="text-code" fill="#6A1B9A" font-weight="600" font-size="13">WORKDIR</text>
+    <text x="450" y="350" class="text-code" fill="#6A1B9A" font-size="12">/app</text>
+    <text x="750" y="350" class="text-ko" text-anchor="end" fill="#4A148C" font-size="11" font-weight="600">레이어 3</text>
+
+    <!-- Layer 2: FROM (base) -->
+    <rect x="340" y="380" width="420" height="45" fill="#BBDEFB" stroke="#1565C0" stroke-width="2.5" rx="4"/>
+    <text x="360" y="400" class="text-code" fill="#0D47A1" font-weight="600" font-size="13">FROM</text>
+    <text x="420" y="400" class="text-code" fill="#0D47A1" font-size="12" font-weight="600">python:3.10 (베이스 이미지)</text>
+    <text x="750" y="400" class="text-ko" text-anchor="end" fill="#1565C0" font-size="11" font-weight="600">레이어 1 (기본)</text>
+  </g>
+
+  <!-- Information boxes -->
+  <g id="info">
+    <!-- Layer concept -->
+    <rect x="40" y="520" width="360" height="20" fill="#F3E5F5" stroke="#7B1FA2" stroke-width="1" rx="3"/>
+    <text x="50" y="535" class="text-ko" fill="#4A148C" font-size="11" font-weight="600">레이어: 각 명령어가 실행되면 새로운 읽기 전용 레이어가 생성됨</text>
+
+    <!-- Caching concept -->
+    <rect x="420" y="520" width="340" height="20" fill="#E0F2F1" stroke="#00695C" stroke-width="1" rx="3"/>
+    <text x="430" y="535" class="text-ko" fill="#004D40" font-size="11" font-weight="600">캐싱: 변경되지 않은 레이어는 재사용되어 빌드 속도 향상</text>
+  </g>
+</svg>

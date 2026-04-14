@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400">
+  <defs>
+    <style>
+      .docker-blue { fill: #2496ED; }
+      .docker-light { fill: #E8F4FD; }
+      .text-main { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; font-weight: 600; }
+      .text-label { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; }
+      .text-ko { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif; font-size: 13px; }
+      .border { stroke: #2496ED; stroke-width: 2; }
+      .arrow { stroke: #333; stroke-width: 2; fill: none; }
+      .arrow-head { fill: #333; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="400" fill="#f8fafb"/>
+
+  <!-- Title -->
+  <text x="400" y="35" class="text-main" text-anchor="middle" fill="#1a1a1a">Docker Architecture</text>
+
+  <!-- LEFT SECTION: Dockerfile to Image -->
+  <g id="dockerfile-section">
+    <!-- Dockerfile box -->
+    <rect x="40" y="80" width="140" height="200" fill="#f0f0f0" class="border" rx="6"/>
+    <text x="110" y="105" class="text-main" text-anchor="middle" fill="#333">Dockerfile</text>
+    <text x="110" y="130" class="text-label" text-anchor="middle" fill="#666" font-size="12">FROM ubuntu</text>
+    <text x="110" y="150" class="text-label" text-anchor="middle" fill="#666" font-size="12">RUN apt-get</text>
+    <text x="110" y="170" class="text-label" text-anchor="middle" fill="#666" font-size="12">COPY files</text>
+    <text x="110" y="190" class="text-label" text-anchor="middle" fill="#666" font-size="12">CMD python</text>
+
+    <!-- Arrow 1: Dockerfile to Image -->
+    <defs>
+      <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+        <polygon points="0 0, 10 3, 0 6" class="arrow-head"/>
+      </marker>
+    </defs>
+    <path d="M 180 180 L 240 180" class="arrow" marker-end="url(#arrowhead)" stroke-width="2.5"/>
+    <text x="210" y="170" class="text-ko" text-anchor="middle" fill="#2496ED" font-weight="600">빌드</text>
+  </g>
+
+  <!-- MIDDLE SECTION: Docker Image -->
+  <g id="image-section">
+    <rect x="240" y="80" width="140" height="200" class="docker-blue docker-light" class="border" rx="6" stroke="#2496ED" stroke-width="2" fill="#E8F4FD"/>
+    <rect x="240" y="80" width="140" height="60" class="docker-blue" rx="6"/>
+    <text x="310" y="105" class="text-main" text-anchor="middle" fill="white">Docker Image</text>
+    <text x="310" y="130" class="text-label" text-anchor="middle" fill="#666" font-size="12">설계도</text>
+
+    <!-- Image layers -->
+    <rect x="250" y="160" width="120" height="30" fill="#D4E9F7" stroke="#2496ED" stroke-width="1.5" rx="3"/>
+    <text x="310" y="182" class="text-label" text-anchor="middle" fill="#333" font-size="11">Base OS</text>
+
+    <rect x="250" y="200" width="120" height="30" fill="#D4E9F7" stroke="#2496ED" stroke-width="1.5" rx="3"/>
+    <text x="310" y="222" class="text-label" text-anchor="middle" fill="#333" font-size="11">Runtime</text>
+
+    <!-- Arrow 2: Image to Containers -->
+    <path d="M 380 180 L 440 180" class="arrow" marker-end="url(#arrowhead)" stroke-width="2.5"/>
+    <text x="410" y="170" class="text-ko" text-anchor="middle" fill="#2496ED" font-weight="600">실행</text>
+  </g>
+
+  <!-- RIGHT SECTION: Multiple Containers -->
+  <g id="containers-section">
+    <!-- Container 1 -->
+    <rect x="440" y="90" width="130" height="85" class="docker-blue" rx="6"/>
+    <text x="505" y="115" class="text-main" text-anchor="middle" fill="white" font-size="14">Container 1</text>
+    <text x="505" y="140" class="text-ko" text-anchor="middle" fill="white" font-size="11">실행 중인 것</text>
+    <text x="505" y="160" class="text-label" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-size="12">Running</text>
+
+    <!-- Container 2 -->
+    <rect x="440" y="190" width="130" height="85" class="docker-blue" rx="6"/>
+    <text x="505" y="215" class="text-main" text-anchor="middle" fill="white" font-size="14">Container 2</text>
+    <text x="505" y="240" class="text-ko" text-anchor="middle" fill="white" font-size="11">실행 중인 것</text>
+    <text x="505" y="260" class="text-label" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-size="12">Running</text>
+
+    <!-- Container 3 (partial) -->
+    <circle cx="635" cy="175" r="50" class="docker-blue"/>
+    <text x="635" y="180" class="text-main" text-anchor="middle" fill="white" font-size="14">Container 3</text>
+    <text x="635" y="200" class="text-ko" text-anchor="middle" fill="white" font-size="11">실행 중</text>
+  </g>
+
+  <!-- Bottom explanation -->
+  <g id="explanation">
+    <rect x="40" y="310" width="720" height="70" fill="#f0f8ff" stroke="#2496ED" stroke-width="1" rx="4" stroke-dasharray="5,5"/>
+    <text x="50" y="330" class="text-label" fill="#333" font-weight="600">개념:</text>
+    <text x="50" y="355" class="text-label" fill="#555">Dockerfile(설명서) → Docker Image(설계도) → Container(실행되는 인스턴스). 하나의 이미지에서 여러 독립적인 컨테이너를 생성할 수 있습니다.</text>
+  </g>
+</svg>

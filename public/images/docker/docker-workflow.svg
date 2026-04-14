@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 400" width="900" height="400">
+  <defs>
+    <style>
+      .text-main { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; font-weight: 600; }
+      .text-label { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; }
+      .text-ko { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif; font-size: 12px; }
+      .flutter-color { fill: #02569B; }
+      .docker-color { fill: #2496ED; }
+      .arrow { stroke: #333; stroke-width: 2.5; fill: none; }
+      .arrow-head { fill: #333; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" class="arrow-head"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="400" fill="#fafafa"/>
+
+  <!-- Title -->
+  <text x="450" y="35" class="text-main" text-anchor="middle" fill="#1a1a1a" font-size="20">Docker Workflow (Flutter + API)</text>
+
+  <!-- STEP 1: Flutter App -->
+  <g id="step1">
+    <rect x="30" y="80" width="120" height="100" class="flutter-color" rx="8"/>
+    <text x="90" y="115" class="text-label" text-anchor="middle" fill="white" font-weight="600">Flutter App</text>
+    <text x="90" y="138" class="text-ko" text-anchor="middle" fill="white" font-size="12">모바일 클라이언트</text>
+    <text x="90" y="158" class="text-label" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-size="11">User Request</text>
+  </g>
+
+  <!-- Arrow 1 -->
+  <g id="arrow1">
+    <path d="M 150 130 L 200 130" class="arrow" marker-end="url(#arrowhead)"/>
+    <rect x="170" y="115" width="60" height="30" fill="white" stroke="#333" stroke-width="1" rx="4"/>
+    <text x="200" y="135" class="text-ko" text-anchor="middle" fill="#333" font-size="11">API 요청</text>
+  </g>
+
+  <!-- STEP 2: Image Transfer -->
+  <g id="step2">
+    <rect x="200" y="80" width="120" height="100" fill="#FFA500" rx="8"/>
+    <text x="260" y="115" class="text-label" text-anchor="middle" fill="white" font-weight="600">Docker</text>
+    <text x="260" y="138" class="text-label" text-anchor="middle" fill="white" font-weight="600">Image</text>
+    <text x="260" y="158" class="text-ko" text-anchor="middle" fill="white" font-size="12">전송</text>
+  </g>
+
+  <!-- Arrow 2 -->
+  <g id="arrow2">
+    <path d="M 320 130 L 370 130" class="arrow" marker-end="url(#arrowhead)"/>
+    <rect x="335" y="115" width="50" height="30" fill="white" stroke="#333" stroke-width="1" rx="4"/>
+    <text x="360" y="135" class="text-ko" text-anchor="middle" fill="#333" font-size="11">실행</text>
+  </g>
+
+  <!-- STEP 3: Docker Container -->
+  <g id="step3">
+    <g>
+      <!-- Outer container box -->
+      <rect x="370" y="70" width="200" height="120" class="docker-color" rx="8" fill="rgba(36, 150, 237, 0.1)" stroke="#2496ED" stroke-width="2"/>
+
+      <!-- API Box -->
+      <rect x="385" y="85" width="55" height="45" fill="#4A90E2" rx="4"/>
+      <text x="412" y="110" class="text-label" text-anchor="middle" fill="white" font-size="12" font-weight="600">API</text>
+      <text x="412" y="125" class="text-ko" text-anchor="middle" fill="white" font-size="10">FastAPI</text>
+
+      <!-- DETR Box -->
+      <rect x="450" y="85" width="55" height="45" fill="#4A90E2" rx="4"/>
+      <text x="477" y="110" class="text-label" text-anchor="middle" fill="white" font-size="12" font-weight="600">DETR</text>
+      <text x="477" y="125" class="text-ko" text-anchor="middle" fill="white" font-size="10">모델</text>
+
+      <!-- PyTorch Box -->
+      <rect x="515" y="85" width="55" height="45" fill="#4A90E2" rx="4"/>
+      <text x="542" y="110" class="text-label" text-anchor="middle" fill="white" font-size="12" font-weight="600">PyTorch</text>
+      <text x="542" y="125" class="text-ko" text-anchor="middle" fill="white" font-size="10">엔진</text>
+
+      <!-- Container label -->
+      <text x="385" y="165" class="text-ko" text-anchor="start" fill="#2496ED" font-weight="600" font-size="12">Docker Container</text>
+      <text x="385" y="180" class="text-ko" text-anchor="start" fill="#666" font-size="11">(격리된 실행 환경)</text>
+    </g>
+  </g>
+
+  <!-- Arrow 3 -->
+  <g id="arrow3">
+    <path d="M 570 130 L 620 130" class="arrow" marker-end="url(#arrowhead)"/>
+    <rect x="580" y="115" width="40" height="30" fill="white" stroke="#333" stroke-width="1" rx="4"/>
+    <text x="600" y="135" class="text-ko" text-anchor="middle" fill="#333" font-size="11">처리</text>
+  </g>
+
+  <!-- STEP 4: Results -->
+  <g id="step4">
+    <rect x="620" y="80" width="120" height="100" fill="#27AE60" rx="8"/>
+    <text x="680" y="115" class="text-label" text-anchor="middle" fill="white" font-weight="600">Results</text>
+    <text x="680" y="138" class="text-ko" text-anchor="middle" fill="white" font-size="12">추론 결과</text>
+    <text x="680" y="158" class="text-label" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-size="11">JSON Response</text>
+  </g>
+
+  <!-- Arrow 4 -->
+  <g id="arrow4">
+    <path d="M 740 130 L 790 130" class="arrow" marker-end="url(#arrowhead)"/>
+    <rect x="750" y="115" width="40" height="30" fill="white" stroke="#333" stroke-width="1" rx="4"/>
+    <text x="770" y="135" class="text-ko" text-anchor="middle" fill="#333" font-size="11">반환</text>
+  </g>
+
+  <!-- STEP 5: User Display -->
+  <g id="step5">
+    <rect x="790" y="80" width="80" height="100" class="flutter-color" rx="8"/>
+    <text x="830" y="115" class="text-label" text-anchor="middle" fill="white" font-weight="600">Display</text>
+    <text x="830" y="138" class="text-ko" text-anchor="middle" fill="white" font-size="12">결과 표시</text>
+  </g>
+
+  <!-- Process Information -->
+  <g id="process-info">
+    <!-- Request side -->
+    <rect x="30" y="230" width="350" height="140" fill="#E8F4FD" stroke="#2496ED" stroke-width="1" rx="6"/>
+    <text x="50" y="252" class="text-main" fill="#2496ED" font-size="14">요청 프로세스:</text>
+    <text x="50" y="280" class="text-ko" fill="#333" font-size="11">1. Flutter 앱에서 사용자 이미지 선택</text>
+    <text x="50" y="302" class="text-ko" fill="#333" font-size="11">2. API 서버에 HTTP POST 요청 전송</text>
+    <text x="50" y="324" class="text-ko" fill="#333" font-size="11">3. Docker Container 내의 DETR 모델이 처리</text>
+    <text x="50" y="346" class="text-ko" fill="#333" font-size="11">4. 검출된 객체 정보를 JSON으로 반환</text>
+
+    <!-- Benefits side -->
+    <rect x="400" y="230" width="370" height="140" fill="#F0FFF4" stroke="#27AE60" stroke-width="1" rx="6"/>
+    <text x="420" y="252" class="text-main" fill="#27AE60" font-size="14">Docker 사용 이점:</text>
+    <text x="420" y="280" class="text-ko" fill="#333" font-size="11">- PyTorch/DETR 환경을 완벽하게 격리</text>
+    <text x="420" y="302" class="text-ko" fill="#333" font-size="11">- 모든 환경에서 동일한 실행 환경 보장</text>
+    <text x="420" y="324" class="text-ko" fill="#333" font-size="11">- 의존성 충돌 없이 여러 프로세스 실행 가능</text>
+    <text x="420" y="346" class="text-ko" fill="#333" font-size="11">- 쉬운 배포 및 확장성 (오토스케일링)</text>
+  </g>
+</svg>
