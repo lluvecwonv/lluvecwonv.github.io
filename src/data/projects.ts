@@ -482,9 +482,10 @@ export const projects: Project[] = [
         ],
       },
       {
-        heading: '모델 서빙 및 Flutter 현장 조사 앱',
-        body: '모델 서빙 단계에서는 로컬과 서버 간 PyTorch 및 CUDA 환경 차이로 인해 추론이 정상 동작하지 않는 문제가 발생하였고, 이를 해결하기 위해 Docker 기반 컨테이너 환경을 구축했습니다. Flutter 앱에서 촬영한 이미지를 API로 전송하면 서버에서 DETR 추론을 수행하고, 결과를 JSON으로 반환받아 bounding box를 시각화하는 구조로 시스템을 설계했습니다. 그 결과, 데이터 구축부터 모델 학습, 서빙, 앱 연동까지 이어지는 End-to-End 시스템을 구현하였습니다.',
+        heading: 'Docker 기반 모델 서빙 및 Flutter 연동',
+        body: '모델 서빙 단계에서는 로컬과 서버 간 PyTorch 및 CUDA 환경 차이로 인해 추론이 정상 동작하지 않는 문제가 발생하였습니다. 예를 들어, 로컬에서는 CUDA 11.8 + PyTorch 2.1 환경에서 정상 동작하던 모델이, 서버에서는 CUDA 버전 불일치로 인해 ModuleNotFoundError나 CUDA mismatch 오류가 발생했습니다.\n\n이를 해결하기 위해 Docker 기반 컨테이너 환경을 구축했습니다. Dockerfile에 Python 3.10, PyTorch, CUDA 11.8, torchvision, FastAPI 등 전체 실행 환경을 정의하고, docker build로 이미지를 생성한 뒤 docker run으로 컨테이너를 실행하는 방식입니다. 이를 통해 로컬, 테스트 서버, 배포 서버에서 항상 동일한 환경으로 추론을 수행할 수 있게 되었습니다.\n\nFlutter 앱과의 연동 흐름은 다음과 같습니다:\n1. Flutter 앱에서 사용자가 이미지를 촬영하거나 선택\n2. HTTP POST(multipart/form-data)로 API 서버에 이미지 전송\n3. Docker 컨테이너 내부의 FastAPI가 이미지를 수신하고 DETR 모델로 추론 수행\n4. 검출된 객체 정보(bounding box 좌표, 손상 클래스, confidence score)를 JSON으로 반환\n5. Flutter 앱에서 bounding box를 이미지 위에 시각화하여 손상 보고서 생성\n\nDocker를 활용함으로써 얻은 이점:\n- PyTorch/DETR/CUDA 환경을 완벽하게 격리하여 의존성 충돌 방지\n- 모든 환경에서 동일한 실행 환경을 보장\n- Dockerfile 기반의 재현 가능한 빌드\n- 쉬운 배포 및 스케일링 가능\n\n그 결과, 데이터 구축부터 모델 학습, Docker 기반 서빙, Flutter 앱 연동까지 이어지는 End-to-End 시스템을 구현하였습니다.',
         images: [
+          { src: '/projects/heritage-docker-workflow.svg', caption: 'Docker 기반 Flutter-API 연동 워크플로우 — Dockerfile → Image → Container → Flutter 앱 연동 전체 흐름' },
           { src: '/projects/heritage-0.jpeg', caption: '국가유산 모니터링 앱 — 로그인 및 조사 등록 화면' },
           { src: '/projects/heritage-2.jpeg', caption: '현장 조사 화면 — 기본정보, 메타, 위치, 사진 촬영 및 손상부 조사' },
         ],

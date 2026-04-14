@@ -654,9 +654,29 @@ In addition, the system supports conversation-context management across all agen
           ],
         },
         {
-          heading: 'Model Serving & Flutter Field Survey App',
-          body: `During the model serving phase, inference failed to run correctly due to differences in PyTorch and CUDA environments between local and server machines. To resolve this, we built a Docker-based container environment. The system was designed so that images captured in the Flutter app are sent to the API server, which performs DETR inference and returns the results as JSON with bounding box visualizations. As a result, we implemented an End-to-End system spanning data construction, model training, serving, and app integration.`,
+          heading: 'Docker-Based Model Serving & Flutter Integration',
+          body: `During the model serving phase, inference failed to run correctly due to differences in PyTorch and CUDA environments between local and server machines. For example, a model that worked correctly with CUDA 11.8 + PyTorch 2.1 locally would produce ModuleNotFoundError or CUDA mismatch errors on the server.
+
+To resolve this, we built a Docker-based container environment. We defined the complete execution environment in a Dockerfile — Python 3.10, PyTorch, CUDA 11.8, torchvision, and FastAPI — then used docker build to create the image and docker run to launch the container. This ensured identical inference environments across local, staging, and production servers.
+
+The Flutter-to-server integration workflow is as follows:
+1. User captures or selects an image in the Flutter app
+2. The image is sent to the API server via HTTP POST (multipart/form-data)
+3. FastAPI inside the Docker container receives the image and performs DETR inference
+4. Detected object information (bounding box coordinates, damage classes, confidence scores) is returned as JSON
+5. The Flutter app visualizes bounding boxes on the image and generates a damage report
+
+Benefits of using Docker:
+- Complete isolation of the PyTorch/DETR/CUDA environment, preventing dependency conflicts
+- Guaranteed identical execution environments across all servers
+- Reproducible builds via Dockerfile
+- Easy deployment and scalability
+
+As a result, we implemented an End-to-End system spanning data construction, model training, Docker-based serving, and Flutter app integration.`,
           images: [
+            {
+              caption: 'Docker-based Flutter-API integration workflow — complete flow from Dockerfile → Image → Container → Flutter app',
+            },
             {
               caption: 'National heritage monitoring app — login and survey registration screens',
             },
