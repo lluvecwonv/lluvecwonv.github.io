@@ -20,16 +20,100 @@ The paper proposes DEtection TRansformer (DETR), which combines a Transformer en
 
 ---
 
-## 1. Introduction
+## 1. DETR's Core Motivation: Why is Object Detection a Set Prediction Problem?
 
-Existing object detection methods address the set prediction task indirectly by defining surrogate regression and classification problems on a large set of proposals, anchors, or window centers. Their performance is significantly influenced by postprocessing steps to collapse near-duplicate predictions, by the design of anchor sets, and by the heuristics that assign target boxes to anchors.
+### 1.1 What Object Detection Really Wants to Solve
 
-DETR bypasses these surrogate tasks by viewing **object detection as a direct set prediction problem**. The two key ingredients are:
+The goal of object detection is simple:
+
+- **Input**: One image
+- **Output**: A list of all objects in that image
+
+For example, if an image contains 1 person, 1 dog, and 1 car, the output is:
+
+$$\{(\text{person}, b_1), (\text{dog}, b_2), (\text{car}, b_3)\}$$
+
+Each element consists of a **(class label, bounding box)**. The output of detection is essentially a **set of multiple objects**.
+
+### 1.2 Why Is It Called a "Set"?
+
+The output is closer to a **set** than a simple list, because **the order of the ground truth does not matter** in object detection.
+
+If the answer is {person, dog, car}, predicting {car, person, dog} is equally correct. There is no rule like "the first prediction must be the person" or "the second must be the dog." Detection output is naturally an **unordered collection of objects — a set**.
+
+### 1.3 Why Is This a Hard Problem?
+
+Detection is fundamentally harder than standard classification for three reasons:
+
+**(1) The number of objects varies per image**
+
+Classification outputs a single fixed class per image. Detection, however, may need to output 0, 3, or 15 objects. **The output length is not fixed.**
+
+**(2) The output has no order**
+
+If the model predicts {dog box, person box} but the ground truth is {person box, dog box}, this is actually correct. But computers naturally want to compare "first prediction with first ground truth." **A matching between predictions and ground truth is needed.**
+
+**(3) Each object requires both location and class**
+
+It's not enough to predict "there's a dog." The class must be correct **and** the location must be accurate. Each output element is not a simple label but **structured information (class + box)**.
+
+### 1.4 Detection Is Fundamentally "Set Prediction"
+
+To summarize, detection is not just about drawing boxes. It's about predicting a **structured set** that is:
+
+- **Variable in size** (different number of objects per image)
+- **Unordered** (no canonical ordering)
+- Each element is **composed of class and box**
+
+The paper calls this a **set prediction task**.
+
+### 1.5 But Existing Detectors Don't Solve This Directly
+
+Existing detectors do not directly solve this set prediction problem. Instead, they convert it into an easier **surrogate problem**. The original problem is "image → set of objects," but since this is hard to handle directly, they:
+
+1. **Pre-generate thousands of candidate locations (anchors/proposals)**
+2. For each candidate: "Is there an object here?" (classification)
+3. "If so, how much should I adjust the box?" (regression)
+
+In other words, the original set prediction is **decomposed into classification + regression**. This is the **surrogate problem** and the **indirect approach**.
+
+### 1.6 Problems Created by the Anchor/Proposal Approach
+
+When many anchors are placed, **multiple anchors can simultaneously cover the same object**. If there's 1 dog in the image, anchor A, B, and C might all predict "dog." **The actual object is 1, but multiple prediction boxes appear — this is the duplicate prediction problem.**
+
+To resolve this, **NMS (Non-Maximum Suppression)** is needed as post-processing: keep the highest-scoring box and remove others that overlap significantly. NMS is not part of the detection problem itself — it's **a fix for the side effect of the indirect anchor-based approach**.
+
+As a result, detector performance depends not just on model capacity but heavily on these factors:
+
+| Hand-designed Component | Role |
+|------------------------|------|
+| **Anchor design** | What sizes and aspect ratios of anchors to use |
+| **Heuristic matching** | Which anchors count as positive/negative (e.g., IoU > 0.5 = positive) |
+| **NMS post-processing** | How to eliminate duplicate boxes |
+
+The detection pipeline is heavily influenced by **human-designed rules and engineering choices** beyond the core problem.
+
+### 1.7 DETR's Core Claim
+
+DETR makes this argument:
+
+> **"Instead of this complex detour, let's solve the original problem in its original form."**
+
+Directly predict "image → set of objects." DETR **removes anchors, removes NMS, removes heuristic matching**, and uses Transformers with bipartite matching to **directly learn set prediction**. The two key ingredients are:
 
 1. **A set-based global loss via bipartite matching**: forces unique matching between predicted and ground-truth objects
 2. **A transformer encoder-decoder architecture**: predicts all objects at once in parallel
 
 DETR is conceptually simple and does not require a specialized library. Inference code can be implemented in less than 50 lines in PyTorch.
+
+### Overall Flow Summary
+
+| Step | Description |
+|------|-------------|
+| **Detection's essence** | Finding multiple objects in an image. Output is an unordered set of objects → **set prediction** |
+| **Existing detectors** | Too hard to solve set prediction directly, so convert to anchor/proposal-based classification + regression → **surrogate problem, indirect approach** |
+| **Consequence** | Multiple anchors predict the same object → duplicate boxes → NMS needed. Performance depends on anchor design and heuristic rules |
+| **DETR** | Abandons the indirect approach and directly predicts the object set → **direct set prediction** |
 
 ![DETR overview - directly predicts final detection set in parallel using CNN backbone + Transformer](/images/detr/DETR_fig1_seagulls.png)
 *Figure 1: DETR directly predicts (in parallel) the final set of detections by combining a common CNN with a transformer architecture. During training, bipartite matching uniquely assigns predictions with ground truth boxes.*

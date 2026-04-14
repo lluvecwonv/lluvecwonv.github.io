@@ -20,16 +20,100 @@ Transformer encoder-decoder 구조와 bipartite matching 기반 set prediction l
 
 ---
 
-## 1. Introduction
+## 1. DETR의 문제의식: Object Detection은 왜 Set Prediction인가?
 
-기존 object detection 방법들은 대량의 proposal, anchor, 또는 window center에 대해 surrogate regression/classification 문제를 정의하는 간접적인 방식을 사용한다. 이 과정에서 near-duplicate prediction을 제거하기 위한 NMS(Non-Maximum Suppression), anchor set 설계, target box를 anchor에 할당하는 heuristic 등 다양한 hand-designed component가 필요하다.
+### 1.1 Object Detection이 진짜 풀고 싶은 문제
 
-DETR은 이러한 surrogate task들을 우회하여 **object detection을 direct set prediction 문제**로 바라본다. 핵심 구성요소는 두 가지이다:
+Object detection에서 정말 하고 싶은 일은 단순하다.
+
+- **입력**: 이미지 1장
+- **출력**: 그 이미지 안에 있는 모든 객체들의 목록
+
+예를 들어 이미지에 사람 1명, 강아지 1마리, 자동차 1대가 있으면, 출력은 이런 형태다:
+
+$$\{(\text{사람}, b_1), (\text{강아지}, b_2), (\text{자동차}, b_3)\}$$
+
+각 원소는 **(class label, bounding box)**로 이루어진다. 즉, detection의 출력은 **객체 여러 개의 집합(set)**이다.
+
+### 1.2 왜 "Set"이라고 부르는가?
+
+출력이 단순한 리스트가 아니라 **set**에 가깝다. 왜냐하면 object detection의 정답은 **순서가 중요하지 않기 때문**이다.
+
+정답이 {사람, 강아지, 자동차}일 때, 이걸 {자동차, 사람, 강아지} 순서로 예측해도 정답은 똑같다. "첫 번째가 사람이어야 한다", "두 번째가 강아지여야 한다" 같은 규칙이 없다. 그래서 detection의 출력은 순서가 있는 sequence가 아니라, **순서가 없는 객체들의 모음, 즉 set으로 보는 게 자연스럽다.**
+
+### 1.3 왜 이게 어려운 문제인가?
+
+Detection이 일반적인 classification보다 근본적으로 어려운 이유는 세 가지다.
+
+**(1) 객체 개수가 매번 다르다**
+
+Classification은 입력 이미지에 대해 고정된 클래스 1개를 출력하면 된다. 하지만 detection은 객체가 0개일 수도, 3개일 수도, 15개일 수도 있다. **출력 길이가 고정되어 있지 않다.**
+
+**(2) 출력 순서가 없다**
+
+모델이 {개 박스, 사람 박스} 순서로 예측했는데, 정답은 {사람 박스, 개 박스}라면? 사실 맞는 예측이다. 하지만 컴퓨터는 기본적으로 "첫 번째 예측은 첫 번째 정답과 비교"하려 한다. **예측과 정답을 어떻게 대응시킬지 matching이 필요하다.**
+
+**(3) 각 객체마다 위치와 클래스 둘 다 맞춰야 한다**
+
+단순히 "강아지가 있다"만 맞추면 되는 게 아니라, 클래스도 맞아야 하고 위치도 정확해야 한다. 출력 하나하나가 단순 label이 아니라 **구조화된 정보(class + box)**다.
+
+### 1.4 Detection의 본질은 "Set Prediction"이다
+
+정리하면, detection은 그냥 박스를 찍는 문제가 아니라:
+
+- **개수가 가변적**이고
+- **순서가 없고**
+- 각 원소가 **class와 box로 이루어진**
+
+**구조화된 set을 예측하는 문제**다. 논문에서 이를 **set prediction task**라고 부른다.
+
+### 1.5 그런데 기존 Detector는 이 문제를 직접 풀지 않았다
+
+기존 detector들은 이 set prediction 문제를 직접 풀지 않고, 더 쉬운 형태의 **surrogate problem(대리 문제)**으로 바꿔서 풀었다. 원래 문제는 "이미지 → 객체들의 집합"인데, 이걸 바로 다루기 어려우니까:
+
+1. **미리 후보 위치(anchor/proposal)를 수천 개 만들어 놓고**
+2. 각 후보에 대해 "이 후보에 객체가 있는가?" (classification)
+3. "있다면 박스를 얼마나 수정할까?" (regression)
+
+를 예측하게 한다. 즉, 원래의 set prediction을 **classification + regression 문제로 쪼개서** 푸는 것이다. 이것이 **surrogate problem**이고 **indirect approach**다.
+
+### 1.6 Anchor/Proposal 방식이 만드는 문제들
+
+anchor를 많이 깔아두면 **하나의 객체를 여러 anchor가 동시에 덮게** 된다. 이미지에 강아지 1마리가 있으면 anchor A, B, C가 모두 "강아지다"라고 예측할 수 있다. **실제 객체는 1개인데 예측 박스는 여러 개가 나오는 중복 예측(duplicate prediction) 문제가 발생한다.**
+
+이 중복을 정리하기 위해 **NMS(Non-Maximum Suppression)**가 필요하다. 가장 점수가 높은 박스 하나를 남기고, 그와 많이 겹치는 다른 박스들을 제거하는 후처리 과정이다. NMS는 원래 문제의 본질이 아니라, **anchor 기반 간접 접근 때문에 생긴 부작용을 정리하는 단계**다.
+
+결과적으로 기존 detector의 성능은 모델의 능력뿐만 아니라 다음 요소들에 크게 좌우된다:
+
+| Hand-designed Component | 역할 |
+|------------------------|------|
+| **Anchor design** | 어떤 크기와 비율의 anchor를 둘 것인가 |
+| **Heuristic matching** | 어떤 anchor를 positive/negative로 볼 것인가 (예: IoU > 0.5이면 positive) |
+| **NMS post-processing** | 중복 박스를 어떻게 제거할 것인가 |
+
+즉 원래 detection 문제 외에도 **사람이 정한 규칙과 설계가 엄청 많이 들어간다.**
+
+### 1.7 DETR의 핵심 주장
+
+DETR은 이렇게 말한다:
+
+> **"그렇게 복잡하게 우회하지 말고, 원래 문제를 원래 형태대로 직접 풀자."**
+
+"이미지 → 객체들의 집합"을 직접 예측하자는 것이다. 그래서 DETR은 **anchor도 없애고, NMS도 없애고, heuristic matching도 없애고**, Transformer와 bipartite matching을 이용해서 **set prediction 자체를 직접 학습**한다. 핵심 구성요소는 두 가지다:
 
 1. **Bipartite matching을 통한 set-based global loss**: predicted와 ground-truth object 간 unique matching을 강제
 2. **Transformer encoder-decoder architecture**: 모든 object를 한 번에 병렬로 예측
 
 DETR은 conceptually simple하며 specialized library가 필요 없다. PyTorch에서 50줄 미만의 inference code로 구현 가능하다.
+
+### 전체 흐름 요약
+
+| 단계 | 설명 |
+|------|------|
+| **Detection의 본질** | 이미지에서 객체 여러 개를 찾는 것. 출력은 순서 없는 객체들의 집합 → **set prediction** |
+| **기존 Detector** | Set prediction을 직접 풀기 어려워서, anchor/proposal 기반 classification + regression으로 변환 → **surrogate problem, indirect approach** |
+| **그 결과** | 하나의 객체를 여러 anchor가 동시에 예측 → 중복 박스 → NMS 필요. anchor 설계와 heuristic rule에 성능 좌우 |
+| **DETR** | 이런 우회 방식을 버리고, 객체 집합 자체를 직접 예측 → **direct set prediction** |
 
 ![DETR overview - CNN backbone + Transformer로 최종 detection set을 직접 병렬 예측](/images/detr/DETR_fig1_seagulls.png)
 *Figure 1: DETR은 CNN과 Transformer architecture를 결합하여 최종 detection set을 직접 병렬로 예측한다. 학습 시 bipartite matching이 prediction과 ground truth box를 고유하게 매칭한다.*
