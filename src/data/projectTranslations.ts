@@ -631,33 +631,37 @@ In addition, the system supports conversation-context management across all agen
   'heritage-monitoring': {
     en: {
       subtitle: 'AI-Based App for Climate-Responsive Conservation Management',
-      description: 'A deep learning-based multi-class damage detection model using DETR to help prevent climate-change-induced deterioration of national heritage sites.',
+      description: 'Developed a DETR-based multi-object detection model to identify climate-change-induced damage on national heritage sites, integrated with a Flutter field survey app as an End-to-End system.',
       sections: [
         {
           heading: 'Project Overview',
-          body: `We developed a national heritage monitoring system with AI-based damage detection to help prevent climate-change-related deterioration of heritage assets. The core AI module uses DETR to build a deep learning-based multi-class damage recognition model.`,
+          body: `Developed a DETR-based multi-object detection model to identify climate-change-induced deterioration of national heritage sites, and integrated it with a Flutter-based field survey app for real-world use by the Cultural Heritage Administration. Built an End-to-End system spanning data construction, model training, Docker-based API serving, and mobile app visualization.`,
         },
         {
-          heading: 'Mobile App UI',
-          body: `We built a mobile and web monitoring app for managing field survey data in real time. The system supports a structured field-workflow including login, survey registration, metadata management, photo capture, location recording, and damage inspection.`,
+          heading: 'Collaborative Data Construction & Quality Management',
+          body: `The initial dataset suffered from insufficient data for certain damage classes (such as decay and biological damage) and inconsistent labeling standards, resulting in poor detection performance for specific classes. To address this, we set up Label Studio to enable real-time feedback among labeling team members and accelerate the annotation workflow through a centralized data management environment. We performed exhaustive labeling across eight damage classes (cracking, fractures, crushing/bursting, decay, flaking, detachment, biological damage, etc.) while improving data quality. Ambiguous labeling criteria between classes were continuously synchronized through team feedback and guideline updates. Additionally, targeted augmentation techniques including rotation, cropping, and noise injection were applied to underrepresented classes to mitigate data imbalance.`,
+        },
+        {
+          heading: 'AI-Based Automated Damage Detection',
+          body: `Adopted the DETR (Detection Transformer) model, which excels at capturing inter-object relationships and contextual information, to precisely detect fine and complex damage patterns on heritage structures. Through high-quality dataset construction and training parameter optimization, we reduced performance variance across classes and achieved mAP (Mean Average Precision) of 0.615.`,
+          images: [
+            {
+              caption: 'Automated damage detection examples — the AI automatically identifies damaged regions in images',
+            },
+            {
+              caption: 'Experimental results on the validation dataset — achieving mAP 0.615',
+            },
+          ],
+        },
+        {
+          heading: 'Docker-Based Serving & Flutter Field Survey App',
+          body: `After model training, we built an inference server in a Docker container environment to prevent dependency conflicts (Python versions, CUDA libraries, etc.) between development and deployment environments and ensure deployment stability. The model was served via REST API, where images captured in the Flutter app are sent to the API, the server performs DETR inference, and returns bounding box and class information in JSON format. We analyzed the actual field survey process of the Cultural Heritage Administration to build the Flutter-based app, implementing an overlay feature that allows surveyors to immediately visualize damage locations and types on-site after taking a photo.`,
           images: [
             {
               caption: 'National heritage monitoring app — login and survey registration screens',
             },
             {
               caption: 'Field survey screen — basic information, metadata, location, photo capture, and damage inspection',
-            },
-          ],
-        },
-        {
-          heading: 'AI-Based Automated Damage Detection',
-          body: `We implemented an automated damage detection function based on AI image analysis. The model was trained and evaluated on eight damage classes including discoloration, cracks, crushing or bursting, decay, flaking, detachment, and biological damage. It achieved mAP 0.615, where mAP (Mean Average Precision) summarizes average detection accuracy across multiple object classes.`,
-          images: [
-            {
-              caption: 'Examples from the automated damage detection gallery — the AI automatically identifies damaged regions in images',
-            },
-            {
-              caption: 'Experimental results on the validation dataset — achieving mAP 0.615',
             },
           ],
         },

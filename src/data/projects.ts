@@ -460,32 +460,36 @@ export const projects: Project[] = [
     title: '국가 유산 모니터링 시스템',
     subtitle: '기후변화 대응 보존관리를 위한 AI 기반 앱',
     description:
-      '기후변화에 따른 국가 유산 훼손을 예방하기 위해, DETR 모델을 사용한 심층학습 기반 손상현상 다중분류 모델을 구축.',
-    tags: ['DETR', 'Object Detection', 'Mobile App', 'Deep Learning'],
+      '기후변화로 인한 국가 유산 훼손을 탐지하기 위해 DETR 기반 다중 객체 탐지 모델을 개발하고, 문화재청 현장 조사에 활용할 수 있도록 Flutter 기반 앱과 연동한 End-to-End 시스템.',
+    tags: ['DETR', 'Object Detection', 'Label Studio', 'Flutter', 'Docker', 'Deep Learning'],
     category: 'AI 기반 앱 개발',
     thumbnail: '/projects/heritage-2.jpeg',
     sections: [
       {
         heading: '프로젝트 개요',
-        body: '기후변화에 따른 국가 유산 훼손을 예방하기 위해, AI 기반 손상 탐지 기능을 포함한 국가 유산 모니터링 시스템을 개발했습니다. DETR 모델을 사용하여 심층학습 기반 손상현상 다중분류 모델을 구축했습니다.',
+        body: '기후변화로 인한 국가 유산 훼손을 탐지하기 위해 DETR 기반 다중 객체 탐지 모델을 개발하고, 실제 문화재청 현장 조사에 활용할 수 있도록 Flutter 기반 현장 조사 앱과 연동하였습니다. 데이터 구축부터 모델 학습, Docker 기반 API 서빙, 모바일 앱 시각화까지 이어지는 End-to-End 시스템을 구축하였습니다.',
       },
       {
-        heading: '모바일 앱 UI',
-        body: '현장 조사 데이터를 실시간으로 관리하는 모바일·웹 모니터링 앱을 개발했습니다. 로그인, 현장 조사, 메타데이터 관리, 사진 촬영, 위치 기록, 손상부 조사 등의 기능을 포함한 체계적인 조사 워크플로우를 구현했습니다.',
+        heading: '협업 기반 데이터 구축 및 품질 관리',
+        body: '초기 데이터셋은 부후, 충해 등 일부 클래스의 데이터가 부족하고, 레이블 기준이 일관되지 않아 특정 클래스의 탐지 성능이 낮은 문제가 있었습니다. 이를 해결하기 위해 레이블링 팀원들과의 실시간 피드백과 빠른 작업 진행을 위해 Label Studio를 직접 구축하여 중앙 집중형 데이터 관리 환경을 조성하였습니다. 8개 손상 클래스(갈라짐, 균열, 압괴/터짐, 부후, 박락, 탈락, 충해 등)에 대해 전수 레이블링을 수행하며 데이터 품질을 개선하였고, 클래스 간 모호한 기준은 팀 내 피드백을 통해 가이드라인을 지속적으로 동기화하였습니다. 또한 희소 클래스에 대해서는 회전, 크롭, 노이즈 추가 등 맞춤형 Augmentation을 적용하여 데이터 불균형 문제를 완화하였습니다.',
+      },
+      {
+        heading: 'AI 손상 자동 탐지',
+        body: '객체 간 관계 및 컨텍스트 파악에 유리한 DETR(Detection Transformer) 모델을 도입하여, 미세하고 복잡한 형태의 문화재 손상 부위를 정밀하게 탐지하도록 설계하였습니다. 고품질 데이터셋과 학습 파라미터 최적화를 통해 전반적인 클래스 간 성능 편차를 줄이며 mAP(Mean Average Precision) 0.615를 달성하였습니다.',
+        images: [
+          { src: '/projects/heritage-1.jpeg', caption: '손상 자동 탐지 예시 — AI가 이미지에서 손상 부위를 자동으로 감지' },
+          { src: '/projects/heritage-3.png', caption: '검증 데이터셋에 대한 실험결과 — mAP 0.615 달성' },
+        ],
+      },
+      {
+        heading: 'Docker 기반 서빙 및 Flutter 현장 조사 앱',
+        body: '모델 학습 이후, 개발 환경과 배포 환경 간의 의존성 충돌(Python 버전, CUDA 라이브러리 등)을 방지하고 배포 안정성을 확보하기 위해 Docker 기반 컨테이너 환경에서 추론 서버를 구축하였습니다. REST API 형태로 모델을 서빙하도록 설계하여, Flutter 앱에서 촬영한 이미지를 API로 전송하면 서버에서 DETR 추론을 수행하고 bounding box 및 클래스 정보를 JSON으로 반환하도록 구현하였습니다. 실제 문화재청 현장 조사 프로세스를 분석하여 Flutter 기반 앱을 제작하였으며, 조사자가 현장에서 사진을 찍으면 즉시 손상 위치와 종류를 시각적으로 확인할 수 있는 오버레이 기능을 구현하였습니다.',
         images: [
           { src: '/projects/heritage-0.jpeg', caption: '국가유산 모니터링 앱 — 로그인 및 조사 등록 화면' },
           { src: '/projects/heritage-2.jpeg', caption: '현장 조사 화면 — 기본정보, 메타, 위치, 사진 촬영 및 손상부 조사' },
         ],
       },
-      {
-        heading: 'AI 손상 자동 탐지',
-        body: 'AI 기반 이미지 분석 모델을 활용한 손상 자동 탐지 기능을 구현했습니다. 8개의 손상 클래스(갈람, 균열, 압괴/터짐, 부후, 박락, 탈락, 충해)로 학습하고 평가를 수행했습니다. 성능 평가 지표 mAP(Mean Average Precision) 0.615를 달성했으며, mAP는 여러 객체 클래스에 대한 평균 정확도를 종합한 지표입니다.',
-        images: [
-          { src: '/projects/heritage-1.jpeg', caption: '손상 자동 탐지 갤럽 예시 — AI가 이미지에서 손상 부위를 자동으로 감지' },
-          { src: '/projects/heritage-3.png', caption: '검증데이터셋에 대한 실험결과 — mAP 0.615 달성' },
-        ],
-      },
     ],
-    techStack: ['Python', 'PyTorch', 'DETR', 'React', 'React Native', 'FastAPI'],
+    techStack: ['Python', 'PyTorch', 'DETR', 'Label Studio', 'Docker', 'Flutter', 'FastAPI'],
   },
 ]
