@@ -30,7 +30,7 @@ export default function CV() {
           <h2 className={styles.sectionTitle}>Education</h2>
           <div className={styles.entry}>
             <div className={styles.entryHeader}>
-              <strong>Master of Computer Science</strong>
+              <strong>Master of Computer Science (Graduated)</strong>
               <span className={styles.date}>Mar. 2024 – Feb. 2026</span>
             </div>
             <div className={styles.entryDetail}>
@@ -47,6 +47,16 @@ export default function CV() {
             </div>
             <div className={styles.entryDetail}>
               <span>Jeonbuk National University, Jeonju, Republic of Korea</span>
+            </div>
+          </div>
+        </section>
+
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Experience</h2>
+          <div className={styles.entry}>
+            <div className={styles.entryHeader}>
+              <strong>Research Engineer, <a href="https://selectstar.ai/" target="_blank" rel="noopener noreferrer">Selectstar</a></strong>
+              <span className={styles.date}>Feb. 2026 – Present</span>
             </div>
           </div>
         </section>
