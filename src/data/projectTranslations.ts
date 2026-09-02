@@ -707,6 +707,10 @@ It accepts requests through three entry points, Slack Bot, HTTP API, and CLI, an
 The Adapter Layer is the interface layer that lets users and external systems reach Selecy, currently accepting requests through three paths: Slack Bot, CLI Client, and HTTP Caller. The top-level orchestrator receives the user's request, decomposes the task, selects the specialist agent best suited to handle it, and then reviews and integrates each agent's results into a final answer.
 
 The overall processing flow follows: user request, request analysis and task planning, specialist agent selection, data and tool use, result integration, final answer generation. Rather than having a single language model handle every task directly, the design distributes responsibilities, task planning, tool selection, information retrieval, data lookup, result review, and answer generation, across multiple components.`,
+          images: [
+            { caption: 'Figure 1. Selecy system architecture — Adapter Layer (Slack Bot, CLI Client, HTTP Caller) leads into the Agent API Layer (unified / per-agent / auxiliary endpoints), which feeds the Multi-Agent Workflow and Specialist Agent Runtime, both backed by Shared Runtime Resources.' },
+            { caption: 'Figure 2. Request processing flow — user request, AgentService, Orchestrator, Planner, Router, Specialist Agents (slack_read, notion_read, web, crawl, text, parser, scheduler), Critic, Synthesizer, final answer.' },
+          ],
         },
         {
           heading: '3. Specialist Sub-Agents and the Ledger Database',

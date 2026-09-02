@@ -502,6 +502,7 @@ export const projects: Project[] = [
     description: `사용자의 요청을 분석해 적합한 전문 Agent를 선택하고, 필요한 도구와 메모리를 활용해 작업을 수행한 뒤 최종 응답을 생성하는 사내 AI Agent 플랫폼. Slack Bot·HTTP API·CLI 세 진입점을 하나의 실행 코어로 묶고, MCP 기반 도구 화이트리스트로 Notion·Slack 접근을 읽기 전용으로 제한했다.`,
     tags: ['Multi-Agent', 'LLM', 'MCP', 'RAG', 'Slack Bot', 'AI Transformation'],
     category: 'Agent',
+    thumbnail: '/projects/selecy-0.png',
     sections: [
       {
         heading: '1. 프로젝트 개요 — 셀렉이(Selecy)란?',
@@ -516,6 +517,10 @@ Slack Bot, HTTP API, CLI 세 가지 진입점을 통해 요청을 받으며, 사
 Adapter Layer는 사용자 또는 외부 시스템이 셀렉이에 접근하도록 지원하는 인터페이스 계층으로, 현재 Slack Bot·CLI Client·HTTP Caller 세 경로로 요청을 받습니다. 상위 오케스트레이터는 사용자 요청을 수신해 작업을 분해하고, 요청을 처리하기에 적합한 전문 에이전트를 선택한 뒤, 각 에이전트의 결과를 검토·통합해 최종 답변을 생성합니다.
 
 전체 처리 흐름은 "사용자 요청 → 요청 분석 및 작업 계획 → 전문 Agent 선택 → 데이터 및 도구 활용 → 결과 통합 → 최종 답변 생성" 순서를 따릅니다. 하나의 언어 모델이 모든 업무를 직접 처리하는 대신, 업무 계획 수립·도구 선택·정보 검색·데이터 조회·결과 검토 및 답변 생성 등의 역할을 여러 구성요소가 분담하도록 설계했습니다.`,
+        images: [
+          { src: '/projects/selecy-0.png', caption: '그림 1. 셀렉이 시스템 아키텍처 — Adapter Layer(Slack Bot·CLI Client·HTTP Caller) → Agent API Layer(통합/개별/보조 API) → Multi-Agent Workflow·Specialist Agent Runtime → Shared Runtime Resources' },
+          { src: '/projects/selecy-1.png', caption: '그림 2. 요청 처리 흐름 — 사용자 요청 → AgentService → Orchestrator → Planner → Router → Specialist Agents(slack_read·notion_read·web·crawl·text·parser·scheduler) → Critic → Synthesizer → 최종 답변' },
+        ],
       },
       {
         heading: '3. 전문 서브 에이전트와 원장(Ledger) 데이터베이스',
