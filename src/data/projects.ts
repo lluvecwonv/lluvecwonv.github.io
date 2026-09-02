@@ -319,7 +319,7 @@ export const projects: Project[] = [
     description:
       '전북대학교 학생을 위한 AI 학사 멘토링 시스템으로, LangGraph 기반 다중 에이전트 아키텍처와 Docker 마이크로서비스로 구현된 개인화 커리큘럼 추천·학사 정보 조회 챗봇.',
     tags: ['LangGraph', 'Multi-Agent', 'Docker', 'Open WebUI', 'FastAPI'],
-    category: 'AI 기반 앱 개발',
+    category: 'Agent',
     github: 'https://github.com/lluvecwonv/Ai_mentor',
     thumbnail: '/projects/jbnu-main.png',
     sections: [
@@ -403,7 +403,7 @@ export const projects: Project[] = [
     description:
       'AI 예술과 AI 부활이라는 두 가지 윤리적 딜레마를 탐구하는 대화형 시스템으로, LangGraph 상태 머신 기반 7개 에이전트(진행자 2 + 페르소나 4 + SPT 1)가 의무론·공리주의·중립 관점을 일관되게 유지하며 플레이어의 윤리적 사고를 촉진.',
     tags: ['LangGraph', 'Multi-Agent', 'DPO Fine-tuning', 'Self-Reflection', 'SPT', 'AI Ethics', 'GPT-4o'],
-    category: 'AI 기반 앱 개발',
+    category: 'Agent',
     github: 'https://github.com/lluvecwonv/PERSONA.I.',
     demo: 'https://persona-i.com/episode/1?idx=554',
     thumbnail: '/projects/moral-0.png',
