@@ -118,8 +118,9 @@ export default function CV() {
               <strong>Selecy — In-house Multi-Agent AI Platform (Selectstar)</strong>
             </div>
             <p className={styles.text}>
-              Built an in-house AI agent that searches and retrieves information across Slack and Notion, answers employee
-              questions, and automates internal documentation — accessible via Slack, HTTP API, and CLI.
+              Built an in-house multi-agent AI system that orchestrates specialized agents via MCP (Model Context Protocol)
+              to search and retrieve information across Slack and Notion, answering employee questions and automating
+              internal documentation.
             </p>
           </div>
           <div className={styles.entry}>
