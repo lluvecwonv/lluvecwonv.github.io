@@ -7,9 +7,8 @@ export default function CV() {
         <header className={styles.header}>
           <h1 className={styles.name}>Chaewon Yoon</h1>
           <div className={styles.info}>
-            <p>Department of Computer Science</p>
-            <p>Jeonbuk National University</p>
-            <p>567 Baekje-daero, Deokjin-gu, Jeonju-si, Jeonbuk, 54896, Korea</p>
+            <p>AI Research Engineer</p>
+            <p>Selectstar</p>
             <div className={styles.contactLinks}>
               <a href="mailto:chaewon0510@gmail.com">chaewon0510@gmail.com</a>
               <span className={styles.dot}>·</span>
@@ -55,7 +54,7 @@ export default function CV() {
           <h2 className={styles.sectionTitle}>Experience</h2>
           <div className={styles.entry}>
             <div className={styles.entryHeader}>
-              <strong>Research Engineer, <a href="https://selectstar.ai/" target="_blank" rel="noopener noreferrer">Selectstar</a></strong>
+              <strong>AI Research Engineer, <a href="https://selectstar.ai/" target="_blank" rel="noopener noreferrer">Selectstar</a></strong>
               <span className={styles.date}>Feb. 2026 – Present</span>
             </div>
           </div>
