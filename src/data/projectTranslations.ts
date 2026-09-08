@@ -25,6 +25,7 @@ export const projectTitleEnglishGlossary: Record<string, string> = {
   'qa-unlearning': 'Large Language Model Unlearning based on Question Answering',
   'heritage-monitoring': 'National Heritage Monitoring System',
   'moral-agent': 'PERSONA.I. — AI Ethics Conversational Education System',
+  selecy: 'Selecy — In-house Multi-Agent AI Platform',
 }
 
 export const projectTranslations: Record<string, Partial<Record<ProjectLocale, LocalizedProjectTranslation>>> = {
@@ -684,6 +685,64 @@ As a result, we implemented an End-to-End system spanning data construction, mod
               caption: 'Field survey screen — basic information, metadata, location, photo capture, and damage inspection',
             },
           ],
+        },
+      ],
+    },
+  },
+  selecy: {
+    en: {
+      subtitle: `A five-layer, multi-agent AI platform (Adapter, Agent API, Multi-Agent Workflow) with an MCP-based tool whitelist that automates internal information retrieval and documentation work`,
+      description: `An in-house AI agent platform that analyzes a user's request, selects the right specialist agent, performs the task using the necessary tools and memory, and generates a final response. It unifies three entry points, Slack Bot, HTTP API, and CLI, behind one execution core, and restricts Notion/Slack access to read-only through an MCP-based tool whitelist.`,
+      sections: [
+        {
+          heading: '1. Project Overview — What is Selecy?',
+          body: `Selecy is an in-house AI agent platform that analyzes a user's request, selects the appropriate specialist agent, performs the task using the necessary tools and memory, and generates a final response. It was built to go beyond simple question-answering and convert repetitive work, task execution, documentation, and information retrieval, into agent-driven workflows, with the goal of realizing in-house AX (AI Transformation).
+
+It accepts requests through three entry points, Slack Bot, HTTP API, and CLI, and provides a range of internal information retrieval and generation features: answering internal HR FAQs, looking up Notion documents, searching Slack conversations, reading internal PDF documents, backtracking document-related threads, drafting reports from templates, and scheduling reminders. It has been under development for about two months since its first commit in June 2026.`,
+        },
+        {
+          heading: '2. System Architecture — A Five-Layer Multi-Agent Structure',
+          body: `Selecy processes requests from various user interfaces through a single Agent API, and depending on the complexity and purpose of the request, runs either a multi-agent workflow or an individual specialist agent. The overall system is organized into five areas: the Adapter Layer, Agent API Layer, Multi-Agent Workflow, Specialist Agent Runtime, and Shared Runtime Resources.
+
+The Adapter Layer is the interface layer that lets users and external systems reach Selecy, currently accepting requests through three paths: Slack Bot, CLI Client, and HTTP Caller. The top-level orchestrator receives the user's request, decomposes the task, selects the specialist agent best suited to handle it, and then reviews and integrates each agent's results into a final answer.
+
+The overall processing flow follows: user request, request analysis and task planning, specialist agent selection, data and tool use, result integration, final answer generation. Rather than having a single language model handle every task directly, the design distributes responsibilities, task planning, tool selection, information retrieval, data lookup, result review, and answer generation, across multiple components.`,
+          images: [
+            { caption: 'Figure 1. Selecy system architecture — Adapter Layer (Slack Bot, CLI Client, HTTP Caller) leads into the Agent API Layer (unified / per-agent / auxiliary endpoints), which feeds the Multi-Agent Workflow and Specialist Agent Runtime, both backed by Shared Runtime Resources.' },
+            { caption: 'Figure 2. Request processing flow — user request, AgentService, Orchestrator, Planner, Router, Specialist Agents (slack_read, notion_read, web, crawl, text, parser, scheduler), Critic, Synthesizer, final answer.' },
+          ],
+        },
+        {
+          heading: '3. Specialist Sub-Agents and the Ledger Database',
+          body: `Selecy runs seven role-specialized sub-agents.
+
+HR FAQ is a RAG agent that searches the in-house HR FAQ knowledge base (FAISS) to answer questions about HR, general affairs, attendance, equipment, and benefits. NOTION READ is a read-only agent that searches internal Notion for evidence at the page or database-row level. SLACK is a read-only agent that searches internal Slack conversations to gather evidence of who said what, when, and where. SCHEDULER lets users register requests such as summarizing the weekly report every Monday at 9am, then re-runs the assistant when the time comes and posts the result to the channel. PARSER extracts text from PDFs and structures it into a searchable form. REPORTER lets teams register their report templates, then fills in the blanks through chat and produces markup ready to paste into Notion. TEXT is a pure-conversion worker with no tools attached.
+
+Every execution is logged to a single ledger database broken down step by step as person, conversation, question, execution, step, tool call, with each level in a 1:N relationship to the one before it. The speaker is recorded on the question (turn) rather than the conversation (session), so both 1:1 DMs and channel threads where multiple people participate together can be tracked accurately. Because execution records can be retried and regenerated while operational records must be preserved, the two are deliberately kept separate rather than joined by a hard foreign key.`,
+        },
+        {
+          heading: '4. Model and Tool Control Layer — an MCP-Based Whitelist',
+          body: `Every agent in Selecy shares a single LLM client, and which model it runs on is decided by a single environment variable rather than by code, an agent has no way of knowing which model it is running on. It currently defaults to gpt-5.4 (OpenAI Responses API, reasoning effort low), and the provider can be swapped across three branches: openai, anthropic, or openai_compatible (anthropic maps to claude-opus-4-7, and openai_compatible connects to OpenAI-compatible gateways such as Ollama, LiteLLM, or vLLM).
+
+Every tool that touches an external system (Notion, Slack) is exposed only through an MCP server, agents never call those APIs directly. The MCP server sits in front and controls exactly what can be called. Tools are filtered in the order discover, whitelist filter, expose to LLM, so a filtered-out tool never even appears in the model's tool list.
+
+For Notion, Selecy runs the official MCP server (@notionhq/notion-mcp-server) over stdio, but trims it down to 13 read-only operations and blocks the entire create/patch/update/delete/move/comment family, so the bot can never create or modify a page on the user's behalf. Six deterministic local tools are layered on top: parse_notion_url, find_db_by_name, resolve_notion_target, inspect_db_schema, fetch_page_full, and query_inline_db_rows. For Slack, instead of the official server, Selecy implements its own with FastMCP, exposing only four read-only tools split along a permission boundary: slack_search_context and slack_find_threads search the entire workspace, including public channels the bot has not joined (via the Real-time Search API), while slack_search_mentions and slack_read_thread only work in channels the bot is a member of.
+
+The internal knowledge base is vectorized into a local FAISS index, and the retrieval strategy can be swapped depending on the nature of the query. The default (auto) is FAISS vector search over OpenAI text-embedding-3-small embeddings; bm25 keyword search, which has no embedding cost, works better for exact code or proper-noun lookups, and when quality matters most, hybrid fuses the two with RRF.`,
+        },
+        {
+          heading: '5. Connecting to Datumo (the In-House Evaluation Platform) and the Difficulty of Evaluation',
+          body: `About six weeks after development began, on July 15, 2026, Selecy was connected to Datumo, the company's in-house AI evaluation platform, for a demo that tried to reproduce Datumo's own evaluation metrics end to end. The point of the demo was not to measure Selecy's performance, but to verify, from the standpoint of a non-expert client, whether Datumo could actually evaluate a multi-agent system like Selecy at all. Selecy served as Datumo's first internal client case, functioning simultaneously as the system under evaluation and as a way to stress-test the usability of the evaluation platform itself.
+
+Evaluation was attempted along two tracks: the retriever module and the tool-use module. The planned full evaluation of the HR FAQ sub-agent was narrowed down to a retriever-only evaluation, and even that failed entirely at the metric-computation stage with an INTERNAL_SERVER_ERROR. The subsequent tool-use evaluation could not proceed properly either, because no gold set existed for correct tool usage. As a result, 9 of the platform's 12 agents still have no evaluation criteria at all, and the remaining 3 have evaluations that were never completed.
+
+What the demo made clear was that, without real usage data, the preconditions an evaluation actually needs simply cannot be established: the distribution of what people actually ask, the diversity of phrasing that shows up only in real conversation, such as referring back to that issue from before, the concurrency of multiple people making overlapping requests in the same thread, the time axis that only reveals itself once real time passes (scheduled triggers, retries, recovery), and permission boundaries that only exist in the actual workspace. It also became clear that satisfaction cannot be approximated by a proxy metric like retrieval accuracy, it is a judgment only the person who asked can make.`,
+        },
+        {
+          heading: '6. Why Deploy Now — Conclusion',
+          body: `Because Selecy's ledger already records every step from person, conversation, question, execution, step, tool call, evaluation assets start accumulating automatically the moment real usage begins. Once real usage logs build up, routing, prompts, and tool design can be evaluated and improved on solid evidence, and the step-by-step execution record makes it possible to quantify exactly where failures and retries cluster across agents. The emoji-reaction feature already built into the system lets satisfaction be labeled alongside each answer, and, most importantly, real usage logs can resolve the single biggest bottleneck the Datumo demo exposed: having to build a benchmark from scratch.
+
+Because execution records are not tied to operational records by a hard foreign key, retrying and regenerating them for evaluation purposes never corrupts operational data, which means the improvement cycle after deployment can move quickly. The real bottleneck this project faces right now is not a lack of features but a lack of evidence. Rather than continuing to stack features on unverified assumptions, the proposed next step for Selecy is to deploy it, gather live usage data, and let the agent development team and the evaluation team split roles, like a blue team and a red team, to judge the next direction for improvement on real evidence.`,
         },
       ],
     },

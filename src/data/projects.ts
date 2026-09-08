@@ -319,7 +319,7 @@ export const projects: Project[] = [
     description:
       '전북대학교 학생을 위한 AI 학사 멘토링 시스템으로, LangGraph 기반 다중 에이전트 아키텍처와 Docker 마이크로서비스로 구현된 개인화 커리큘럼 추천·학사 정보 조회 챗봇.',
     tags: ['LangGraph', 'Multi-Agent', 'Docker', 'Open WebUI', 'FastAPI'],
-    category: 'AI 기반 앱 개발',
+    category: 'Agent',
     github: 'https://github.com/lluvecwonv/Ai_mentor',
     thumbnail: '/projects/jbnu-main.png',
     sections: [
@@ -403,7 +403,7 @@ export const projects: Project[] = [
     description:
       'AI 예술과 AI 부활이라는 두 가지 윤리적 딜레마를 탐구하는 대화형 시스템으로, LangGraph 상태 머신 기반 7개 에이전트(진행자 2 + 페르소나 4 + SPT 1)가 의무론·공리주의·중립 관점을 일관되게 유지하며 플레이어의 윤리적 사고를 촉진.',
     tags: ['LangGraph', 'Multi-Agent', 'DPO Fine-tuning', 'Self-Reflection', 'SPT', 'AI Ethics', 'GPT-4o'],
-    category: 'AI 기반 앱 개발',
+    category: 'Agent',
     github: 'https://github.com/lluvecwonv/PERSONA.I.',
     demo: 'https://persona-i.com/episode/1?idx=554',
     thumbnail: '/projects/moral-0.png',
@@ -492,5 +492,69 @@ export const projects: Project[] = [
       },
     ],
     techStack: ['Python', 'PyTorch', 'DETR', 'Label Studio', 'Docker', 'Flutter', 'FastAPI'],
+  },
+
+  // ── Agent ──
+  {
+    slug: 'selecy',
+    title: '셀렉이 — 사내 멀티 에이전트 AI 플랫폼',
+    subtitle: 'Adapter → Agent API → Multi-Agent Workflow 5계층 구조와 MCP 기반 도구 화이트리스트로 사내 정보 탐색과 문서화 업무를 자동화하는 AI Agent 플랫폼',
+    description: `사용자의 요청을 분석해 적합한 전문 Agent를 선택하고, 필요한 도구와 메모리를 활용해 작업을 수행한 뒤 최종 응답을 생성하는 사내 AI Agent 플랫폼. Slack Bot·HTTP API·CLI 세 진입점을 하나의 실행 코어로 묶고, MCP 기반 도구 화이트리스트로 Notion·Slack 접근을 읽기 전용으로 제한했다.`,
+    tags: ['Multi-Agent', 'LLM', 'MCP', 'RAG', 'Slack Bot', 'AI Transformation'],
+    category: 'Agent',
+    thumbnail: '/projects/selecy-0.png',
+    sections: [
+      {
+        heading: '1. 프로젝트 개요 — 셀렉이(Selecy)란?',
+        body: `셀렉이는 사용자의 요청을 분석해 적절한 전문 Agent를 선택하고, 필요한 도구 및 메모리를 활용해 작업을 수행한 뒤 최종 응답을 생성하는 사내 AI Agent 플랫폼입니다. 단순한 질의응답 수준을 넘어 반복적인 업무 수행·문서화·정보 탐색을 Agent 기반으로 전환함으로써 사내 AX(AI Transformation)를 실현하는 것을 목표로 개발했습니다.
+
+Slack Bot, HTTP API, CLI 세 가지 진입점을 통해 요청을 받으며, 사내 인사 FAQ 응답, Notion 문서 조회, Slack 대화 검색, 사내문서 PDF 리딩, 문서 기반 스레드 백트래킹, 템플릿 기반 보고서 초안 작성, 스케줄 알림 등 다양한 사내 정보 탐색·생성 기능을 제공합니다. 2026년 6월 첫 커밋 이후 약 2개월간 개발되었습니다.`,
+      },
+      {
+        heading: '2. 시스템 아키텍처 — 5계층 멀티 에이전트 구조',
+        body: `셀렉이는 다양한 사용자 인터페이스에서 전달된 요청을 하나의 Agent API로 처리하고, 요청의 복잡도와 목적에 따라 멀티 에이전트 워크플로 또는 개별 전문 에이전트를 실행하는 구조로 설계했습니다. 전체 시스템은 Adapter Layer, Agent API Layer, Multi-Agent Workflow, Specialist Agent Runtime, Shared Runtime Resources 다섯 영역으로 구성됩니다.
+
+Adapter Layer는 사용자 또는 외부 시스템이 셀렉이에 접근하도록 지원하는 인터페이스 계층으로, 현재 Slack Bot·CLI Client·HTTP Caller 세 경로로 요청을 받습니다. 상위 오케스트레이터는 사용자 요청을 수신해 작업을 분해하고, 요청을 처리하기에 적합한 전문 에이전트를 선택한 뒤, 각 에이전트의 결과를 검토·통합해 최종 답변을 생성합니다.
+
+전체 처리 흐름은 "사용자 요청 → 요청 분석 및 작업 계획 → 전문 Agent 선택 → 데이터 및 도구 활용 → 결과 통합 → 최종 답변 생성" 순서를 따릅니다. 하나의 언어 모델이 모든 업무를 직접 처리하는 대신, 업무 계획 수립·도구 선택·정보 검색·데이터 조회·결과 검토 및 답변 생성 등의 역할을 여러 구성요소가 분담하도록 설계했습니다.`,
+        images: [
+          { src: '/projects/selecy-0.png', caption: '그림 1. 셀렉이 시스템 아키텍처 — Adapter Layer(Slack Bot·CLI Client·HTTP Caller) → Agent API Layer(통합/개별/보조 API) → Multi-Agent Workflow·Specialist Agent Runtime → Shared Runtime Resources' },
+          { src: '/projects/selecy-1.png', caption: '그림 2. 요청 처리 흐름 — 사용자 요청 → AgentService → Orchestrator → Planner → Router → Specialist Agents(slack_read·notion_read·web·crawl·text·parser·scheduler) → Critic → Synthesizer → 최종 답변' },
+        ],
+      },
+      {
+        heading: '3. 전문 서브 에이전트와 원장(Ledger) 데이터베이스',
+        body: `셀렉이는 역할별로 특화된 7종의 서브 에이전트를 운영합니다.
+
+HR FAQ는 사내 인사팀 FAQ 지식베이스(FAISS)를 검색해 인사·총무·근태·장비·복지 질문에 답하는 RAG 에이전트입니다. NOTION READ는 사내 Notion을 읽기 전용으로 탐색해 본문·DB row 단위 근거를 찾아오는 에이전트입니다. SLACK은 사내 Slack 대화를 검색해 "누가 언제 어디서 뭐라고 했는지" 근거를 모으는 읽기 전용 에이전트입니다. SCHEDULER는 "매주 월요일 9시에 주간보고 정리해줘" 같은 요청을 등록해두고 시간이 되면 어시스턴트를 재실행해 채널에 결과를 전달하는 에이전트입니다. PARSER는 PDF에서 텍스트를 추출해 검색 가능한 형태로 구조화하는 에이전트입니다. REPORTER는 팀별 보고서 양식을 등록해두고 빈칸을 채팅으로 채워 Notion에 붙여넣을 마크업으로 만들어주는 에이전트입니다. TEXT는 도구 없이 순수 텍스트 변환만 수행하는 워커입니다.
+
+모든 실행 기록은 사람 → 대화 → 질문 → 실행 → 단계 → 도구 호출 순서로 세분화된 하나의 원장(ledger) 데이터베이스에 저장되며, 각 단계는 이전 단계와 1:N 관계를 이룹니다. 발화자는 대화(session)가 아닌 질문(turn)에 기록되어, 1:1 DM뿐 아니라 여러 사용자가 함께 참여하는 채널 스레드도 정확히 추적할 수 있습니다. 실행 기록은 재수행·재생성될 수 있는 반면 운영 기록은 보존되어야 하므로, 두 기록은 하드 FK로 묶지 않고 분리해 설계했습니다.`,
+      },
+      {
+        heading: '4. 모델·도구 제어 계층 — MCP 기반 화이트리스트',
+        body: `셀렉이의 모든 에이전트는 하나의 LLM 클라이언트를 공유하며, 어떤 모델을 쓸지는 코드가 아니라 환경변수 한 줄로 결정됩니다. 에이전트는 자신이 어떤 모델 위에서 동작하는지 알지 못하도록 설계했습니다. 현재는 gpt-5.4(OpenAI Responses API, reasoning effort low)를 기본으로 사용하며, 공급자를 openai / anthropic / openai_compatible 세 갈래로 갈아 끼울 수 있습니다(anthropic은 claude-opus-4-7, openai_compatible은 Ollama·LiteLLM·vLLM 등 OpenAI 호환 게이트웨이).
+
+외부 시스템(Notion·Slack)에 닿는 도구는 전부 MCP 서버를 통해서만 노출됩니다. 에이전트가 API를 직접 호출하지 않고, MCP 서버가 한 겹 앞에 서서 무엇을 호출할 수 있는지를 통제합니다. 도구는 서버에서 발견(discover) → 화이트리스트 필터 → LLM 노출의 순서로 걸러지며, 필터링된 도구는 모델의 도구 목록에 아예 오르지 않습니다.
+
+Notion은 공식 MCP 서버(@notionhq/notion-mcp-server)를 stdio로 띄우되 read-only 13종만 통과시키고 create/patch/update/delete/move/comment 계열은 전부 차단해, 봇이 사용자 대신 페이지를 만들거나 고칠 수 없도록 설계했습니다. 여기에 parse_notion_url·find_db_by_name·resolve_notion_target·inspect_db_schema·fetch_page_full·query_inline_db_rows 등 결정적 로컬 도구 6종을 더했습니다. Slack은 공식 서버 대신 FastMCP로 직접 구현했으며, slack_search_context·slack_find_threads(봇이 참여하지 않은 공개 채널까지 워크스페이스 전체를 검색)와 slack_search_mentions·slack_read_thread(봇이 멤버인 채널 한정) 등 조회 전용 도구 4종만 노출합니다.
+
+사내 지식베이스는 로컬 FAISS 인덱스로 벡터화하며, 검색 전략은 질의 성격에 따라 갈아 끼울 수 있습니다. 기본값(auto)은 OpenAI text-embedding-3-small 임베딩 기반 FAISS 벡터 검색이고, 정확한 코드·고유명사 검색에는 임베딩 비용이 없는 bm25 키워드 검색이, 품질이 가장 중요할 때는 두 방식을 RRF로 융합한 hybrid 전략이 더 낫습니다.`,
+      },
+      {
+        heading: '5. 다투모(사내 평가 플랫폼) 연동과 평가의 어려움',
+        body: `개발 시작 약 6주 뒤인 2026년 7월 15일, 셀렉이를 사내 AI 평가 플랫폼 '다투모'에 연결해 자체평가 메트릭을 그대로 재현해보는 시연을 진행했습니다. 시연의 목적은 셀렉이의 성능 확인이 아니라, "비전문가 클라이언트"의 관점에서 다투모가 셀렉이 같은 멀티 에이전트 시스템을 평가할 수 있는지를 직접 검증하는 것이었습니다. 셀렉이는 다투모의 첫 내부 클라이언트 케이스로 쓰여, 평가 대상인 동시에 평가 플랫폼의 사용성을 검증하는 도구 역할도 겸했습니다.
+
+retriever 모듈과 tool use 모듈 두 갈래로 평가를 시도했습니다. 계획했던 HR FAQ 서브에이전트 전체 평가는 Retriever 평가로 범위가 축소되었고, 그마저도 메트릭 계산 단계에서 서버 오류(INTERNAL_SERVER_ERROR)로 전부 실패했습니다. 이어서 진행한 tool use 평가는 툴 사용에 대한 gold set(정답 데이터)이 없어 제대로 진행되지 못했습니다. 결과적으로 12종의 에이전트 중 9종은 평가 기준조차 없고, 나머지 3종도 평가를 완주하지 못한 상태로 남았습니다.
+
+이 시연을 통해 확인한 것은, 실사용 데이터 없이는 평가에 필요한 전제조건 자체를 확보할 수 없다는 점이었습니다. 사람들이 실제로 무엇을 묻는지의 의도 분포, "저번 그 문제"처럼 지시대명사를 쓰는 표현의 다양성, 여러 사람이 한 스레드에 동시에 요청하는 동시성, 예약·재시도·복구처럼 시간이 실제로 흘러야 검증되는 시간 축, 실제 워크스페이스에서만 드러나는 권한 경계까지 — 이 모두가 실사용 환경에서만 확인할 수 있는 조건들이었습니다. 특히 만족도는 검색 정확도 같은 대리 지표로 대체할 수 없으며, 요청한 사람만 내릴 수 있는 판단이라는 점도 분명해졌습니다.`,
+      },
+      {
+        heading: '6. 왜 지금 배포해야 하는가 — 결론',
+        body: `셀렉이의 원장은 사람 → 대화 → 질문 → 실행 → 단계 → 도구 호출을 이미 단계별로 기록하고 있으므로, 사용이 시작되는 순간부터 평가 자산이 자동으로 쌓이는 구조입니다. 실사용 로그가 쌓이면 라우팅·프롬프트·도구 설계를 근거 기반으로 평가하고 발전시킬 수 있고, 단계별 실행 기록으로 어느 에이전트에 실패와 재시도가 집중되는지 정량적으로 확인할 수 있습니다. 이미 구축된 이모지 반응 수집 기능으로 만족도와 답변을 함께 라벨링할 수 있고, 무엇보다 다투모 시연에서 가장 큰 어려움이었던 "벤치마크를 처음부터 직접 만들어야 한다"는 병목을 실사용 로그 자체로 해소할 수 있습니다.
+
+실행 기록은 운영 기록과 하드 FK로 묶여 있지 않아 재실행·재생성이 운영 데이터를 훼손하지 않으므로, 배포 이후에도 평가 목적의 반복 실험을 통해 개선 사이클을 빠르게 돌릴 수 있습니다. 현재 이 프로젝트가 마주한 병목은 기능 부족이 아니라 판단 근거의 부족입니다. 검증되지 않은 가정 위에 기능을 계속 쌓기보다, 배포를 통해 살아있는 사용 데이터를 확보하고 이를 기반으로 에이전트 개발팀과 평가팀이 역할을 나누어 다음 개선 방향을 근거 있게 판단해 나가는 것을 셀렉이의 다음 단계로 제안했습니다.`,
+      },
+    ],
+    techStack: ['Python', 'GPT-5.4 (OpenAI Responses API)', 'Claude Opus 4.7', 'MCP', 'FastMCP', 'FAISS', 'BM25', 'Slack Bot API', 'Notion API'],
   },
 ]
