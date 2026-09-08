@@ -115,6 +115,16 @@ export default function CV() {
           <h2 className={styles.sectionTitle}>Projects</h2>
           <div className={styles.entry}>
             <div className={styles.entryHeader}>
+              <strong>Selecy — In-house Multi-Agent AI Platform (Selectstar)</strong>
+            </div>
+            <p className={styles.text}>
+              Designed and built a five-layer in-house AI agent platform (Adapter Layer → Agent API Layer → Multi-Agent Workflow) that
+              unifies Slack Bot, HTTP API, and CLI entry points into a single execution core, automating internal information
+              retrieval and documentation. Enforced read-only access to Notion and Slack via an MCP-based tool whitelist for safe operation.
+            </p>
+          </div>
+          <div className={styles.entry}>
+            <div className={styles.entryHeader}>
               <strong>Game Agent Development for AI Ethics Education</strong>
             </div>
             <p className={styles.text}>
