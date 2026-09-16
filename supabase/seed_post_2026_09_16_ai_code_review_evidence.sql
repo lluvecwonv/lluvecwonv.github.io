@@ -1,0 +1,74 @@
+-- Prepared only: execute with an authorized database connection.
+INSERT INTO public.posts (slug, title, date, summary, tags, category, content, published, language)
+VALUES (
+  '2026-09-16-ai-code-review-evidence',
+  'AI 코드 리뷰, 패치만 읽어서는 충분하지 않다',
+  '2026-09-16',
+  'Medium 최신 AI 목록의 코드 리뷰 화두를 바탕으로, 기능 테스트·저장소 맥락·운영 증거까지 함께 검토해야 하는 이유를 세 편의 연구와 연결해 살펴본다.',
+  ARRAY['AI', 'Code Review', 'SWE-bench', 'SWE-agent', 'Software Engineering'],
+  'AI 소식',
+  $post$
+![AI 코드 패치와 테스트·배포 증거를 함께 검토하는 개념 이미지](/images/posts/2026-09-16-ai-code-review-evidence.png)
+
+## 오늘의 화두: 코드는 리뷰의 절반이다
+
+2026년 9월 16일 확인한 Medium의 Artificial Intelligence 최신 목록에는 Andras Ludanyi의 [The Code Is Only Half the Review](https://medium.com/@aludanyi/the-code-is-only-half-the-review-88b7cd61eab6)가 표시됐다. 목록의 상대 시간은 `Just now`였지만, 원문 본문과 절대 발행일은 확인하지 못했다. 따라서 당일 발행을 확정하거나 원문을 요약하지 않는다. 아래는 이 제목이 던지는 화두를 관련 연구로 검토한 독립적인 해설이다.
+
+AI가 만든 패치는 보기에는 깔끔할 수 있다. 그러나 함수 몇 줄이 자연스럽다는 사실과 실제 사용자 문제가 해결됐다는 사실은 다르다. 리뷰의 대상은 코드뿐 아니라 그 코드가 맞다는 근거여야 한다.
+
+## 1. 함수가 맞는 것과 제품이 맞는 것은 다르다
+
+코드 생성 연구의 대표적 평가셋 HumanEval은 함수 설명으로부터 생성한 프로그램의 기능적 정확성을 테스트한다. 실행 가능한 검증을 도입했다는 의미가 있지만, 작은 함수 문제의 성공이 실제 제품 전체의 안전성을 보장하지는 않는다. 이는 벤치마크를 폄하하는 주장이 아니라 평가 범위를 구분하는 것이다. [Chen et al., Evaluating Large Language Models Trained on Code](https://arxiv.org/abs/2107.03374)
+
+예를 들어 날짜 변환 함수가 테스트를 통과해도 시간대가 다른 사용자의 일정이 하루 밀릴 수 있다. 함수 단위 리뷰에는 올바른 반환값이 중요하지만, 제품 리뷰에는 입력이 들어오는 경로와 그 결과를 사용하는 화면까지 중요하다. 이 예시는 연구의 실험 결과가 아니라 실무적 설명이다.
+
+## 2. 저장소 맥락까지 연결해서 봐야 한다
+
+SWE-bench는 실제 GitHub 이슈와 대응하는 수정 사항을 바탕으로 소프트웨어 문제 해결을 평가한다. 원 논문은 12개 Python 저장소에서 수집한 2,294개 문제를 소개하며, 여러 함수·클래스·파일에 걸친 변경을 이해하고 조율해야 한다고 설명한다. 단독 코드 생성보다 넓은 평가 단위를 제공한다. 원 논문의 모델 성적을 현재 모델의 성능으로 읽어서는 안 된다. [Jimenez et al., SWE-bench](https://arxiv.org/abs/2310.06770)
+
+이 관점에서 리뷰어가 확인할 것은 “이 줄이 맞는가”뿐 아니라 “이 변경이 기존 계약을 깨뜨리는가”다. API 응답 형식, 오류 처리, 권한 확인, 데이터 마이그레이션이 연결된 변경이라면 작은 패치라도 영향 범위가 크다. 이 리뷰 원칙은 연구 설계에서 도출한 실무적 해석이다.
+
+## 3. AI에게도 검증 가능한 작업 환경이 필요하다
+
+SWE-agent는 에이전트가 저장소를 탐색하고 파일을 수정하며 테스트를 실행하는 인터페이스를 설계한다. 논문은 에이전트와 컴퓨터 사이의 인터페이스가 행동과 성능에 영향을 준다는 점을 연구한다. 따라서 프롬프트만 개선하는 접근과 작업 환경을 개선하는 접근을 구분할 필요가 있다. [Yang et al., SWE-agent](https://arxiv.org/abs/2405.15793)
+
+여기에서 얻는 실무적 시사점은 AI가 자신 있게 쓴 완료 문장보다 관찰 가능한 산출물을 요구하자는 것이다. 어떤 테스트를 실행했는지, 어떤 결과가 나왔는지, 실행하지 못한 검증이 무엇인지가 리뷰에 포함돼야 한다. 테스트 통과는 필요한 근거지만 모든 운영 위험을 없애는 충분조건은 아니다.
+
+## 리뷰에 붙일 작은 증거 묶음
+
+팀에 적용한다면 PR 설명에 다음 정보를 함께 적는 방식부터 시작할 수 있다. 아래는 논문이 직접 입증한 표준 절차가 아니라 이 글의 제안이다.
+
+- 변경 목적: 어떤 사용자 문제를 해결하며, 무엇은 범위 밖인가?
+- 재현과 검증: 수정 전 실패 조건과 수정 후 실행한 테스트는 무엇인가?
+- 영향 범위: 연결된 호출부·데이터·권한에 어떤 변화가 있는가?
+- 운영 준비: 배포 후 확인 지표와 문제가 생겼을 때 되돌릴 방법은 무엇인가?
+
+이렇게 정리하면 “테스트 완료”와 “테스트 실행 불가”를 혼동하지 않게 된다. 파일 저장, 커밋 생성, 원격 업로드, DB 반영도 각각 다른 완료 조건이다. 앞 단계가 끝났다고 뒤 단계가 자동으로 끝나는 것은 아니다.
+
+## 정리
+
+AI 시대의 코드 리뷰는 문법 검사에서 끝나지 않는다. 함수 테스트에서 저장소 수준 문제 해결로 평가 범위가 확장됐고, 에이전트가 검증 도구를 사용하는 환경도 연구 대상이 됐다. 이를 실무에 연결하면 리뷰의 중심 질문은 하나다. **이 코드가 맞다고 믿을 수 있는 실행 증거와 맥락이 있는가?**
+
+## 출처
+
+Medium 화두: Andras Ludanyi, [The Code Is Only Half the Review](https://medium.com/@aludanyi/the-code-is-only-half-the-review-88b7cd61eab6). 최신 목록 확인일 2026-09-16. 본문·절대 발행일 미확인.
+
+1. Chen et al. (2021), [Evaluating Large Language Models Trained on Code](https://arxiv.org/abs/2107.03374).
+2. Jimenez et al. (2023; ICLR 2024), [SWE-bench: Can Language Models Resolve Real-World GitHub Issues?](https://arxiv.org/abs/2310.06770).
+3. Yang et al. (2024), [SWE-agent: Agent-Computer Interfaces Enable Automated Software Engineering](https://arxiv.org/abs/2405.15793).
+
+이미지: AI 생성 개념 일러스트이며 실제 서비스 화면이나 연구 결과 도표가 아니다.
+$post$,
+  true,
+  'ko'
+)
+ON CONFLICT (slug) DO UPDATE SET
+  title = EXCLUDED.title,
+  date = EXCLUDED.date,
+  summary = EXCLUDED.summary,
+  tags = EXCLUDED.tags,
+  category = EXCLUDED.category,
+  content = EXCLUDED.content,
+  published = EXCLUDED.published,
+  language = EXCLUDED.language;
+
