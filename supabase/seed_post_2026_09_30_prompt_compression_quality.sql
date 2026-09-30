@@ -1,0 +1,57 @@
+-- Execute with an authorized database connection.
+INSERT INTO public.posts (slug, title, date, summary, tags, category, content, published, language)
+VALUES ('2026-09-30-prompt-compression-quality', '프롬프트는 길수록 좋을까: 압축보다 먼저 확인할 정보의 역할', '2026-09-30', 'Medium의 프롬프트 단축 화두를 Lost in the Middle과 LLMLingua 연구로 해설하고, 품질을 지키며 지시문을 정리하는 평가 방법을 제안한다.', ARRAY['AI','LLM','Prompt','Compression'], 'AI/개발', $post$
+![긴 지시문 카드가 필터를 통과해 핵심 카드로 정리되는 모습](/images/posts/2026-09-30-prompt-compression-quality.png)
+
+## 오늘의 Medium 화두
+
+2026년 9월 30일 확인한 Medium Artificial Intelligence 최신 목록에서 Viral Haria의 [I Cut an LLM Prompt by 60%. Accuracy Went Up.](https://medium.com/@viralharia0708/i-cut-an-llm-prompt-by-60-accuracy-went-up-4e5a056fe11c)가 `Just now`로 표시됐다. 제목과 공개 소개문은 지시를 더 많이 넣는 일이 항상 더 안정적인 답변으로 이어지는지 묻는다.
+
+원문 전체와 절대 발행일은 확인하지 못했다. 제목의 60% 및 정확도 향상은 이 글에서 검증한 실험 결과가 아니다. 아래는 공개된 화두를 출발점으로 관련 연구 두 편을 연결한 독립적인 해설이다.
+
+## 긴 입력을 받을 수 있다는 것과 잘 활용한다는 것
+
+Lost in the Middle은 여러 문서에서 답을 찾는 질문 응답과 키·값 검색 과제를 통해 정보의 위치가 결과에 미치는 영향을 조사했다. 연구 대상 모델들은 필요한 정보가 입력의 처음이나 끝에 있을 때보다 중간에 있을 때 성능이 떨어지는 경향을 보였다. [논문 1](https://arxiv.org/abs/2307.03172)
+
+이는 2023년 연구의 모델과 과제에서 관찰한 결과다. 모든 최신 모델에 같은 정도의 문제가 있다는 뜻도, 지시문을 짧게 만들면 반드시 정확도가 오른다는 증거도 아니다. 다만 입력 한도 안에 들어간 정보가 모두 똑같이 활용된다고 가정하지 말아야 한다는 평가상의 교훈은 남는다.
+
+실무적으로는 답에 꼭 필요한 조건이 반복 설명 속에 묻히는지 살펴볼 수 있다. 예를 들어 고객 문의를 분류하는 작업에서 분류 기준과 출력 형식은 필요하지만, 동일한 역할 설명을 여러 표현으로 반복하는 부분은 삭제 후보가 된다. 이 구분은 해당 논문의 실험 결과가 아니라 이 글의 설계 제안이다.
+
+## LLMLingua가 보여준 것은 무작정 삭제가 아니다
+
+LLMLingua는 토큰 예산을 관리하고 토큰 수준에서 반복적으로 내용을 압축하는 방법을 제안했다. 연구진은 네 가지 데이터셋에서 평가했으며, 특정 실험 조건에서 성능 손실을 작게 유지하면서 최대 20배 압축을 보고했다. [논문 2](https://arxiv.org/abs/2310.05736)
+
+여기서 중요한 점은 정보를 보존하기 위한 별도의 절차가 있다는 것이다. 사람이 지시문을 임의로 줄이는 작업과 연구의 압축 알고리즘을 동일하게 볼 수 없다. 논문의 최대 압축률을 자신의 서비스에 그대로 적용할 목표값으로 삼기도 어렵다.
+
+두 연구를 함께 읽으면 길이와 정보의 유용성을 분리해 생각할 수 있다. 긴 입력의 활용에는 위치가 영향을 줄 수 있고, 압축에는 남길 정보를 선택하는 문제가 따른다. 따라서 목표는 가장 짧은 프롬프트가 아니라 필요한 조건을 유지하면서 실제 업무 평가를 통과하는 프롬프트다.
+
+## 지시문을 정리할 때 비교할 세 가지
+
+다음 절차는 위 연구에서 착안한 실무 제안이며 직접 실행한 벤치마크 결과는 아니다.
+
+1. **원본을 기준선으로 고정한다.** 같은 모델과 설정으로 일반 사례, 예외 사례, 정보가 부족한 사례를 평가한다. 정확도뿐 아니라 형식 준수와 필수 조건 누락도 기록한다.
+2. **한 종류의 변경만 적용한다.** 먼저 반복 설명을 합치고, 다음에는 예시의 중복을 줄인다. 업무 규칙과 예외 조건은 삭제 전에 별도 평가 항목으로 만든다.
+3. **절감과 손실을 함께 본다.** 입력 토큰 수, 응답 시간, 재시도 횟수와 실패 사례를 나란히 비교한다. 프롬프트 수정에 쓴 예시와 최종 평가 예시는 분리한다.
+
+가령 배송 문의 분류 프롬프트에서 친절한 말투를 여러 번 강조하는 문장은 통합할 수 있다. 하지만 주문번호가 없을 때 추측하지 않는 조건까지 지우면 입력은 짧아져도 업무 품질이 나빠질 수 있다. 실제로 어느 문장을 없앨 수 있는지는 예시별 결과로 판단해야 한다.
+
+Medium의 이번 화두는 프롬프트를 덜 쓰자는 구호보다 더 구체적인 질문으로 이어진다. 남겨 둔 각 문장이 어떤 실패를 막고 있는가? 그 역할을 설명하고 검증할 수 있을 때, 길이를 줄이는 작업도 품질 개선 과정이 된다.
+
+## 출처
+
+Medium 화두: Viral Haria, [I Cut an LLM Prompt by 60%. Accuracy Went Up.](https://medium.com/@viralharia0708/i-cut-an-llm-prompt-by-60-accuracy-went-up-4e5a056fe11c). 최신 목록 확인일 2026-09-30. 전체 본문·절대 발행일 미확인.
+
+1. Liu et al. (2023), [Lost in the Middle: How Language Models Use Long Contexts](https://arxiv.org/abs/2307.03172).
+2. Jiang et al. (2023), [LLMLingua: Compressing Prompts for Accelerated Inference of Large Language Models](https://arxiv.org/abs/2310.05736).
+
+이미지: AI 생성 개념 일러스트이며 논문에 제시된 실제 구조도는 아니다.
+$post$, true, 'ko')
+ON CONFLICT (slug) DO UPDATE SET
+  title = EXCLUDED.title,
+  date = EXCLUDED.date,
+  summary = EXCLUDED.summary,
+  tags = EXCLUDED.tags,
+  category = EXCLUDED.category,
+  content = EXCLUDED.content,
+  published = EXCLUDED.published,
+  language = EXCLUDED.language;
